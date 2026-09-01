@@ -26,7 +26,7 @@ from genomics_1kg_boost_sensitivity import (load_loci, block_positions_in_order,
                                              DEFAULT_GAP_PCT, DEFAULT_PRIOR_P,
                                              REGION_HALFWIDTHS, RESULTS_DIR)
 
-OUT_DIR = os.path.join(os.path.dirname(__file__), "results_boost_sensitivity")
+OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results_boost_sensitivity")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 XI1_FIXED = 4.0

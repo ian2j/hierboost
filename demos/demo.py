@@ -22,7 +22,7 @@ from spatial_boost.weights import select_phi_by_region
 from spatial_boost.model import (fit_em, em_filter, gibbs_sampler, centroid_estimate,
                                   embfdr, select_kappa_by_embfdr)
 
-OUT = os.path.join(os.path.dirname(__file__), "figures")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures")
 os.makedirs(OUT, exist_ok=True)
 
 

@@ -21,7 +21,7 @@ runs on them.
 
 `paper/` contains a LaTeX draft (`main.tex`) launching the block-latent model
 on real 1000 Genomes Phase 3 data: ~10 well-characterized loci
-(`genomics_1kg_locus.py` drives each one -- fetch, LD-block, CV against
+(`applications/genomics/genomics_1kg_locus.py` drives each one -- fetch, LD-block, CV against
 standard baselines + SuSiE, full-data fit, JSON summary), benchmarked against
 SuSiE (Wang et al. 2020), the current standard for Bayesian fine-mapping.
 Per-locus results live in `results/*.json`; `paper/build_results_table.py`
@@ -70,7 +70,7 @@ from hierboost.model_selection import cross_val_score, cross_val_predict
 cross_val_score(reg, X, y, cv=5, coords=lag_index)             # purpose-built CV (see below)
 ```
 
-See `test_estimator.py` (main env) and `test_hierboost_jax.py`'s
+See `tests/test_estimator.py` (main env) and `tests/test_hierboost_jax.py`'s
 `test_estimator_classifier_ar1_decorrelate_predicts_held_out` (`.venv-jax`) for more
 complete worked examples of every `decorrelate`/`fit_method` combination.
 
@@ -173,20 +173,20 @@ sklearn's `cross_val_score`/`GridSearchCV` for this package's estimators.
   count). Wired into `estimator.py` as `marginal="copula"` (continuous branch only, i.e.
   every response family except Binomial, which routes through Chapter 4's discrete/JAX
   path and assumes the raw features are Binomial already). Validated first on a
-  controlled synthetic case (`copula_synthetic_validation.py`: recovers the true shared
+  controlled synthetic case (`validation/copula_synthetic_validation.py`: recovers the true shared
   latent factor markedly better than raw `gaussian_block_factor` as marginal distortion
   gets more severe, +0.24 to +0.45 correlation-with-truth), then on two real datasets —
-  `finance_copula_demo.py` (AAPL vs. other ETFs' own {return, dollar volume} activity
+  `demos/finance_copula_demo.py` (AAPL vs. other ETFs' own {return, dollar volume} activity
   pairs, motivated by the volume-volatility relation/Clark 1973 MDH: a real economic
   story, but neither raw nor copula generalizes to held-out AAPL return/volatility here —
   an honest negative result, though copula consistently overfits less) and
-  `uk_weather_copula_demo.py` (reusing the one domain already confirmed to carry real
+  `demos/uk_weather_copula_demo.py` (reusing the one domain already confirmed to carry real
   spatial signal — see project memory — extended with block-latent decorrelation for the
   first time: each station's {wet-day count, mm total} pair, predicting a held-out
   target station's count. Clean positive result: held-out Poisson deviance 0.43 (copula)
   vs. 0.61 (raw) vs. 0.92 (naive), corr(pred, actual) 0.76 vs. 0.62, and the top
   copula-favored stations are dominated by the physically nearest ones), and
-  `genomics_1kg_copula_demo.py` (back on hierboost's own origin domain, 1000 Genomes LD
+  `applications/genomics/genomics_1kg_copula_demo.py` (back on hierboost's own origin domain, 1000 Genomes LD
   blocks — LCT/SLC24A5/DARC, all three already-fetched real loci. A clean, theoretically
   interesting NEGATIVE result: copula, both the empirical/rank variant and a new
   `fit_parametric_marginal(..., "binom")` variant added for this test, slightly hurts CV
@@ -201,7 +201,7 @@ sklearn's `cross_val_score`/`GridSearchCV` for this package's estimators.
   decorrelate-agnostic (`check_ci_coverage`, `check_theta_calibration`): repeatedly
   simulate from a known ground truth, fit, and check whether the reported credible
   intervals/`theta_hat` are actually honest — a rigor check on a claim the practitioner
-  API already makes, not a new modeling capability. See `calibration_check.py` for the
+  API already makes, not a new modeling capability. See `validation/calibration_check.py` for the
   empirical study: the `decorrelate=None` baseline is well-calibrated (~95% coverage,
   ECE≈0.02), but `decorrelate="sar"` collapses to ~60% causal-effect coverage — the
   two-stage plug-in pipeline's stage-1 latent-estimation uncertainty never propagates
@@ -291,31 +291,40 @@ sklearn's `cross_val_score`/`GridSearchCV` for this package's estimators.
 - `simulate.py` — LD-correlated genotype simulator (AR(1)-in-space latent
   Gaussian), gene annotations, gene-proximity-weighted causal markers.
 
-**Demos & tests**
+**Demos, applications, validation & tests**
 
-- `demo.py` — GWAS Monte Carlo comparison + detailed walkthrough with plots in `figures/`.
-- `demo_nongenomic.py` — **proves the generalization**: the same `hierboost`
+Root scripts are sorted by purpose: `demos/` (framework demos on any domain),
+`applications/<domain>/` (genomics/predom/riemann-specific analyses, including
+several scripts that import a sibling in the same folder as a plain module — keep
+those co-located if you copy one out), `validation/` (calibration/coverage/efficiency
+studies, not part of the pytest suite), and `tests/` (the actual pytest suite). Each
+domain directory that already existed before this reorg (`earthquake_japan/`,
+`m6_backtest/`, `paper/`, `predom_*/`, `state_econ/`, `streamflow_delaware/`,
+`uk_weather/`) is untouched — only the loose top-level scripts were moved.
+
+- `demos/demo.py` — GWAS Monte Carlo comparison + detailed walkthrough with plots in `figures/`.
+- `demos/demo_nongenomic.py` — **proves the generalization**: the same `hierboost`
   core applied to a 2D sensor network (point groups, not genomic intervals) —
   zero genomics code involved.
-- `benchmark_efficiency.py` — dense vs rank-truncated timing at p=20,000 (~360x speedup).
-- `finance_demo.py`, `finance_factor_selection.py`, `finance_cross_sectional.py` —
+- `validation/benchmark_efficiency.py` — dense vs rank-truncated timing at p=20,000 (~360x speedup).
+- `demos/finance_demo.py`, `demos/finance_factor_selection.py`, `demos/finance_cross_sectional.py` —
   Chapter 4's *spatial* block-latent idea on real ETF/stock data (see below).
-- `temporal_demo.py` — the **temporal** block-latent idea (`state_space.py`) on real
+- `demos/temporal_demo.py` — the **temporal** block-latent idea (`state_space.py`) on real
   market data: several rolling-window return features of one stock, collinear for the
   same underlying reason LD-correlated SNPs are, decorrelated into one shared,
   AR(1)-smoothed "trend state" instead of one static factor per block.
-- `test_spatial_boost.py`, `test_hierboost.py` — sanity checks, run in the main env
+- `tests/test_spatial_boost.py`, `tests/test_hierboost.py` — sanity checks, run in the main env
   (includes `causal_affinity_1d`/`ar1_weight_matrix`/`state_space.py`/`spacetime.py`,
   the last with a K=1-degenerates-to-scalar-AR(1) consistency check and a 3-block
   synthetic spatial-coupling recovery test).
-- `test_spike_slab_glm.py` — Poisson/NB EM, EM-filtering, offsets, and `gibbs_sampler_nb`
+- `tests/test_spike_slab_glm.py` — Poisson/NB EM, EM-filtering, offsets, and `gibbs_sampler_nb`
   (coefficient + dispersion recovery). Main env.
-- `test_estimator.py` — `HierBoostClassifier`/`Regressor`/`CountRegressor`:
+- `tests/test_estimator.py` — `HierBoostClassifier`/`Regressor`/`CountRegressor`:
   no-decorrelate, `sar`/`ar1`/`star` decorrelate (Gaussian and count response alike),
   `em`/`em_filter`/`gibbs` fit methods, out-of-sample `predict`, `.summary()`,
   `.describe_blocks()`, `.save()`/`.load()`, `.get_params()`/clone, `cross_val_score`/
   `cross_val_predict`, and plotting smoke tests. Main env.
-- `test_hierboost_jax.py` — sanity checks for `latent.py` (SAR *and* `structure="ar1"`),
+- `tests/test_hierboost_jax.py` — sanity checks for `latent.py` (SAR *and* `structure="ar1"`),
   `joint.py`, and `HierBoostClassifier`'s binomial `decorrelate` path, run in `.venv-jax`.
 
 ## Installation & the functional API (manual control)
@@ -336,20 +345,20 @@ structure, direct access to the Gibbs sampler's raw draws, ...) instead of going
 ```bash
 # main environment (GWAS core, hierboost core, structure/relevance, estimator/viz)
 pip install -e .
-python3 test_spatial_boost.py
-python3 test_hierboost.py
-python3 test_spike_slab_glm.py
-python3 test_estimator.py
-python3 demo.py
-python3 demo_nongenomic.py
-python3 benchmark_efficiency.py     # slow (~5 min): dense vs rank-truncated
+python3 tests/test_spatial_boost.py
+python3 tests/test_hierboost.py
+python3 tests/test_spike_slab_glm.py
+python3 tests/test_estimator.py
+python3 demos/demo.py
+python3 demos/demo_nongenomic.py
+python3 validation/benchmark_efficiency.py     # slow (~5 min): dense vs rank-truncated
 
 # isolated environment (Chapter 4 latent model + joint inference + the
 # decorrelate="sar"/"ar1" binomial path of HierBoostClassifier)
 python3 -m virtualenv .venv-jax
 source .venv-jax/bin/activate
 pip install -e ".[jax]"
-python3 test_hierboost_jax.py
+python3 tests/test_hierboost_jax.py
 ```
 
 ```python
@@ -380,7 +389,7 @@ result_cont = fit_temporal_block_factor(X_block)   # (T, m) -> smoothed trend + 
 
 ## What the demos actually show
 
-**GWAS Monte Carlo comparison** (`demo.py`, 15 replicates, p=1200, n=60, m_causal=8):
+**GWAS Monte Carlo comparison** (`demos/demo.py`, 15 replicates, p=1200, n=60, m_causal=8):
 
 |                  | single-SNP | SB, no boost | SB, gene boost |
 |------------------|-----------:|-------------:|---------------:|
@@ -393,14 +402,14 @@ misspecified prior it can slightly *hurt*, spending prior mass boosting the
 wrong markers. The model's edge is in ranking (AUC), not loud hard calls: the
 centroid estimator selects very few markers at conventional γ.
 
-**Non-genomic generalization** (`demo_nongenomic.py`, 2D sensor network): a
+**Non-genomic generalization** (`demos/demo_nongenomic.py`, 2D sensor network): a
 marginal correlation test gets AUC 0.51 (chance), joint spike-and-slab without
 the zone boost gets 0.63, and *with* the zone-proximity boost gets **0.89** —
 using the identical `hierboost` machinery as the GWAS demo, just with
 `gaussian_affinity_points` (2D centroids) instead of `gaussian_affinity_1d`
 (1D genomic intervals).
 
-**Chapter 4 modernized** (`test_hierboost_jax.py`): on a synthetic
+**Chapter 4 modernized** (`tests/test_hierboost_jax.py`): on a synthetic
 LD-correlated block dataset with one causal block, the autodiff-fit latent
 block model assigns the causal block θ̂ ≈ 1.0 (vs ≈0.04 for the others) and
 recovers a block-level latent correlating 0.5–0.8 with the true underlying

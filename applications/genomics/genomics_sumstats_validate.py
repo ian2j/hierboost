@@ -27,7 +27,7 @@ from hierboost.spike_slab_gaussian import fit_em_gaussian, em_filter_gaussian, p
 from hierboost.sumstats import fit_em_sumstats, em_filter_sumstats, summarize_by_block
 
 LCT_PATH = os.path.expanduser("~/genomics_1kg/lct_region.npz")
-RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results")
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results")
 COMMON_HYPERPARAMS = dict(xi0=-1.5, xi1=0.0, kappa=80.0, nu=1.0, lam=1.0)
 
 

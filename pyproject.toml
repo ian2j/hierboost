@@ -23,10 +23,11 @@ dependencies = [
 # SEPARATE virtualenv (see README's .venv-jax instructions), never alongside the base
 # install.
 jax = ["jax", "jaxlib", "numpyro"]
-# Only needed to run the demo scripts (finance_demo.py, temporal_demo.py, ...), not the
-# installable package itself.
+# Only needed to run the demo scripts (demos/finance_demo.py, demos/temporal_demo.py,
+# ...), not the installable package itself.
 demos = ["pandas", "yfinance", "statsmodels", "pysusie"]
-# genomics_1kg_fetch.py needs pysam for remote region-restricted VCF access; kept as its
+# applications/genomics/genomics_1kg_fetch.py needs pysam for remote region-restricted
+# VCF access; kept as its
 # own extra (installed into .venv-genomics in this project) since pysam's htslib build
 # has caused environment friction before -- see README.
 genomics = ["pysam", "pandas"]

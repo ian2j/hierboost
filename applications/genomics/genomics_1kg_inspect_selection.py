@@ -12,8 +12,8 @@ import numpy as np
 from genomics_1kg_demo import build_blocks, full_data_fit
 from hierboost.blocks import block_membership_lists
 
-RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results")
-OUT_DIR = os.path.join(os.path.dirname(__file__), "results_selection")
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results")
+OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results_selection")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 NARRATIVE_ORDER = ["lct", "slc24a5", "darc", "edar", "herc2_oca2", "abcc11",

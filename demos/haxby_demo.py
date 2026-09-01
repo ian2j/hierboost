@@ -48,7 +48,7 @@ from hierboost.blocks import block_membership_lists
 from hierboost.factor import gaussian_block_factor, project_block_factor
 from hierboost.spike_slab import em_filter
 
-OUT = os.path.join(os.path.dirname(__file__), "figures")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures")
 os.makedirs(OUT, exist_ok=True)
 
 XI0 = np.log(0.10 / 0.90)   # prior belief ~10% of spatial blocks are truly discriminative

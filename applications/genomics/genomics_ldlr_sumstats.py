@@ -40,8 +40,9 @@ from hierboost.blocks import threshold_blocks_1d
 from hierboost.sumstats import em_filter_sumstats, summarize_by_block, effective_rank
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-GENOMICS_VENV_PY = os.path.join(HERE, ".venv-genomics", "bin", "python")
-RESULTS_DIR = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))
+GENOMICS_VENV_PY = os.path.join(ROOT, ".venv-genomics", "bin", "python")
+RESULTS_DIR = os.path.join(ROOT, "results")
 GLGC_PATH = os.path.expanduser("~/genomics_1kg/glgc_ldl_eur_ldlr.npz")
 KG_PATH = os.path.expanduser("~/genomics_1kg/ldlr_eur_region.npz")
 

@@ -21,7 +21,7 @@ from sklearn.metrics import roc_auc_score
 from hierboost.kernels import gaussian_affinity_points, combine_affinity_with_relevance
 from hierboost.spike_slab import em_filter, gibbs_sampler, centroid_estimate
 
-OUT = os.path.join(os.path.dirname(__file__), "figures")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures")
 os.makedirs(OUT, exist_ok=True)
 
 

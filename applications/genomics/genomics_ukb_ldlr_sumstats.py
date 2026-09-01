@@ -77,8 +77,8 @@ import pandas as pd
 from hierboost.blocks import threshold_blocks_1d
 from hierboost.sumstats import em_filter_sumstats, summarize_by_block, effective_rank
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-RESULTS_DIR = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+RESULTS_DIR = os.path.join(ROOT, "results")
 KG_PATH = os.path.expanduser("~/genomics_1kg/ldlr_eur_region.npz")  # reused, not refetched
 PANEL_PATH = os.path.expanduser("~/genomics_1kg/panel.txt")
 UKB_PATH = os.path.expanduser("~/genomics_1kg/ukb_ldl_irnt_ldlr.npz")

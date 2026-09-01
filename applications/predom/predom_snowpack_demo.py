@@ -65,11 +65,11 @@ from sklearn.preprocessing import StandardScaler
 from hierboost.kernels import resolve_affinity
 from hierboost.spike_slab_gaussian import em_filter_gaussian
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(HERE, "predom_snowpack", "data")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_DIR = os.path.join(ROOT, "predom_snowpack", "data")
 RAW_JSON = os.path.join(DATA_DIR, "san_juan_wteq_raw.json")
 PROCESSED_NPZ = os.path.join(DATA_DIR, "daily_swe.npz")
-RESULTS_JSON = os.path.join(HERE, "results", "predom_snowpack.json")
+RESULTS_JSON = os.path.join(ROOT, "results", "predom_snowpack.json")
 USER_AGENT = "hierboost-research/0.1 (research use; contact: ian2johnston@gmail.com)"
 
 AWDB_BASE = "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data"

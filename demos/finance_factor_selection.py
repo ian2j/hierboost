@@ -21,7 +21,7 @@ from hierboost.factor import gaussian_block_factor
 from hierboost.spike_slab_gaussian import em_filter_gaussian, gibbs_sampler_gaussian
 from hierboost.spike_slab import centroid_estimate
 
-OUT = os.path.join(os.path.dirname(__file__), "figures")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures")
 os.makedirs(OUT, exist_ok=True)
 
 TARGET = "AAPL"

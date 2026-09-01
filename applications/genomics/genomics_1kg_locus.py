@@ -33,10 +33,11 @@ from genomics_1kg_demo import (load_data, build_blocks, cross_validate, full_dat
                                 susie_full_fit, make_figure)
 from hierboost.blocks import block_membership_lists
 
-RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results")
-os.makedirs(RESULTS_DIR, exist_ok=True)
 HERE = os.path.dirname(os.path.abspath(__file__))
-GENOMICS_VENV_PY = os.path.join(HERE, ".venv-genomics", "bin", "python")
+ROOT = os.path.dirname(os.path.dirname(HERE))
+RESULTS_DIR = os.path.join(ROOT, "results")
+os.makedirs(RESULTS_DIR, exist_ok=True)
+GENOMICS_VENV_PY = os.path.join(ROOT, ".venv-genomics", "bin", "python")
 
 
 def run_locus(label, chrom, start, end, pop_a, pop_b, causal_pos, causal_rsid,

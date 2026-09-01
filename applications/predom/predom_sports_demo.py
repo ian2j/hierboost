@@ -68,7 +68,7 @@ from hierboost.estimator import HierBoostRegressor
 from hierboost.structure import blocks_from_correlation_threshold
 
 DATA_DIR = os.path.expanduser("~/nba_sports_data")
-RESULTS_PATH = os.path.join(os.path.dirname(__file__), "results", "predom_sports.json")
+RESULTS_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results", "predom_sports.json")
 
 TRAIN_SEASON = "2022-23"
 TEST_SEASON = "2023-24"

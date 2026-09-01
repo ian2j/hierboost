@@ -81,10 +81,10 @@ from hierboost.kernels import causal_affinity_1d
 from hierboost.spike_slab_gaussian import em_filter_gaussian
 from hierboost.state_space import fit_temporal_block_factor
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-CACHE_DIR = os.path.join(HERE, "streamflow_delaware", "data")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CACHE_DIR = os.path.join(ROOT, "streamflow_delaware", "data")
 CACHE_PATH = os.path.join(CACHE_DIR, "raw_discharge.json")
-RESULTS_PATH = os.path.join(HERE, "results", "predom_streamflow.json")
+RESULTS_PATH = os.path.join(ROOT, "results", "predom_streamflow.json")
 USER_AGENT = "hierboost-research/0.1 (research use; contact: ian2johnston@gmail.com)"
 
 # site_no -> (name, lat, lon, drainage_area_sqmi)

@@ -49,7 +49,7 @@ from hierboost.structure import blocks_from_correlation_threshold
 
 CORR_RHO = 0.2
 
-OUT = os.path.join(os.path.dirname(__file__), "figures")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures")
 os.makedirs(OUT, exist_ok=True)
 DATA_DIR = os.path.expanduser("~/movielens_data")
 ML100K_URL = "https://files.grouplens.org/datasets/movielens/ml-100k.zip"

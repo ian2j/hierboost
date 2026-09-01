@@ -79,10 +79,10 @@ from sklearn.preprocessing import StandardScaler
 from hierboost.kernels import resolve_affinity
 from hierboost.spike_slab_gaussian import em_filter_gaussian
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(HERE, "predom_airquality", "data")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_DIR = os.path.join(ROOT, "predom_airquality", "data")
 PROCESSED_NPZ = os.path.join(DATA_DIR, "daily_pm25.npz")
-RESULTS_JSON = os.path.join(HERE, "results", "predom_airquality.json")
+RESULTS_JSON = os.path.join(ROOT, "results", "predom_airquality.json")
 USER_AGENT = "hierboost-research/0.1 (research use; contact: ian2johnston@gmail.com)"
 
 PARAMETER_CODE = 88101  # PM2.5 FRM/FEM Mass

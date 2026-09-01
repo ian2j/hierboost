@@ -90,10 +90,10 @@ from sklearn.metrics import r2_score
 from hierboost.kernels import resolve_affinity
 from hierboost.spike_slab_gaussian import em_filter_gaussian
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-CACHE_DIR = os.path.join(HERE, "predom_traffic", "data")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CACHE_DIR = os.path.join(ROOT, "predom_traffic", "data")
 CACHE_PATH = os.path.join(CACHE_DIR, "raw_speeds.json")
-RESULTS_PATH = os.path.join(HERE, "results", "predom_traffic.json")
+RESULTS_PATH = os.path.join(ROOT, "results", "predom_traffic.json")
 USER_AGENT = "hierboost-research/0.1 (research use; contact: ian2johnston@gmail.com)"
 BASE_URL = "https://data.cityofnewyork.us/resource/i4gi-tjb9.json"
 START_DATE = "2026-06-01T00:00:00"

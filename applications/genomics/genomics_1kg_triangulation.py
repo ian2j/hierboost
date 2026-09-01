@@ -37,9 +37,9 @@ from genomics_1kg_demo import (load_data, build_blocks, full_data_fit, susie_ful
 from hierboost.blocks import block_membership_lists
 from hierboost.spike_slab import em_filter
 
-RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results_triangulation")
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results_triangulation")
 os.makedirs(RESULTS_DIR, exist_ok=True)
-MAIN_RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results")
+MAIN_RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results")
 
 
 # ---------------------------------------------------------------------------

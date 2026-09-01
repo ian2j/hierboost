@@ -57,7 +57,7 @@ from hierboost.blocks import block_membership_lists
 from hierboost.factor import gaussian_block_factor, project_block_factor
 from hierboost.spike_slab_gaussian import em_filter_gaussian
 
-OUT = os.path.join(os.path.dirname(__file__), "figures")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures")
 os.makedirs(OUT, exist_ok=True)
 
 TARGET_A = "AAPL"   # Technology -- the stock the block latent is fit/validated on

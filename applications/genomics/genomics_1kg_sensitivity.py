@@ -37,8 +37,8 @@ from genomics_1kg_demo import (load_data, build_blocks, cross_validate_hierboost
                                 full_data_fit)
 from hierboost.blocks import block_membership_lists
 
-RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results")
-SENS_DIR = os.path.join(os.path.dirname(__file__), "results_sensitivity")
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results")
+SENS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results_sensitivity")
 os.makedirs(SENS_DIR, exist_ok=True)
 
 DEFAULT_KAPPA = 100.0

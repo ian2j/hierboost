@@ -38,7 +38,7 @@ from hierboost.blocks import block_membership_lists
 from hierboost.factor import gaussian_block_factor, project_block_factor
 from hierboost.spike_slab import em_filter, fit_em
 
-OUT = os.path.join(os.path.dirname(__file__), "figures")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "figures")
 os.makedirs(OUT, exist_ok=True)
 
 CATEGORIES = ["comp.sys.mac.hardware", "comp.sys.ibm.pc.hardware"]

@@ -64,8 +64,8 @@ from hierboost.structure import blocks_from_correlation_threshold
 from hierboost.blocks import block_membership_lists
 from hierboost.spike_slab_gaussian import em_filter_gaussian
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-RESULTS_DIR = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+RESULTS_DIR = os.path.join(ROOT, "results")
 os.makedirs(RESULTS_DIR, exist_ok=True)
 CACHE_PATH = os.path.join(RESULTS_DIR, "wikipedia_pageviews_cache.json")
 OUT_PATH = os.path.join(RESULTS_DIR, "predom_wikipedia.json")

@@ -35,8 +35,8 @@ from genomics_1kg_demo import (load_data, build_blocks, cross_validate_hierboost
 from hierboost.blocks import block_membership_lists
 from hierboost.kernels import gaussian_affinity_1d, combine_affinity_with_relevance
 
-RESULTS_DIR = os.path.join(os.path.dirname(__file__), "results")
-OUT_DIR = os.path.join(os.path.dirname(__file__), "results_boost_sensitivity")
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results")
+OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results_boost_sensitivity")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 DEFAULT_KAPPA = 100.0

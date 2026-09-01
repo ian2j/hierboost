@@ -57,7 +57,7 @@ KAPPA_SWEEP = [1.0, 3.0, 10.0, 30.0, 100.0, 300.0, 1000.0]
 XI0, XI1, NU, LAM = -2.0, 2.0, 1.0, 1.0  # fixed, disclosed prior range (not tuned here)
 FILTER_FRAC = 0.2
 SEED = 0
-OUT_JSON = os.path.join(os.path.dirname(__file__), "results", "predom_goldetf.json")
+OUT_JSON = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "results", "predom_goldetf.json")
 
 
 # ---------------------------------------------------------------------------------
