@@ -1,0 +1,542 @@
+48 periods total (12 original M6 + 36 extended): 2022-03-07 .. 2025-11-06
+
+=== Period 1/48 [M6]: 2022-03-07 -> 2022-04-04 (momentum_sign=-0.100, from 0 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 36s elapsed
+    ...60/100 assets fit, 57s elapsed
+    ...80/100 assets fit, 75s elapsed
+    ...100/100 assets fit, 97s elapsed
+  fit+simulate: 97s
+  shrinkage blend=0.250 (from 0 prior)
+  RPS=0.1585  IR=-1.2015  n_assets_scored=100
+
+=== Period 2/48 [M6]: 2022-04-04 -> 2022-05-02 (momentum_sign=-0.207, from 1 prior) ===
+    ...20/100 assets fit, 21s elapsed
+    ...40/100 assets fit, 37s elapsed
+    ...60/100 assets fit, 56s elapsed
+    ...80/100 assets fit, 72s elapsed
+    ...100/100 assets fit, 89s elapsed
+  fit+simulate: 89s
+  shrinkage blend=0.312 (from 1 prior)
+  RPS=0.1517  IR=3.7463  n_assets_scored=90
+
+=== Period 3/48 [M6]: 2022-05-02 -> 2022-05-31 (momentum_sign=-0.230, from 2 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 69s elapsed
+    ...100/100 assets fit, 87s elapsed
+  fit+simulate: 87s
+  shrinkage blend=0.270 (from 2 prior)
+  RPS=0.1539  IR=6.1493  n_assets_scored=90
+
+=== Period 4/48 [M6]: 2022-05-31 -> 2022-06-27 (momentum_sign=-0.226, from 3 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 36s elapsed
+    ...60/100 assets fit, 57s elapsed
+    ...80/100 assets fit, 76s elapsed
+    ...100/100 assets fit, 95s elapsed
+  fit+simulate: 95s
+  shrinkage blend=0.258 (from 3 prior)
+  RPS=0.1543  IR=0.5632  n_assets_scored=100
+
+=== Period 5/48 [M6]: 2022-06-27 -> 2022-07-25 (momentum_sign=-0.218, from 4 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 36s elapsed
+    ...60/100 assets fit, 54s elapsed
+    ...80/100 assets fit, 74s elapsed
+    ...100/100 assets fit, 95s elapsed
+  fit+simulate: 95s
+  shrinkage blend=0.250 (from 4 prior)
+  RPS=0.1615  IR=4.1094  n_assets_scored=100
+
+=== Period 6/48 [M6]: 2022-07-25 -> 2022-08-22 (momentum_sign=-0.213, from 5 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 36s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 71s elapsed
+    ...100/100 assets fit, 89s elapsed
+  fit+simulate: 89s
+  shrinkage blend=0.306 (from 5 prior)
+  RPS=0.1558  IR=2.1844  n_assets_scored=100
+
+=== Period 7/48 [M6]: 2022-08-22 -> 2022-09-19 (momentum_sign=-0.186, from 6 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 52s elapsed
+    ...80/100 assets fit, 71s elapsed
+    ...100/100 assets fit, 89s elapsed
+  fit+simulate: 89s
+  shrinkage blend=0.317 (from 6 prior)
+  RPS=0.1522  IR=3.2497  n_assets_scored=91
+
+=== Period 8/48 [M6]: 2022-09-19 -> 2022-10-17 (momentum_sign=-0.174, from 7 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 52s elapsed
+    ...80/100 assets fit, 69s elapsed
+    ...100/100 assets fit, 86s elapsed
+  fit+simulate: 86s
+  shrinkage blend=0.295 (from 7 prior)
+  RPS=0.1580  IR=3.1792  n_assets_scored=91
+
+=== Period 9/48 [M6]: 2022-10-17 -> 2022-11-14 (momentum_sign=-0.159, from 8 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 51s elapsed
+    ...80/100 assets fit, 69s elapsed
+    ...100/100 assets fit, 88s elapsed
+  fit+simulate: 88s
+  shrinkage blend=0.314 (from 8 prior)
+  RPS=0.1636  IR=-2.7713  n_assets_scored=100
+
+=== Period 10/48 [M6]: 2022-11-14 -> 2022-12-12 (momentum_sign=-0.145, from 9 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 54s elapsed
+    ...80/100 assets fit, 72s elapsed
+    ...100/100 assets fit, 90s elapsed
+  fit+simulate: 90s
+  shrinkage blend=0.362 (from 9 prior)
+  RPS=0.1557  IR=-0.2888  n_assets_scored=99
+
+=== Period 11/48 [M6]: 2022-12-12 -> 2023-01-09 (momentum_sign=-0.128, from 10 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 72s elapsed
+    ...100/100 assets fit, 92s elapsed
+  fit+simulate: 92s
+  shrinkage blend=0.365 (from 10 prior)
+  RPS=0.1583  IR=2.4959  n_assets_scored=99
+
+=== Period 12/48 [M6]: 2023-01-09 -> 2023-02-02 (momentum_sign=-0.114, from 11 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 71s elapsed
+    ...100/100 assets fit, 88s elapsed
+  fit+simulate: 88s
+  shrinkage blend=0.382 (from 11 prior)
+  RPS=0.1709  IR=-9.1959  n_assets_scored=99
+
+=== Period 13/48 [extended-yr1]: 2023-02-02 -> 2023-03-02 (momentum_sign=-0.097, from 12 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 52s elapsed
+    ...80/100 assets fit, 69s elapsed
+    ...100/100 assets fit, 88s elapsed
+  fit+simulate: 88s
+  shrinkage blend=0.423 (from 12 prior)
+  RPS=0.1597  IR=-4.5073  n_assets_scored=98
+
+=== Period 14/48 [extended-yr1]: 2023-03-02 -> 2023-03-30 (momentum_sign=-0.105, from 13 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 71s elapsed
+    ...100/100 assets fit, 89s elapsed
+  fit+simulate: 89s
+  shrinkage blend=0.441 (from 13 prior)
+  RPS=0.1637  IR=-2.2780  n_assets_scored=98
+
+=== Period 15/48 [extended-yr1]: 2023-03-30 -> 2023-04-27 (momentum_sign=-0.118, from 14 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.474 (from 14 prior)
+  RPS=0.1573  IR=-0.5793  n_assets_scored=98
+
+=== Period 16/48 [extended-yr1]: 2023-04-27 -> 2023-05-25 (momentum_sign=-0.104, from 15 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 68s elapsed
+    ...100/100 assets fit, 85s elapsed
+  fit+simulate: 85s
+  shrinkage blend=0.469 (from 15 prior)
+  RPS=0.1554  IR=0.8623  n_assets_scored=98
+
+=== Period 17/48 [extended-yr1]: 2023-05-25 -> 2023-06-22 (momentum_sign=-0.112, from 16 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 52s elapsed
+    ...80/100 assets fit, 69s elapsed
+    ...100/100 assets fit, 87s elapsed
+  fit+simulate: 87s
+  shrinkage blend=0.455 (from 16 prior)
+  RPS=0.1585  IR=11.4912  n_assets_scored=98
+
+=== Period 18/48 [extended-yr1]: 2023-06-22 -> 2023-07-20 (momentum_sign=-0.102, from 17 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 70s elapsed
+    ...100/100 assets fit, 88s elapsed
+  fit+simulate: 88s
+  shrinkage blend=0.463 (from 17 prior)
+  RPS=0.1530  IR=3.6277  n_assets_scored=98
+
+=== Period 19/48 [extended-yr1]: 2023-07-20 -> 2023-08-17 (momentum_sign=-0.088, from 18 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 52s elapsed
+    ...80/100 assets fit, 69s elapsed
+    ...100/100 assets fit, 87s elapsed
+  fit+simulate: 87s
+  shrinkage blend=0.440 (from 18 prior)
+  RPS=0.1579  IR=-3.2994  n_assets_scored=98
+
+=== Period 20/48 [extended-yr1]: 2023-08-17 -> 2023-09-14 (momentum_sign=-0.088, from 19 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 36s elapsed
+    ...60/100 assets fit, 54s elapsed
+    ...80/100 assets fit, 73s elapsed
+    ...100/100 assets fit, 93s elapsed
+  fit+simulate: 93s
+  shrinkage blend=0.443 (from 19 prior)
+  RPS=0.1537  IR=6.0160  n_assets_scored=98
+
+=== Period 21/48 [extended-yr1]: 2023-09-14 -> 2023-10-12 (momentum_sign=-0.091, from 20 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 31s elapsed
+    ...60/100 assets fit, 47s elapsed
+    ...80/100 assets fit, 63s elapsed
+    ...100/100 assets fit, 79s elapsed
+  fit+simulate: 79s
+  shrinkage blend=0.433 (from 20 prior)
+  RPS=0.1533  IR=1.2060  n_assets_scored=98
+
+=== Period 22/48 [extended-yr1]: 2023-10-12 -> 2023-11-09 (momentum_sign=-0.084, from 21 prior) ===
+    ...20/100 assets fit, 15s elapsed
+    ...40/100 assets fit, 30s elapsed
+    ...60/100 assets fit, 46s elapsed
+    ...80/100 assets fit, 63s elapsed
+    ...100/100 assets fit, 80s elapsed
+  fit+simulate: 80s
+  shrinkage blend=0.423 (from 21 prior)
+  RPS=0.1595  IR=-0.5451  n_assets_scored=98
+
+=== Period 23/48 [extended-yr1]: 2023-11-09 -> 2023-12-07 (momentum_sign=-0.088, from 22 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 48s elapsed
+    ...80/100 assets fit, 65s elapsed
+    ...100/100 assets fit, 82s elapsed
+  fit+simulate: 82s
+  shrinkage blend=0.434 (from 22 prior)
+  RPS=0.1584  IR=3.3631  n_assets_scored=98
+
+=== Period 24/48 [extended-yr1]: 2023-12-07 -> 2024-01-04 (momentum_sign=-0.081, from 23 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.440 (from 23 prior)
+  RPS=0.1628  IR=0.5655  n_assets_scored=98
+
+=== Period 25/48 [extended-yr2]: 2024-01-04 -> 2024-02-01 (momentum_sign=-0.073, from 24 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 49s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.457 (from 24 prior)
+  RPS=0.1477  IR=7.7348  n_assets_scored=98
+
+=== Period 26/48 [extended-yr2]: 2024-02-01 -> 2024-02-29 (momentum_sign=-0.071, from 25 prior) ===
+    ...20/100 assets fit, 15s elapsed
+    ...40/100 assets fit, 31s elapsed
+    ...60/100 assets fit, 49s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 82s elapsed
+  fit+simulate: 82s
+  shrinkage blend=0.441 (from 25 prior)
+  RPS=0.1539  IR=4.8837  n_assets_scored=98
+
+=== Period 27/48 [extended-yr2]: 2024-02-29 -> 2024-03-28 (momentum_sign=-0.061, from 26 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 31s elapsed
+    ...60/100 assets fit, 48s elapsed
+    ...80/100 assets fit, 64s elapsed
+    ...100/100 assets fit, 81s elapsed
+  fit+simulate: 81s
+  shrinkage blend=0.433 (from 26 prior)
+  RPS=0.1563  IR=2.9554  n_assets_scored=98
+
+=== Period 28/48 [extended-yr2]: 2024-03-28 -> 2024-04-25 (momentum_sign=-0.054, from 27 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 48s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 84s elapsed
+  fit+simulate: 84s
+  shrinkage blend=0.432 (from 27 prior)
+  RPS=0.1699  IR=-4.5674  n_assets_scored=98
+
+=== Period 29/48 [extended-yr2]: 2024-04-25 -> 2024-05-23 (momentum_sign=-0.042, from 28 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.450 (from 28 prior)
+  RPS=0.1564  IR=4.7444  n_assets_scored=98
+
+=== Period 30/48 [extended-yr2]: 2024-05-23 -> 2024-06-20 (momentum_sign=-0.042, from 29 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 48s elapsed
+    ...80/100 assets fit, 65s elapsed
+    ...100/100 assets fit, 81s elapsed
+  fit+simulate: 81s
+  shrinkage blend=0.452 (from 29 prior)
+  RPS=0.1544  IR=1.2208  n_assets_scored=98
+
+=== Period 31/48 [extended-yr2]: 2024-06-20 -> 2024-07-18 (momentum_sign=-0.040, from 30 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 49s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.447 (from 30 prior)
+  RPS=0.1564  IR=-2.1405  n_assets_scored=98
+
+=== Period 32/48 [extended-yr2]: 2024-07-18 -> 2024-08-15 (momentum_sign=-0.048, from 31 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 48s elapsed
+    ...80/100 assets fit, 65s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.446 (from 31 prior)
+  RPS=0.1608  IR=-1.8493  n_assets_scored=98
+
+=== Period 33/48 [extended-yr2]: 2024-08-15 -> 2024-09-12 (momentum_sign=-0.047, from 32 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 49s elapsed
+    ...80/100 assets fit, 67s elapsed
+    ...100/100 assets fit, 84s elapsed
+  fit+simulate: 84s
+  shrinkage blend=0.456 (from 32 prior)
+  RPS=0.1528  IR=0.7892  n_assets_scored=98
+
+=== Period 34/48 [extended-yr2]: 2024-09-12 -> 2024-10-10 (momentum_sign=-0.047, from 33 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 67s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.443 (from 33 prior)
+  RPS=0.1577  IR=-1.3033  n_assets_scored=98
+
+=== Period 35/48 [extended-yr2]: 2024-10-10 -> 2024-11-07 (momentum_sign=-0.053, from 34 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 67s elapsed
+    ...100/100 assets fit, 84s elapsed
+  fit+simulate: 84s
+  shrinkage blend=0.445 (from 34 prior)
+  RPS=0.1471  IR=5.1957  n_assets_scored=98
+
+=== Period 36/48 [extended-yr2]: 2024-11-07 -> 2024-12-05 (momentum_sign=-0.053, from 35 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 31s elapsed
+    ...60/100 assets fit, 49s elapsed
+    ...80/100 assets fit, 67s elapsed
+    ...100/100 assets fit, 85s elapsed
+  fit+simulate: 85s
+  shrinkage blend=0.433 (from 35 prior)
+  RPS=0.1516  IR=8.5083  n_assets_scored=98
+
+=== Period 37/48 [extended-yr3]: 2024-12-05 -> 2025-01-02 (momentum_sign=-0.043, from 36 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 49s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 84s elapsed
+  fit+simulate: 84s
+  shrinkage blend=0.422 (from 36 prior)
+  RPS=0.1625  IR=-0.7689  n_assets_scored=98
+
+=== Period 38/48 [extended-yr3]: 2025-01-02 -> 2025-01-30 (momentum_sign=-0.043, from 37 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 48s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.434 (from 37 prior)
+  RPS=0.1555  IR=5.2146  n_assets_scored=98
+
+=== Period 39/48 [extended-yr3]: 2025-01-30 -> 2025-02-27 (momentum_sign=-0.045, from 38 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 32s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  shrinkage blend=0.433 (from 38 prior)
+  RPS=0.1575  IR=2.1694  n_assets_scored=98
+
+=== Period 40/48 [extended-yr3]: 2025-02-27 -> 2025-03-27 (momentum_sign=-0.046, from 39 prior) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 36s elapsed
+    ...60/100 assets fit, 55s elapsed
+    ...80/100 assets fit, 73s elapsed
+    ...100/100 assets fit, 91s elapsed
+  fit+simulate: 91s
+  shrinkage blend=0.435 (from 39 prior)
+  RPS=0.1557  IR=-3.1393  n_assets_scored=98
+
+=== Period 41/48 [extended-yr3]: 2025-03-27 -> 2025-04-24 (momentum_sign=-0.041, from 40 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 52s elapsed
+    ...80/100 assets fit, 71s elapsed
+    ...100/100 assets fit, 88s elapsed
+  fit+simulate: 88s
+  shrinkage blend=0.434 (from 40 prior)
+  RPS=0.1595  IR=0.5607  n_assets_scored=98
+
+=== Period 42/48 [extended-yr3]: 2025-04-24 -> 2025-05-22 (momentum_sign=-0.040, from 41 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 37s elapsed
+    ...60/100 assets fit, 55s elapsed
+    ...80/100 assets fit, 75s elapsed
+    ...100/100 assets fit, 93s elapsed
+  fit+simulate: 93s
+  shrinkage blend=0.440 (from 41 prior)
+  RPS=0.1583  IR=-2.5822  n_assets_scored=98
+
+=== Period 43/48 [extended-yr3]: 2025-05-22 -> 2025-06-19 (momentum_sign=-0.040, from 42 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 71s elapsed
+    ...100/100 assets fit, 89s elapsed
+  fit+simulate: 89s
+  shrinkage blend=0.441 (from 42 prior)
+  RPS=0.1570  IR=-2.7141  n_assets_scored=98
+
+=== Period 44/48 [extended-yr3]: 2025-06-19 -> 2025-07-17 (momentum_sign=-0.042, from 43 prior) ===
+    ...20/100 assets fit, 19s elapsed
+    ...40/100 assets fit, 37s elapsed
+    ...60/100 assets fit, 55s elapsed
+    ...80/100 assets fit, 73s elapsed
+    ...100/100 assets fit, 92s elapsed
+  fit+simulate: 92s
+  shrinkage blend=0.442 (from 43 prior)
+  RPS=0.1526  IR=0.0031  n_assets_scored=98
+
+=== Period 45/48 [extended-yr3]: 2025-07-17 -> 2025-08-14 (momentum_sign=-0.041, from 44 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 54s elapsed
+    ...80/100 assets fit, 74s elapsed
+    ...100/100 assets fit, 93s elapsed
+  fit+simulate: 93s
+  shrinkage blend=0.435 (from 44 prior)
+  RPS=0.1491  IR=3.2477  n_assets_scored=98
+
+=== Period 46/48 [extended-yr3]: 2025-08-14 -> 2025-09-11 (momentum_sign=-0.038, from 45 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 37s elapsed
+    ...60/100 assets fit, 58s elapsed
+    ...80/100 assets fit, 76s elapsed
+    ...100/100 assets fit, 97s elapsed
+  fit+simulate: 97s
+  shrinkage blend=0.426 (from 45 prior)
+  RPS=0.1577  IR=-5.8944  n_assets_scored=98
+
+=== Period 47/48 [extended-yr3]: 2025-09-11 -> 2025-10-09 (momentum_sign=-0.036, from 46 prior) ===
+    ...20/100 assets fit, 18s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 70s elapsed
+    ...100/100 assets fit, 88s elapsed
+  fit+simulate: 88s
+  shrinkage blend=0.428 (from 46 prior)
+  RPS=0.1484  IR=1.4660  n_assets_scored=98
+
+=== Period 48/48 [extended-yr3]: 2025-10-09 -> 2025-11-06 (momentum_sign=-0.034, from 47 prior) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 35s elapsed
+    ...60/100 assets fit, 54s elapsed
+    ...80/100 assets fit, 82s elapsed
+    ...100/100 assets fit, 100s elapsed
+  fit+simulate: 100s
+  shrinkage blend=0.419 (from 47 prior)
+  RPS=0.1514  IR=7.9179  n_assets_scored=98
+
+=== SUMMARY ===
+ period          era      start        end      rps        ir  momentum_sign    blend  n_assets_scored
+      1           M6 2022-03-07 2022-04-04 0.158495 -1.201517      -0.100000 0.250000              100
+      2           M6 2022-04-04 2022-05-02 0.151709  3.746288      -0.206874 0.312500               90
+      3           M6 2022-05-02 2022-05-31 0.153885  6.149268      -0.230494 0.270000               90
+      4           M6 2022-05-31 2022-06-27 0.154344  0.563160      -0.225710 0.258333              100
+      5           M6 2022-06-27 2022-07-25 0.161462  4.109370      -0.218151 0.250000              100
+      6           M6 2022-07-25 2022-08-22 0.155788  2.184429      -0.212564 0.306250              100
+      7           M6 2022-08-22 2022-09-19 0.152202  3.249698      -0.186351 0.316667               91
+      8           M6 2022-09-19 2022-10-17 0.158031  3.179192      -0.174136 0.295000               91
+      9           M6 2022-10-17 2022-11-14 0.163566 -2.771297      -0.159258 0.313636              100
+     10           M6 2022-11-14 2022-12-12 0.155683 -0.288781      -0.144864 0.362500               99
+     11           M6 2022-12-12 2023-01-09 0.158261  2.495949      -0.128097 0.365385               99
+     12           M6 2023-01-09 2023-02-02 0.170877 -9.195883      -0.113990 0.382143               99
+     13 extended-yr1 2023-02-02 2023-03-02 0.159690 -4.507266      -0.097246 0.423333               98
+     14 extended-yr1 2023-03-02 2023-03-30 0.163725 -2.278035      -0.104800 0.440625               98
+     15 extended-yr1 2023-03-30 2023-04-27 0.157273 -0.579299      -0.117984 0.473529               98
+     16 extended-yr1 2023-04-27 2023-05-25 0.155364  0.862288      -0.104308 0.469444               98
+     17 extended-yr1 2023-05-25 2023-06-22 0.158517 11.491153      -0.112215 0.455263               98
+     18 extended-yr1 2023-06-22 2023-07-20 0.152988  3.627657      -0.101831 0.462500               98
+     19 extended-yr1 2023-07-20 2023-08-17 0.157929 -3.299380      -0.088476 0.440476               98
+     20 extended-yr1 2023-08-17 2023-09-14 0.153665  6.015967      -0.087862 0.443182               98
+     21 extended-yr1 2023-09-14 2023-10-12 0.153252  1.205992      -0.091086 0.432609               98
+     22 extended-yr1 2023-10-12 2023-11-09 0.159488 -0.545149      -0.084449 0.422917               98
+     23 extended-yr1 2023-11-09 2023-12-07 0.158394  3.363071      -0.087981 0.434000               98
+     24 extended-yr1 2023-12-07 2024-01-04 0.162771  0.565486      -0.081021 0.440385               98
+     25 extended-yr2 2024-01-04 2024-02-01 0.147706  7.734802      -0.073191 0.457407               98
+     26 extended-yr2 2024-02-01 2024-02-29 0.153880  4.883674      -0.070864 0.441071               98
+     27 extended-yr2 2024-02-29 2024-03-28 0.156274  2.955354      -0.060923 0.432759               98
+     28 extended-yr2 2024-03-28 2024-04-25 0.169887 -4.567369      -0.053913 0.431667               98
+     29 extended-yr2 2024-04-25 2024-05-23 0.156410  4.744397      -0.041616 0.450000               98
+     30 extended-yr2 2024-05-23 2024-06-20 0.154387  1.220845      -0.041588 0.451563               98
+     31 extended-yr2 2024-06-20 2024-07-18 0.156425 -2.140472      -0.039821 0.446970               98
+     32 extended-yr2 2024-07-18 2024-08-15 0.160751 -1.849312      -0.047625 0.445588               98
+     33 extended-yr2 2024-08-15 2024-09-12 0.152776  0.789162      -0.047227 0.455714               98
+     34 extended-yr2 2024-09-12 2024-10-10 0.157705 -1.303301      -0.047066 0.443056               98
+     35 extended-yr2 2024-10-10 2024-11-07 0.147122  5.195732      -0.053279 0.444595               98
+     36 extended-yr2 2024-11-07 2024-12-05 0.151609  8.508315      -0.052908 0.432895               98
+     37 extended-yr3 2024-12-05 2025-01-02 0.162462 -0.768934      -0.042649 0.421795               98
+     38 extended-yr3 2025-01-02 2025-01-30 0.155547  5.214574      -0.043371 0.433750               98
+     39 extended-yr3 2025-01-30 2025-02-27 0.157463  2.169399      -0.044940 0.432927               98
+     40 extended-yr3 2025-02-27 2025-03-27 0.155746 -3.139275      -0.046478 0.434524               98
+     41 extended-yr3 2025-03-27 2025-04-24 0.159480  0.560734      -0.041341 0.433721               98
+     42 extended-yr3 2025-04-24 2025-05-22 0.158275 -2.582182      -0.039621 0.439773               98
+     43 extended-yr3 2025-05-22 2025-06-19 0.156998 -2.714083      -0.040149 0.441111               98
+     44 extended-yr3 2025-06-19 2025-07-17 0.152642  0.003137      -0.041586 0.442391               98
+     45 extended-yr3 2025-07-17 2025-08-14 0.149142  3.247706      -0.041391 0.435106               98
+     46 extended-yr3 2025-08-14 2025-09-11 0.157654 -5.894377      -0.037881 0.426042               98
+     47 extended-yr3 2025-09-11 2025-10-09 0.148409  1.466046      -0.035669 0.427551               98
+     48 extended-yr3 2025-10-09 2025-11-06 0.151383  7.917929      -0.033968 0.419000               98
+
+By era:
+                   rps        ir
+era                             
+M6            0.157859  1.018323
+extended-yr1  0.157755  1.326874
+extended-yr2  0.155411  2.180986
+extended-yr3  0.155433  0.456723
+
+Saved results_multiyear.csv and all_forecasts_multiyear.pkl

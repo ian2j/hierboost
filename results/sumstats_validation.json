@@ -1,0 +1,43 @@
+{
+  "n": 1164,
+  "p": 400,
+  "n_true": 6,
+  "snr_beta": 0.45,
+  "true_idx": [
+    107,
+    252,
+    202,
+    122,
+    16,
+    335
+  ],
+  "max_recon_err": 5.551115123125783e-17,
+  "single_fit": {
+    "max_beta_diff": 2.6253305085433e-14,
+    "max_theta_diff": 1.6903145549918008e-14,
+    "raw_sigma_y2": 0.3151297734077248,
+    "ss_sigma_y2": 0.31512977340772413,
+    "time_raw_sec": 0.08914875984191895,
+    "time_sumstats_sec": 0.0233001708984375
+  },
+  "em_filter": {
+    "raw_n_retained": 126,
+    "ss_n_retained": 126,
+    "identical_retained_set": false,
+    "raw_ppl": 711.6582956339469,
+    "ss_ppl": 711.6582956339461,
+    "max_beta_diff_retained": 7.954747971439247e-14,
+    "time_raw_sec": 0.22994208335876465,
+    "time_sumstats_sec": 0.07541465759277344
+  },
+  "true_blocks": [
+    3,
+    26,
+    29,
+    51,
+    65,
+    83
+  ],
+  "blocks_localized": 6,
+  "n_true_blocks": 6
+}

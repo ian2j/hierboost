@@ -1,0 +1,142 @@
+adaptive mode: momentum_sign estimated per-period from prior periods only
+12 periods: [Timestamp('2022-03-07 00:00:00'), Timestamp('2022-04-04 00:00:00'), Timestamp('2022-05-02 00:00:00'), Timestamp('2022-05-31 00:00:00'), Timestamp('2022-06-27 00:00:00'), Timestamp('2022-07-25 00:00:00'), Timestamp('2022-08-22 00:00:00'), Timestamp('2022-09-19 00:00:00'), Timestamp('2022-10-17 00:00:00'), Timestamp('2022-11-14 00:00:00'), Timestamp('2022-12-12 00:00:00'), Timestamp('2023-01-09 00:00:00'), Timestamp('2023-02-02 00:00:00')]
+
+=== Period 1: 2022-03-07 -> 2022-04-04 (momentum_sign=-0.100, from 0 prior period(s)) ===
+    ...20/100 assets fit, 14s elapsed
+    ...40/100 assets fit, 30s elapsed
+    ...60/100 assets fit, 47s elapsed
+    ...80/100 assets fit, 64s elapsed
+    ...100/100 assets fit, 81s elapsed
+  fit+simulate: 81s
+  RPS=0.1608  IR=-1.3809
+  realized momentum-return corr this period: -0.527
+
+=== Period 2: 2022-04-04 -> 2022-05-02 (momentum_sign=-0.207, from 1 prior period(s)) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 31s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 67s elapsed
+    ...100/100 assets fit, 83s elapsed
+  fit+simulate: 83s
+  RPS=0.1519  IR=3.5703
+  realized momentum-return corr this period: -0.325
+
+=== Period 3: 2022-05-02 -> 2022-05-31 (momentum_sign=-0.230, from 2 prior period(s)) ===
+    ...20/100 assets fit, 16s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 50s elapsed
+    ...80/100 assets fit, 66s elapsed
+    ...100/100 assets fit, 85s elapsed
+  fit+simulate: 85s
+  RPS=0.1538  IR=6.6496
+  realized momentum-return corr this period: -0.202
+
+=== Period 4: 2022-05-31 -> 2022-06-27 (momentum_sign=-0.226, from 3 prior period(s)) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 72s elapsed
+    ...100/100 assets fit, 89s elapsed
+  fit+simulate: 89s
+  RPS=0.1554  IR=0.3107
+  realized momentum-return corr this period: -0.173
+
+=== Period 5: 2022-06-27 -> 2022-07-25 (momentum_sign=-0.218, from 4 prior period(s)) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 33s elapsed
+    ...60/100 assets fit, 52s elapsed
+    ...80/100 assets fit, 70s elapsed
+    ...100/100 assets fit, 86s elapsed
+  fit+simulate: 86s
+  RPS=0.1651  IR=4.1765
+  realized momentum-return corr this period: -0.173
+
+=== Period 6: 2022-07-25 -> 2022-08-22 (momentum_sign=-0.213, from 5 prior period(s)) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 37s elapsed
+    ...60/100 assets fit, 53s elapsed
+    ...80/100 assets fit, 68s elapsed
+    ...100/100 assets fit, 84s elapsed
+  fit+simulate: 84s
+  RPS=0.1579  IR=2.2015
+  realized momentum-return corr this period: 0.023
+
+=== Period 7: 2022-08-22 -> 2022-09-19 (momentum_sign=-0.186, from 6 prior period(s)) ===
+    ...20/100 assets fit, 15s elapsed
+    ...40/100 assets fit, 30s elapsed
+    ...60/100 assets fit, 47s elapsed
+    ...80/100 assets fit, 63s elapsed
+    ...100/100 assets fit, 87s elapsed
+  fit+simulate: 87s
+  RPS=0.1511  IR=3.0408
+  realized momentum-return corr this period: -0.064
+
+=== Period 8: 2022-09-19 -> 2022-10-17 (momentum_sign=-0.174, from 7 prior period(s)) ===
+    ...20/100 assets fit, 20s elapsed
+    ...40/100 assets fit, 42s elapsed
+    ...60/100 assets fit, 69s elapsed
+    ...80/100 assets fit, 96s elapsed
+    ...100/100 assets fit, 127s elapsed
+  fit+simulate: 127s
+  RPS=0.1605  IR=2.6818
+  realized momentum-return corr this period: -0.010
+
+=== Period 9: 2022-10-17 -> 2022-11-14 (momentum_sign=-0.159, from 8 prior period(s)) ===
+    ...20/100 assets fit, 26s elapsed
+    ...40/100 assets fit, 56s elapsed
+    ...60/100 assets fit, 80s elapsed
+    ...80/100 assets fit, 100s elapsed
+    ...100/100 assets fit, 118s elapsed
+  fit+simulate: 118s
+  RPS=0.1684  IR=-2.0405
+  realized momentum-return corr this period: 0.013
+
+=== Period 10: 2022-11-14 -> 2022-12-12 (momentum_sign=-0.145, from 9 prior period(s)) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 51s elapsed
+    ...80/100 assets fit, 69s elapsed
+    ...100/100 assets fit, 87s elapsed
+  fit+simulate: 87s
+  RPS=0.1571  IR=-0.5735
+  realized momentum-return corr this period: 0.073
+
+=== Period 11: 2022-12-12 -> 2023-01-09 (momentum_sign=-0.128, from 10 prior period(s)) ===
+    ...20/100 assets fit, 17s elapsed
+    ...40/100 assets fit, 34s elapsed
+    ...60/100 assets fit, 65s elapsed
+    ...80/100 assets fit, 98s elapsed
+    ...100/100 assets fit, 132s elapsed
+  fit+simulate: 132s
+  RPS=0.1627  IR=2.2670
+  realized momentum-return corr this period: 0.069
+
+=== Period 12: 2023-01-09 -> 2023-02-02 (momentum_sign=-0.114, from 11 prior period(s)) ===
+    ...20/100 assets fit, 28s elapsed
+    ...40/100 assets fit, 55s elapsed
+    ...60/100 assets fit, 83s elapsed
+    ...80/100 assets fit, 99s elapsed
+    ...100/100 assets fit, 116s elapsed
+  fit+simulate: 116s
+  RPS=0.1855  IR=-9.3239
+  realized momentum-return corr this period: 0.137
+
+=== SUMMARY ===
+ period      start        end      rps        ir  momentum_sign
+      1 2022-03-07 2022-04-04 0.160779 -1.380857      -0.100000
+      2 2022-04-04 2022-05-02 0.151936  3.570287      -0.206874
+      3 2022-05-02 2022-05-31 0.153832  6.649610      -0.230495
+      4 2022-05-31 2022-06-27 0.155440  0.310728      -0.225710
+      5 2022-06-27 2022-07-25 0.165140  4.176534      -0.218151
+      6 2022-07-25 2022-08-22 0.157932  2.201476      -0.212564
+      7 2022-08-22 2022-09-19 0.151090  3.040752      -0.186351
+      8 2022-09-19 2022-10-17 0.160518  2.681826      -0.174136
+      9 2022-10-17 2022-11-14 0.168392 -2.040456      -0.159258
+     10 2022-11-14 2022-12-12 0.157079 -0.573481      -0.144864
+     11 2022-12-12 2023-01-09 0.162737  2.267037      -0.128097
+     12 2023-01-09 2023-02-02 0.185515 -9.323908      -0.113990
+
+Mean RPS across 12 periods: 0.1609
+Mean IR across 12 periods:  0.9650
+
+Saved results_adaptive.csv and all_forecasts_adaptive.pkl

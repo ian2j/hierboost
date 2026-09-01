@@ -1,0 +1,65 @@
+{
+  "label": "EDAR",
+  "chrom": "2",
+  "causal_pos": 109513601,
+  "causal_rsid": "rs3827760",
+  "n_snps": 298,
+  "n_blocks": 76,
+  "individual": {
+    "hierboost": {
+      "top_pos": 109450504,
+      "dist_bp": 63097.0
+    },
+    "susie": {
+      "top_pos": 109539653,
+      "dist_bp": 26052.0
+    },
+    "single_snp": {
+      "top_pos": 109451118,
+      "dist_bp": 62483.0,
+      "top_p": 1e-300
+    }
+  },
+  "ensemble": {
+    "rank_avg": {
+      "top_pos": 109543883,
+      "dist_bp": 30282.0
+    },
+    "geo_mean": {
+      "top_pos": 109543883,
+      "dist_bp": 30282.0
+    },
+    "consensus": {
+      "top_pos": 109450811,
+      "dist_bp": 62790.0,
+      "consensus": true,
+      "agreeing_pair": "hb+snp"
+    }
+  },
+  "cv_results": [
+    {
+      "method": "SuSiE",
+      "acc_mean": 0.982138613861386,
+      "acc_std": 0.013025412169133914,
+      "n_features": 29.0
+    },
+    {
+      "method": "hierboost",
+      "acc_mean": 0.9851188118811882,
+      "acc_std": 0.012571792764525006,
+      "n_features": 9.9
+    },
+    {
+      "method": "single-SNP",
+      "acc_mean": 0.9880990099009901,
+      "acc_std": 0.01123671989114902,
+      "n_features": 251.0
+    },
+    {
+      "method": "triangulated (rank-avg top-15)",
+      "acc_mean": 0.981138613861386,
+      "acc_std": 0.014405269549128172,
+      "n_features": 15.0
+    }
+  ]
+}

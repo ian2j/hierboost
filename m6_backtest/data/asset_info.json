@@ -1,0 +1,802 @@
+{
+ "ABBV": {
+  "quoteType": "EQUITY",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "category": null,
+  "fundFamily": null,
+  "longName": "AbbVie Inc."
+ },
+ "ACN": {
+  "quoteType": "EQUITY",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Accenture plc"
+ },
+ "AEP": {
+  "quoteType": "EQUITY",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "category": null,
+  "fundFamily": null,
+  "longName": "American Electric Power Company, Inc."
+ },
+ "AIZ": {
+  "quoteType": "EQUITY",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Assurant, Inc."
+ },
+ "ALLE": {
+  "quoteType": "EQUITY",
+  "sector": "Industrials",
+  "industry": "Security & Protection Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Allegion plc"
+ },
+ "AMAT": {
+  "quoteType": "EQUITY",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Applied Materials, Inc."
+ },
+ "AMP": {
+  "quoteType": "EQUITY",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Ameriprise Financial, Inc."
+ },
+ "AMZN": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Amazon.com, Inc."
+ },
+ "AVB": {
+  "quoteType": "EQUITY",
+  "sector": "Real Estate",
+  "industry": "REIT - Residential",
+  "category": null,
+  "fundFamily": null,
+  "longName": "AvalonBay Communities Inc"
+ },
+ "AVY": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Cyclical",
+  "industry": "Packaging & Containers",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Avery Dennison Corporation"
+ },
+ "AXP": {
+  "quoteType": "EQUITY",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "American Express Company"
+ },
+ "BDX": {
+  "quoteType": "EQUITY",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Becton, Dickinson and Company"
+ },
+ "BF-B": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Wineries & Distilleries",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Brown-Forman Corporation"
+ },
+ "BMY": {
+  "quoteType": "EQUITY",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Bristol-Myers Squibb Company"
+ },
+ "BR": {
+  "quoteType": "EQUITY",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Broadridge Financial Solutions, Inc."
+ },
+ "CARR": {
+  "quoteType": "EQUITY",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Carrier Global Corporation"
+ },
+ "CDW": {
+  "quoteType": "EQUITY",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "CDW Corporation"
+ },
+ "CE": {
+  "quoteType": "EQUITY",
+  "sector": "Basic Materials",
+  "industry": "Chemicals",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Celanese Corporation"
+ },
+ "CHTR": {
+  "quoteType": "EQUITY",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Charter Communications, Inc."
+ },
+ "CNC": {
+  "quoteType": "EQUITY",
+  "sector": "Healthcare",
+  "industry": "Healthcare Plans",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Centene Corporation"
+ },
+ "CNP": {
+  "quoteType": "EQUITY",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "category": null,
+  "fundFamily": null,
+  "longName": "CenterPoint Energy, Inc."
+ },
+ "COP": {
+  "quoteType": "EQUITY",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "category": null,
+  "fundFamily": null,
+  "longName": "ConocoPhillips"
+ },
+ "CTAS": {
+  "quoteType": "EQUITY",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Cintas Corporation"
+ },
+ "CZR": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Cyclical",
+  "industry": "Resorts & Casinos",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Caesars Entertainment, Inc."
+ },
+ "DG": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Defensive",
+  "industry": "Discount Stores",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Dollar General Corporation"
+ },
+ "DPZ": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Domino's Pizza, Inc."
+ },
+ "DRE": {
+  "quoteType": "NONE",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": null,
+  "longName": null
+ },
+ "DXC": {
+  "quoteType": "EQUITY",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "DXC Technology Company"
+ },
+ "EWA": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Focused Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Australia ETF"
+ },
+ "EWC": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Focused Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Canada ETF"
+ },
+ "EWG": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Focused Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Germany ETF"
+ },
+ "EWH": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Greater China Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Hong Kong ETF"
+ },
+ "EWJ": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Japan Stock",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Japan ETF"
+ },
+ "EWL": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Focused Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Switzerland ETF"
+ },
+ "EWQ": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Focused Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI France ETF"
+ },
+ "EWT": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Greater China Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Taiwan ETF"
+ },
+ "EWU": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Focused Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI United Kingdom ETF"
+ },
+ "EWY": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Focused Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI South Korea ETF"
+ },
+ "EWZ": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Focused Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Brazil ETF"
+ },
+ "FTV": {
+  "quoteType": "EQUITY",
+  "sector": "Technology",
+  "industry": "Scientific & Technical Instruments",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Fortive Corporation"
+ },
+ "GOOG": {
+  "quoteType": "EQUITY",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Alphabet Inc."
+ },
+ "GPC": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Genuine Parts Company"
+ },
+ "GSG": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Commodities Broad Basket",
+  "fundFamily": "iShares",
+  "longName": "iShares S&P GSCI Commodity-Indexed Trust"
+ },
+ "HIG": {
+  "quoteType": "EQUITY",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "category": null,
+  "fundFamily": null,
+  "longName": "The Hartford Insurance Group, Inc."
+ },
+ "HIGH.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares \u20ac High Yield Corp Bond UCITS ETF EUR (Acc)"
+ },
+ "HST": {
+  "quoteType": "EQUITY",
+  "sector": "Real Estate",
+  "industry": "REIT - Hotel & Motel",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Host Hotels & Resorts, Inc."
+ },
+ "HYG": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "High Yield Bond",
+  "fundFamily": "iShares",
+  "longName": "iShares iBoxx $ High Yield Corporate Bond ETF"
+ },
+ "IAU": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Commodities Focused",
+  "fundFamily": "iShares",
+  "longName": "iShares Gold Trust"
+ },
+ "ICLN": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Miscellaneous Sector",
+  "fundFamily": "iShares",
+  "longName": "iShares Global Clean Energy ETF"
+ },
+ "IEAA.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares Core \u20ac Corp Bond UCITS ETF EUR (Acc)"
+ },
+ "IEF": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Long Government",
+  "fundFamily": "iShares",
+  "longName": "iShares 7-10 Year Treasury Bond ETF"
+ },
+ "IEFM.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares Edge MSCI Europe Momentum Factor UCITS ETF EUR (Acc)"
+ },
+ "IEMG": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Diversified Emerging Mkts",
+  "fundFamily": "iShares",
+  "longName": "iShares Core MSCI Emerging Markets ETF"
+ },
+ "IEUS": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Europe Stock",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI Europe Small-Cap ETF"
+ },
+ "IEVL.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares Edge MSCI Europe Value Factor UCITS ETF EUR (Acc)"
+ },
+ "IGF": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Infrastructure",
+  "fundFamily": "iShares",
+  "longName": "iShares Global Infrastructure ETF"
+ },
+ "INDA": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "India Equity",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI India ETF"
+ },
+ "IUMO.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares Edge MSCI USA Momentum Factor UCITS ETF USD (Acc)"
+ },
+ "IUVL.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares Edge MSCI USA Value Factor UCITS ETF USD (Acc)"
+ },
+ "IVV": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Large Blend",
+  "fundFamily": "iShares",
+  "longName": "iShares Core S&P 500 ETF"
+ },
+ "IWM": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Small Blend",
+  "fundFamily": "iShares",
+  "longName": "iShares Russell 2000 ETF"
+ },
+ "IXN": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Technology",
+  "fundFamily": "iShares",
+  "longName": "iShares Global Tech ETF"
+ },
+ "JPEA.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares J.P. Morgan $ EM Bond UCITS ETF USD (Acc)"
+ },
+ "JPM": {
+  "quoteType": "EQUITY",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "category": null,
+  "fundFamily": null,
+  "longName": "JPMorgan Chase & Co."
+ },
+ "KR": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "category": null,
+  "fundFamily": null,
+  "longName": "The Kroger Co."
+ },
+ "LQD": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Corporate Bond",
+  "fundFamily": "iShares",
+  "longName": "iShares iBoxx $ Investment Grade Corporate Bond ETF"
+ },
+ "MCHI": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Greater China Region",
+  "fundFamily": "iShares",
+  "longName": "iShares MSCI China ETF"
+ },
+ "META": {
+  "quoteType": "EQUITY",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Meta Platforms, Inc."
+ },
+ "MVEU.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares Edge MSCI Europe Minimum Volatility UCITS ETF EUR (Acc)"
+ },
+ "OGN": {
+  "quoteType": "EQUITY",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Organon & Co."
+ },
+ "PG": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "category": null,
+  "fundFamily": null,
+  "longName": "The Procter & Gamble Company"
+ },
+ "PPL": {
+  "quoteType": "EQUITY",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "category": null,
+  "fundFamily": null,
+  "longName": "PPL Corporation"
+ },
+ "PRU": {
+  "quoteType": "EQUITY",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Prudential Financial, Inc."
+ },
+ "PYPL": {
+  "quoteType": "EQUITY",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "PayPal Holdings, Inc."
+ },
+ "RE": {
+  "quoteType": "NONE",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": null,
+  "longName": null
+ },
+ "REET": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Global Real Estate",
+  "fundFamily": "iShares",
+  "longName": "iShares Global REIT ETF"
+ },
+ "ROL": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Cyclical",
+  "industry": "Personal Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Rollins, Inc."
+ },
+ "ROST": {
+  "quoteType": "EQUITY",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Retail",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Ross Stores, Inc."
+ },
+ "SEGA.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares Core \u20ac Govt Bond UCITS ETF EUR (Dist)"
+ },
+ "SHY": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Short Government",
+  "fundFamily": "iShares",
+  "longName": "iShares 1-3 Year Treasury Bond ETF"
+ },
+ "SLV": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Commodities Focused",
+  "fundFamily": "iShares",
+  "longName": "iShares Silver Trust"
+ },
+ "SPMV.L": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": "BlackRock Asset Management Ireland - ETF",
+  "longName": "iShares Edge S&P 500 Minimum Volatility UCITS ETF USD (Acc)"
+ },
+ "TLT": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Long Government",
+  "fundFamily": "iShares",
+  "longName": "iShares 20+ Year Treasury Bond ETF"
+ },
+ "UNH": {
+  "quoteType": "EQUITY",
+  "sector": "Healthcare",
+  "industry": "Healthcare Plans",
+  "category": null,
+  "fundFamily": null,
+  "longName": "UnitedHealth Group Incorporated"
+ },
+ "URI": {
+  "quoteType": "EQUITY",
+  "sector": "Industrials",
+  "industry": "Rental & Leasing Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "United Rentals, Inc."
+ },
+ "V": {
+  "quoteType": "EQUITY",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Visa Inc."
+ },
+ "VRSK": {
+  "quoteType": "EQUITY",
+  "sector": "Industrials",
+  "industry": "Consulting Services",
+  "category": null,
+  "fundFamily": null,
+  "longName": "Verisk Analytics, Inc."
+ },
+ "VXX": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Trading--Miscellaneous",
+  "fundFamily": "iPath",
+  "longName": "iPath Series B S&P 500 VIX Short-Term Futures ETN"
+ },
+ "WRK": {
+  "quoteType": "NONE",
+  "sector": null,
+  "industry": null,
+  "category": null,
+  "fundFamily": null,
+  "longName": null
+ },
+ "XLB": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Natural Resources",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Materials Select Sector SPDR ETF"
+ },
+ "XLC": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Communications",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Communication Services Select Sector SPDR ETF"
+ },
+ "XLE": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Equity Energy",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Energy Select Sector SPDR ETF"
+ },
+ "XLF": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Financial",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Financial Select Sector SPDR ETF"
+ },
+ "XLI": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Industrials",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Industrial Select Sector SPDR ETF"
+ },
+ "XLK": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Technology",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Technology Select Sector SPDR ETF"
+ },
+ "XLP": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Consumer Defensive",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Consumer Staples Select Sector SPDR ETF"
+ },
+ "XLU": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Utilities",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Utilities Select Sector SPDR ETF"
+ },
+ "XLV": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Health",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Health Care Select Sector SPDR ETF"
+ },
+ "XLY": {
+  "quoteType": "ETF",
+  "sector": null,
+  "industry": null,
+  "category": "Consumer Cyclical",
+  "fundFamily": "State Street Investment Management",
+  "longName": "State Street Consumer Discretionary Select Sector SPDR ETF"
+ },
+ "XOM": {
+  "quoteType": "EQUITY",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "category": null,
+  "fundFamily": null,
+  "longName": "ExxonMobil Holdings Corporation"
+ }
+}

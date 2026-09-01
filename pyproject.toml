@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hierboost"
+version = "0.1.0"
+description = "Hierarchical proximity-boosted spike-and-slab models (spatial + temporal), generalized from Johnston et al.'s GWAS dissertation work"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy<2",
+    "scipy",
+    "scikit-learn",
+    "matplotlib",
+    "polyagamma",
+]
+
+[project.optional-dependencies]
+# Chapter 4's discrete/binomial block-latent model (hierboost.latent) and joint NUTS
+# inference (hierboost.joint) need JAX/NumPyro, which pull in numpy>=2 -- incompatible
+# with the numpy<2 pin above (needed for scikit-learn/scipy). Install this extra into a
+# SEPARATE virtualenv (see README's .venv-jax instructions), never alongside the base
+# install.
+jax = ["jax", "jaxlib", "numpyro"]
+# Only needed to run the demo scripts (finance_demo.py, temporal_demo.py, ...), not the
+# installable package itself.
+demos = ["pandas", "yfinance", "statsmodels", "pysusie"]
+# genomics_1kg_fetch.py needs pysam for remote region-restricted VCF access; kept as its
+# own extra (installed into .venv-genomics in this project) since pysam's htslib build
+# has caused environment friction before -- see README.
+genomics = ["pysam", "pandas"]
+
+[tool.setuptools]
+packages = ["hierboost", "spatial_boost"]

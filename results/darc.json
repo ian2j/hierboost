@@ -1,0 +1,67 @@
+{
+  "label": "DARC",
+  "gene": "DARC/ACKR1",
+  "chrom": "1",
+  "start": 159020000,
+  "end": 159320000,
+  "pop_a": "EUR",
+  "pop_b": "AFR",
+  "causal_pos": 159174683,
+  "causal_rsid": "rs2814778",
+  "n_individuals": 1164,
+  "n_snps": 723,
+  "n_blocks": 182,
+  "cv_time_sec": 833.459704875946,
+  "cv_results": [
+    {
+      "method": "L1-logistic (raw SNPs)",
+      "acc_mean": 0.9888594164456233,
+      "acc_std": 0.009045074218498787,
+      "n_features": 59.9
+    },
+    {
+      "method": "Linear SVM (raw SNPs)",
+      "acc_mean": 0.9742558208075449,
+      "acc_std": 0.0193958261339684,
+      "n_features": 723.0
+    },
+    {
+      "method": "PCA(182)+logistic",
+      "acc_mean": 0.9828396699086355,
+      "acc_std": 0.011427063893083065,
+      "n_features": 182.0
+    },
+    {
+      "method": "Random Forest (raw SNPs)",
+      "acc_mean": 0.9922855879752431,
+      "acc_std": 0.006309964716767267,
+      "n_features": 723.0
+    },
+    {
+      "method": "SuSiE credible-set SNPs + logistic",
+      "acc_mean": 0.9914308871205423,
+      "acc_std": 0.008058275535973831,
+      "n_features": 1.0
+    },
+    {
+      "method": "hierboost (LD block-latent + spike-slab)",
+      "acc_mean": 0.9905761862658414,
+      "acc_std": 0.010230651275506732,
+      "n_features": 11.3
+    }
+  ],
+  "hierboost_full": {
+    "top_block": 92,
+    "top_pos": 159175093.66666666,
+    "top_theta": 1.0,
+    "dist_bp": 410.66666665673256,
+    "n_retained": 13
+  },
+  "susie_full": {
+    "top_pos": 159174683,
+    "top_pip": 1.0,
+    "dist_bp": 0.0,
+    "n_credible_sets": 1
+  },
+  "figure": "genomics_1kg_darc_demo.png"
+}

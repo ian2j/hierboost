@@ -1,0 +1,67 @@
+{
+  "label": "FUT2",
+  "gene": "FUT2",
+  "chrom": "19",
+  "start": 49106000,
+  "end": 49306000,
+  "pop_a": "EUR",
+  "pop_b": "EAS",
+  "causal_pos": 49206674,
+  "causal_rsid": "rs601338",
+  "n_individuals": 1007,
+  "n_snps": 460,
+  "n_blocks": 116,
+  "cv_time_sec": 426.3825259208679,
+  "cv_results": [
+    {
+      "method": "L1-logistic (raw SNPs)",
+      "acc_mean": 0.988059405940594,
+      "acc_std": 0.012267926495503647,
+      "n_features": 62.5
+    },
+    {
+      "method": "Linear SVM (raw SNPs)",
+      "acc_mean": 0.9870891089108911,
+      "acc_std": 0.012417594267309236,
+      "n_features": 460.0
+    },
+    {
+      "method": "PCA(116)+logistic",
+      "acc_mean": 0.9880792079207922,
+      "acc_std": 0.010260067365460071,
+      "n_features": 116.0
+    },
+    {
+      "method": "Random Forest (raw SNPs)",
+      "acc_mean": 0.9691980198019803,
+      "acc_std": 0.01652839087476774,
+      "n_features": 460.0
+    },
+    {
+      "method": "SuSiE credible-set SNPs + logistic",
+      "acc_mean": 0.9821188118811881,
+      "acc_std": 0.01608227493008965,
+      "n_features": 34.1
+    },
+    {
+      "method": "hierboost (LD block-latent + spike-slab)",
+      "acc_mean": 0.979158415841584,
+      "acc_std": 0.017133465577430118,
+      "n_features": 17.0
+    }
+  ],
+  "hierboost_full": {
+    "top_block": 15,
+    "top_pos": 49132634.0,
+    "top_theta": 0.1564303567848706,
+    "dist_bp": 74040.0,
+    "n_retained": 17
+  },
+  "susie_full": {
+    "top_pos": 49269106,
+    "top_pip": 1.0,
+    "dist_bp": 62432.0,
+    "n_credible_sets": 10
+  },
+  "figure": "genomics_1kg_fut2_demo.png"
+}

@@ -1,0 +1,65 @@
+{
+  "label": "SLC45A2",
+  "chrom": "5",
+  "causal_pos": 33951693,
+  "causal_rsid": "rs16891982",
+  "n_snps": 473,
+  "n_blocks": 120,
+  "individual": {
+    "hierboost": {
+      "top_pos": 34018504,
+      "dist_bp": 66811.0
+    },
+    "susie": {
+      "top_pos": 33951693,
+      "dist_bp": 0.0
+    },
+    "single_snp": {
+      "top_pos": 33913369,
+      "dist_bp": 38324.0,
+      "top_p": 1e-300
+    }
+  },
+  "ensemble": {
+    "rank_avg": {
+      "top_pos": 33951693,
+      "dist_bp": 0.0
+    },
+    "geo_mean": {
+      "top_pos": 33999079,
+      "dist_bp": 47386.0
+    },
+    "consensus": {
+      "top_pos": 33951693,
+      "dist_bp": 0.0,
+      "consensus": false,
+      "agreeing_pair": null
+    }
+  },
+  "cv_results": [
+    {
+      "method": "SuSiE",
+      "acc_mean": 0.98193339227822,
+      "acc_std": 0.013738527082909123,
+      "n_features": 7.4
+    },
+    {
+      "method": "hierboost",
+      "acc_mean": 0.9785219569702328,
+      "acc_std": 0.010125382764121192,
+      "n_features": 13.2
+    },
+    {
+      "method": "single-SNP",
+      "acc_mean": 0.9819481284998526,
+      "acc_std": 0.010319096996748264,
+      "n_features": 425.5
+    },
+    {
+      "method": "triangulated (rank-avg top-15)",
+      "acc_mean": 0.9767978190391984,
+      "acc_std": 0.012185431180841439,
+      "n_features": 15.0
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "label": "HERC2_OCA2",
+  "chrom": "15",
+  "causal_pos": 28365618,
+  "causal_rsid": "rs12913832",
+  "n_snps": 543,
+  "n_blocks": 137,
+  "individual": {
+    "hierboost": {
+      "top_pos": 28283441,
+      "dist_bp": 82177.0
+    },
+    "susie": {
+      "top_pos": 28286002,
+      "dist_bp": 79616.0
+    },
+    "single_snp": {
+      "top_pos": 28269008,
+      "dist_bp": 96610.0,
+      "top_p": 1e-300
+    }
+  },
+  "ensemble": {
+    "rank_avg": {
+      "top_pos": 28410491,
+      "dist_bp": 44873.0
+    },
+    "geo_mean": {
+      "top_pos": 28410491,
+      "dist_bp": 44873.0
+    },
+    "consensus": {
+      "top_pos": 28284721,
+      "dist_bp": 80897.0,
+      "consensus": true,
+      "agreeing_pair": "hb+susie"
+    }
+  },
+  "cv_results": [
+    {
+      "method": "SuSiE",
+      "acc_mean": 0.9785072207486001,
+      "acc_std": 0.013010926095652842,
+      "n_features": 36.7
+    },
+    {
+      "method": "hierboost",
+      "acc_mean": 0.9784998526377837,
+      "acc_std": 0.014776192638758763,
+      "n_features": 14.6
+    },
+    {
+      "method": "single-SNP",
+      "acc_mean": 0.986243737105806,
+      "acc_std": 0.012962713075780624,
+      "n_features": 503.9
+    },
+    {
+      "method": "triangulated (rank-avg top-15)",
+      "acc_mean": 0.9785219569702328,
+      "acc_std": 0.007297964056663719,
+      "n_features": 15.0
+    }
+  ]
+}

@@ -1,0 +1,612 @@
+{
+  "domain": "F2_gold_etf_basket",
+  "predicted": "FAIL",
+  "n_obs": 751,
+  "n_train": 600,
+  "n_test": 151,
+  "target": "GLD",
+  "gold_predictors": [
+    "IAU",
+    "SGOL",
+    "OUNZ",
+    "BAR",
+    "AAAU"
+  ],
+  "contrast_assets": [
+    "SLV",
+    "GDX"
+  ],
+  "full_correlation_matrix": {
+    "GLD": {
+      "GLD": 1.0,
+      "IAU": 0.9997600225997313,
+      "SGOL": 0.9994440199905804,
+      "OUNZ": 0.9994237521875305,
+      "BAR": 0.9994381816426074,
+      "AAAU": 0.9995164289454497,
+      "SLV": 0.7867482194249998,
+      "GDX": 0.8310686937817345
+    },
+    "IAU": {
+      "GLD": 0.9997600225997313,
+      "IAU": 1.0,
+      "SGOL": 0.9995068402829745,
+      "OUNZ": 0.9994203540689937,
+      "BAR": 0.9994783344450936,
+      "AAAU": 0.9995897394668904,
+      "SLV": 0.7858106726278435,
+      "GDX": 0.8307004363613772
+    },
+    "SGOL": {
+      "GLD": 0.9994440199905804,
+      "IAU": 0.9995068402829745,
+      "SGOL": 1.0,
+      "OUNZ": 0.9992407272090565,
+      "BAR": 0.9991498198001391,
+      "AAAU": 0.999418025998374,
+      "SLV": 0.7855540888096483,
+      "GDX": 0.8300441673591562
+    },
+    "OUNZ": {
+      "GLD": 0.9994237521875305,
+      "IAU": 0.9994203540689937,
+      "SGOL": 0.9992407272090565,
+      "OUNZ": 1.0,
+      "BAR": 0.9992001172241087,
+      "AAAU": 0.9993282463217761,
+      "SLV": 0.7864809578791563,
+      "GDX": 0.8317871315264642
+    },
+    "BAR": {
+      "GLD": 0.9994381816426074,
+      "IAU": 0.9994783344450936,
+      "SGOL": 0.9991498198001391,
+      "OUNZ": 0.9992001172241087,
+      "BAR": 1.0,
+      "AAAU": 0.9992920742319557,
+      "SLV": 0.7857736225784768,
+      "GDX": 0.8295640720738249
+    },
+    "AAAU": {
+      "GLD": 0.9995164289454497,
+      "IAU": 0.9995897394668904,
+      "SGOL": 0.999418025998374,
+      "OUNZ": 0.9993282463217761,
+      "BAR": 0.9992920742319557,
+      "AAAU": 1.0,
+      "SLV": 0.7858930794454849,
+      "GDX": 0.8303663600013558
+    },
+    "SLV": {
+      "GLD": 0.7867482194249998,
+      "IAU": 0.7858106726278435,
+      "SGOL": 0.7855540888096483,
+      "OUNZ": 0.7864809578791563,
+      "BAR": 0.7857736225784768,
+      "AAAU": 0.7858930794454849,
+      "SLV": 1.0,
+      "GDX": 0.7641144268530327
+    },
+    "GDX": {
+      "GLD": 0.8310686937817345,
+      "IAU": 0.8307004363613772,
+      "SGOL": 0.8300441673591562,
+      "OUNZ": 0.8317871315264642,
+      "BAR": 0.8295640720738249,
+      "AAAU": 0.8303663600013558,
+      "SLV": 0.7641144268530327,
+      "GDX": 1.0
+    }
+  },
+  "generalization_gate": {
+    "best_feature": "IAU",
+    "train_corr": 0.9996111527531678,
+    "test_corr": 0.9999263790977057,
+    "held_out_over_train_ratio": 1.0003153489671155,
+    "passed": true,
+    "all_train_corr": {
+      "IAU": 0.9996111527531678,
+      "SGOL": 0.9990951605977733,
+      "OUNZ": 0.9990716731810583,
+      "BAR": 0.9991370739745593,
+      "AAAU": 0.9992409269493606
+    }
+  },
+  "baselines": {
+    "naive (train-mean)": {
+      "r2": -0.007924957979888347,
+      "n_features": 0
+    },
+    "Lasso (alpha=1.08e-05)": {
+      "r2": 0.9998604001601898,
+      "n_features": 5,
+      "coef": [
+        0.006360188399711188,
+        0.00127902625935519,
+        0.0016864739712549278,
+        0.0012075799874934332,
+        0.0002875213700630374
+      ],
+      "alpha": 1.082720364097853e-05
+    },
+    "PCA(1 comps, 0.9992 var)+linear": {
+      "r2": 0.9998437604103713,
+      "n_features": 1,
+      "explained_variance_ratio": [
+        0.999194680504854
+      ]
+    },
+    "Random Forest (5 raw features)": {
+      "r2": 0.9476611746738666,
+      "n_features": 5,
+      "feature_importances": [
+        0.5490703767321747,
+        0.07708410647079152,
+        0.07464096973250373,
+        0.07753698708602126,
+        0.22166755997850882
+      ]
+    }
+  },
+  "block_structure_sweep_gold_only": {
+    "0.3": {
+      "n_blocks": 1,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ]
+      }
+    },
+    "0.5": {
+      "n_blocks": 1,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ]
+      }
+    },
+    "0.75": {
+      "n_blocks": 1,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ]
+      }
+    },
+    "0.9": {
+      "n_blocks": 1,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ]
+      }
+    },
+    "0.95": {
+      "n_blocks": 1,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ]
+      }
+    },
+    "0.99": {
+      "n_blocks": 1,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ]
+      }
+    }
+  },
+  "block_structure_sweep_with_contrast": {
+    "0.3": {
+      "n_blocks": 1,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU",
+          "SLV",
+          "GDX"
+        ]
+      }
+    },
+    "0.5": {
+      "n_blocks": 1,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU",
+          "SLV",
+          "GDX"
+        ]
+      }
+    },
+    "0.75": {
+      "n_blocks": 2,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU",
+          "GDX"
+        ],
+        "1": [
+          "SLV"
+        ]
+      }
+    },
+    "0.9": {
+      "n_blocks": 3,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ],
+        "1": [
+          "SLV"
+        ],
+        "2": [
+          "GDX"
+        ]
+      }
+    },
+    "0.95": {
+      "n_blocks": 3,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ],
+        "1": [
+          "SLV"
+        ],
+        "2": [
+          "GDX"
+        ]
+      }
+    },
+    "0.99": {
+      "n_blocks": 3,
+      "blocks": {
+        "0": [
+          "IAU",
+          "SGOL",
+          "OUNZ",
+          "BAR",
+          "AAAU"
+        ],
+        "1": [
+          "SLV"
+        ],
+        "2": [
+          "GDX"
+        ]
+      }
+    }
+  },
+  "hierboost_main_block_structure": {
+    "rho": 0.75,
+    "membership": {
+      "0": [
+        "IAU",
+        "SGOL",
+        "OUNZ",
+        "BAR",
+        "AAAU"
+      ]
+    },
+    "loadings": {
+      "IAU+SGOL+OUNZ+BAR+AAAU_factor": {
+        "IAU": 0.9997623381524825,
+        "SGOL": 0.9995336986213886,
+        "OUNZ": 0.9995094808161475,
+        "BAR": 0.9995234285409041,
+        "AAAU": 0.9996573255935584
+      }
+    }
+  },
+  "hierboost_primary_r2": 0.9998437604103713,
+  "hierboost_primary_n_blocks": 1,
+  "hierboost_primary_feature_retention_frac": 0.2,
+  "em_filter_sweep_block_design": {
+    "1.0": {
+      "n_retained": 1,
+      "n_candidates": 1,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU+SGOL+OUNZ+BAR+AAAU_factor"
+      ],
+      "theta_hat": [
+        0.5
+      ],
+      "r2": 0.9998437024155843
+    },
+    "3.0": {
+      "n_retained": 1,
+      "n_candidates": 1,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU+SGOL+OUNZ+BAR+AAAU_factor"
+      ],
+      "theta_hat": [
+        0.3660526064786091
+      ],
+      "r2": 0.9998437172499225
+    },
+    "10.0": {
+      "n_retained": 1,
+      "n_candidates": 1,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU+SGOL+OUNZ+BAR+AAAU_factor"
+      ],
+      "theta_hat": [
+        0.2402819608911537
+      ],
+      "r2": 0.999843716024918
+    },
+    "30.0": {
+      "n_retained": 1,
+      "n_candidates": 1,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU+SGOL+OUNZ+BAR+AAAU_factor"
+      ],
+      "theta_hat": [
+        0.15440928069479812
+      ],
+      "r2": 0.9998437123279535
+    },
+    "100.0": {
+      "n_retained": 1,
+      "n_candidates": 1,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU+SGOL+OUNZ+BAR+AAAU_factor"
+      ],
+      "theta_hat": [
+        0.09092347849895355
+      ],
+      "r2": 0.9998437090030481
+    },
+    "300.0": {
+      "n_retained": 1,
+      "n_candidates": 1,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU+SGOL+OUNZ+BAR+AAAU_factor"
+      ],
+      "theta_hat": [
+        0.0545926833565672
+      ],
+      "r2": 0.9998437069931327
+    },
+    "1000.0": {
+      "n_retained": 1,
+      "n_candidates": 1,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU+SGOL+OUNZ+BAR+AAAU_factor"
+      ],
+      "theta_hat": [
+        0.03065864995819161
+      ],
+      "r2": 0.9998437056469855
+    }
+  },
+  "em_filter_sweep_raw_design": {
+    "1.0": {
+      "n_retained": 5,
+      "n_candidates": 5,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU",
+        "SGOL",
+        "OUNZ",
+        "BAR",
+        "AAAU"
+      ],
+      "theta_hat": [
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "r2": 0.9998665978248289
+    },
+    "3.0": {
+      "n_retained": 5,
+      "n_candidates": 5,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU",
+        "SGOL",
+        "OUNZ",
+        "BAR",
+        "AAAU"
+      ],
+      "theta_hat": [
+        0.36603930343637225,
+        0.36602584670662985,
+        0.366026201772701,
+        0.36602607566432116,
+        0.36602579937475727
+      ],
+      "r2": 0.9998666648136857
+    },
+    "10.0": {
+      "n_retained": 5,
+      "n_candidates": 5,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU",
+        "SGOL",
+        "OUNZ",
+        "BAR",
+        "AAAU"
+      ],
+      "theta_hat": [
+        0.24026780955429133,
+        0.240253544818531,
+        0.2402539214362838,
+        0.24025378830363664,
+        0.24025349484179762
+      ],
+      "r2": 0.999866658032128
+    },
+    "30.0": {
+      "n_retained": 5,
+      "n_candidates": 5,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU",
+        "SGOL",
+        "OUNZ",
+        "BAR",
+        "AAAU"
+      ],
+      "theta_hat": [
+        0.15439836479990063,
+        0.15438745305256257,
+        0.15438774157540133,
+        0.1543876407478788,
+        0.15438741518844376
+      ],
+      "r2": 0.9998666404121316
+    },
+    "100.0": {
+      "n_retained": 5,
+      "n_candidates": 5,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU",
+        "SGOL",
+        "OUNZ",
+        "BAR",
+        "AAAU"
+      ],
+      "theta_hat": [
+        0.09091637607550294,
+        0.090909328250538,
+        0.09090951484960987,
+        0.09090945030615451,
+        0.09090930400496111
+      ],
+      "r2": 0.9998666245486504
+    },
+    "300.0": {
+      "n_retained": 5,
+      "n_candidates": 5,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU",
+        "SGOL",
+        "OUNZ",
+        "BAR",
+        "AAAU"
+      ],
+      "theta_hat": [
+        0.05458820911658234,
+        0.05458378869263435,
+        0.05458390581972095,
+        0.05458386555725112,
+        0.054583773565626714
+      ],
+      "r2": 0.9998666149103124
+    },
+    "1000.0": {
+      "n_retained": 5,
+      "n_candidates": 5,
+      "frac_retained": 1.0,
+      "retained_names": [
+        "IAU",
+        "SGOL",
+        "OUNZ",
+        "BAR",
+        "AAAU"
+      ],
+      "theta_hat": [
+        0.030656063990083294,
+        0.030653516570360997,
+        0.030653584103871097,
+        0.030653560985896052,
+        0.03065350788380032
+      ],
+      "r2": 0.9998666084304652
+    }
+  },
+  "kappa_sweep": [
+    1.0,
+    3.0,
+    10.0,
+    30.0,
+    100.0,
+    300.0,
+    1000.0
+  ],
+  "rho_sweep": [
+    0.3,
+    0.5,
+    0.75,
+    0.9,
+    0.95,
+    0.99
+  ],
+  "verdict": {
+    "verdict": "MIXED",
+    "work_ok": true,
+    "fail_ok": true,
+    "best_baseline": "Lasso (alpha=1.08e-05)",
+    "best_baseline_r2": 0.9998604001601898,
+    "naive_r2": -0.007924957979888347,
+    "r2_gap": -1.6639749818581073e-05,
+    "notes": [
+      "Gate: best raw feature='IAU', train_corr=+0.9996, test_corr=+0.9999, PASSES (same sign & |test|>=50% |train|).",
+      "Criterion 2a: hierboost R2=0.9998 vs best baseline (Lasso (alpha=1.08e-05))=0.9999 (gap=-0.0000, threshold 0.05); hierboost retains 20.0% of raw feature count (threshold <=50%). SATISFIED.",
+      "Criterion 2b: hierboost R2=0.9998 vs naive=-0.0079 (beats naive by >0.05: True), BUT no independently-known structural variable exists for a basket of interchangeable gold trackers (no physical-distance/causal-order/pathway analog) -- mechanism-validation half of 2b is not applicable/available, so 2b is NOT satisfied regardless.",
+      "Criterion FAIL-1 (gate fails): False.",
+      "Criterion FAIL-2 (worse than naive): hierboost R2=0.9998 < naive R2=-0.0079: False.",
+      "Criterion FAIL-3 (sparsity never engages, >90% retained across kappa sweep, AND no mechanism-validation): block-design min frac retained=1.00, raw-design min frac retained=1.00: True.",
+      "WORK criteria met: True. FAIL criteria met: True. => Mechanical verdict per the pre-registered rule: MIXED"
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "label": "APOL1",
+  "chrom": "22",
+  "causal_pos": 36661906,
+  "causal_rsid": "rs73885319",
+  "n_snps": 1023,
+  "n_blocks": 258,
+  "individual": {
+    "hierboost": {
+      "top_pos": 36656138,
+      "dist_bp": 5768.0
+    },
+    "susie": {
+      "top_pos": 36597141,
+      "dist_bp": 64765.0
+    },
+    "single_snp": {
+      "top_pos": 36686125,
+      "dist_bp": 24219.0,
+      "top_p": 2.1190076874697558e-262
+    }
+  },
+  "ensemble": {
+    "rank_avg": {
+      "top_pos": 36656555,
+      "dist_bp": 5351.0
+    },
+    "geo_mean": {
+      "top_pos": 36656555,
+      "dist_bp": 5351.0
+    },
+    "consensus": {
+      "top_pos": 36656555,
+      "dist_bp": 5351.0,
+      "consensus": false,
+      "agreeing_pair": null
+    }
+  },
+  "cv_results": [
+    {
+      "method": "SuSiE",
+      "acc_mean": 0.9793545534924846,
+      "acc_std": 0.014216351405245816,
+      "n_features": 15.3
+    },
+    {
+      "method": "hierboost",
+      "acc_mean": 0.9845343353964043,
+      "acc_std": 0.007918611224736345,
+      "n_features": 18.9
+    },
+    {
+      "method": "single-SNP",
+      "acc_mean": 0.985366931918656,
+      "acc_std": 0.012883696530179223,
+      "n_features": 932.9
+    },
+    {
+      "method": "triangulated (rank-avg top-15)",
+      "acc_mean": 0.9725022104332449,
+      "acc_std": 0.010600512637115993,
+      "n_features": 15.0
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "domain": "W2: urban air quality (PM2.5) across an EPA monitoring network",
+  "data_source": {
+    "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_<year>.zip",
+    "note": "EPA AQS pre-generated annual daily-summary flat files (parameter 88101, PM2.5 FRM/FEM Mass, 24 HOUR duration), verified live 2026-08-30, no signup or API key needed. Metro area substituted from the assignment's suggested example (LA) to Chicago-Naperville-Elgin, IL-IN-WI after live verification that Chicago has more distinct monitoring sites (21, tied with New York, vs LA's 12) within a comparable/tighter radius than New York -- a data-driven substitution, not a fallback from a broken source.",
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022
+    ],
+    "parameter_code": 88101,
+    "cbsa": "Chicago-Naperville-Elgin, IL-IN-WI"
+  },
+  "analysis_pool_size": 9,
+  "target_site": "17-031-3301",
+  "target_site_name": "GRAVES ES",
+  "predictor_sites": [
+    "18-089-0031",
+    "17-031-1016",
+    "17-089-0007",
+    "17-031-0022",
+    "18-089-0026",
+    "18-089-0022",
+    "17-031-4201",
+    "17-031-3103"
+  ],
+  "n_days_total": 271,
+  "generalization_gate": {
+    "best_predictor_site": "18-089-0031",
+    "train_corr": 0.24124143698918632,
+    "test_corr": -0.05601419919454976,
+    "ratio": 0.2321914505801116,
+    "same_sign": false,
+    "passes": false
+  },
+  "diagnostic_contemporaneous_vs_lagged": {
+    "best_site_same_day": "17-031-1016",
+    "same_day_train_corr": 0.8224424167755408,
+    "same_day_test_corr": 0.8801643607674781,
+    "target_lag1_autocorrelation": 0.15059256314655373
+  },
+  "main_run_window1": {
+    "window": 1,
+    "n": 270,
+    "n_train": 216,
+    "n_test": 54,
+    "p": 8,
+    "results": {
+      "naive (train mean)": {
+        "r2": -0.03862459652724892,
+        "corr": null,
+        "n_features": 0
+      },
+      "Lasso/L1 (raw, 8 sites)": {
+        "r2": -0.08220185556043647,
+        "corr": -0.08754583054569745,
+        "n_features": 3
+      },
+      "PCA(6)+linear": {
+        "r2": -0.13183356717660533,
+        "corr": -0.14079409896085737,
+        "n_features": 6
+      },
+      "Random Forest (raw, 8 sites)": {
+        "r2": -0.39474663356254225,
+        "corr": -0.27270401054086035,
+        "n_features": 8
+      },
+      "hierboost flat prior (kappa=100)": {
+        "r2": -0.15587299913997787,
+        "corr": -0.18659436860748208,
+        "n_features": 8
+      },
+      "hierboost spatial-proximity boost (kappa=100)": {
+        "r2": -0.15702257032889055,
+        "corr": -0.18692214393169068,
+        "n_features": 8
+      }
+    },
+    "mechanism_check": {
+      "rho_theta_vs_distance_flat": 0.0,
+      "rho_theta_vs_distance_spatial": -0.6190476190476191,
+      "spatial_top_by_theta": [
+        "17-031-1016",
+        "17-031-3103",
+        "18-089-0022",
+        "17-031-0022",
+        "17-031-4201"
+      ]
+    },
+    "hierboost_flat_n_retained": 8,
+    "hierboost_spatial_n_retained": 8
+  },
+  "secondary_run_window3": {
+    "window": 3,
+    "n": 268,
+    "n_train": 214,
+    "n_test": 54,
+    "p": 8,
+    "results": {
+      "naive (train mean)": {
+        "r2": -0.03892410407338032,
+        "corr": null,
+        "n_features": 0
+      },
+      "Lasso/L1 (raw, 8 sites)": {
+        "r2": -0.08030749120860592,
+        "corr": -0.1408145145498361,
+        "n_features": 3
+      },
+      "PCA(6)+linear": {
+        "r2": -0.14428732959741142,
+        "corr": -0.18019660872647986,
+        "n_features": 6
+      },
+      "Random Forest (raw, 8 sites)": {
+        "r2": -0.11928608487616987,
+        "corr": -0.037013964164092604,
+        "n_features": 8
+      },
+      "hierboost flat prior (kappa=100)": {
+        "r2": -0.13803486805977672,
+        "corr": -0.18341632446810777,
+        "n_features": 8
+      },
+      "hierboost spatial-proximity boost (kappa=100)": {
+        "r2": -0.13900940829092412,
+        "corr": -0.18392041879226212,
+        "n_features": 8
+      }
+    },
+    "mechanism_check": {
+      "rho_theta_vs_distance_flat": 0.4285714285714286,
+      "rho_theta_vs_distance_spatial": -0.5952380952380953,
+      "spatial_top_by_theta": [
+        "17-031-1016",
+        "17-031-3103",
+        "18-089-0022",
+        "17-031-4201",
+        "17-031-0022"
+      ]
+    },
+    "hierboost_flat_n_retained": 8,
+    "hierboost_spatial_n_retained": 8
+  },
+  "sparsity_sweep": [
+    {
+      "kappa": 10.0,
+      "n_retained": 8,
+      "frac_retained": 1.0
+    },
+    {
+      "kappa": 100.0,
+      "n_retained": 8,
+      "frac_retained": 1.0
+    },
+    {
+      "kappa": 1000.0,
+      "n_retained": 8,
+      "frac_retained": 1.0
+    },
+    {
+      "kappa": 10000.0,
+      "n_retained": 8,
+      "frac_retained": 1.0
+    }
+  ],
+  "sparsity_sweep_max_retained_frac": 1.0,
+  "verdict": "FAIL",
+  "verdict_reasoning": [
+    "gate: FAIL (same_sign=False, ratio=0.232 < 0.5)",
+    "2a: close_to_best_conventional=False (best_conv_r2=-0.0822, hb_best_r2=-0.1559, gap=0.0737) AND sparse<=50%=False (retained 8/8=100.0%) -> False",
+    "2b: beats_naive_by_margin=False (hb_best_r2=-0.1559 vs naive_r2=-0.0386, margin=-0.1172) AND mechanism_validated=True (rho flat=+0.000, rho spatial=-0.619) -> False",
+    "FAIL-2: hierboost worse than naive: True (hb_best_r2=-0.1559 vs naive_r2=-0.0386)",
+    "FAIL-3: sparsity never engages (max retained frac across sweep=100.0% > 90%) AND no mechanism validation: False",
+    "-> FAIL rule 1 triggered (gate failed): verdict is FAIL regardless of downstream fit."
+  ],
+  "verdict_numbers": {
+    "best_conventional_r2": -0.08220185556043647,
+    "hierboost_flat_r2": -0.15587299913997787,
+    "hierboost_spatial_r2": -0.15702257032889055,
+    "naive_r2": -0.03862459652724892,
+    "hierboost_n_retained": 8,
+    "p": 8,
+    "retention_frac": 1.0
+  },
+  "preregistered_prediction": "WORK"
+}

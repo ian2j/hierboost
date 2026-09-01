@@ -1,0 +1,67 @@
+{
+  "label": "ADH1B",
+  "gene": "ADH1B",
+  "chrom": "4",
+  "start": 100139000,
+  "end": 100339000,
+  "pop_a": "EAS",
+  "pop_b": "EUR",
+  "causal_pos": 100239319,
+  "causal_rsid": "rs1229984",
+  "n_individuals": 1007,
+  "n_snps": 671,
+  "n_blocks": 170,
+  "cv_time_sec": 336.67343759536743,
+  "cv_results": [
+    {
+      "method": "L1-logistic (raw SNPs)",
+      "acc_mean": 0.9831485148514851,
+      "acc_std": 0.01148607788053499,
+      "n_features": 83.9
+    },
+    {
+      "method": "Linear SVM (raw SNPs)",
+      "acc_mean": 0.9871188118811881,
+      "acc_std": 0.010485543778278698,
+      "n_features": 671.0
+    },
+    {
+      "method": "PCA(170)+logistic",
+      "acc_mean": 0.9861386138613861,
+      "acc_std": 0.013365317974466403,
+      "n_features": 170.0
+    },
+    {
+      "method": "Random Forest (raw SNPs)",
+      "acc_mean": 0.9781881188118812,
+      "acc_std": 0.017328590188032664,
+      "n_features": 671.0
+    },
+    {
+      "method": "SuSiE credible-set SNPs + logistic",
+      "acc_mean": 0.9751980198019801,
+      "acc_std": 0.014199494977472516,
+      "n_features": 56.6
+    },
+    {
+      "method": "hierboost (LD block-latent + spike-slab)",
+      "acc_mean": 0.9702376237623762,
+      "acc_std": 0.018089192909243716,
+      "n_features": 14.7
+    }
+  ],
+  "hierboost_full": {
+    "top_block": 92,
+    "top_pos": 100232624.0,
+    "top_theta": 1.0,
+    "dist_bp": 6695.0,
+    "n_retained": 12
+  },
+  "susie_full": {
+    "top_pos": 100142780,
+    "top_pip": 0.9999999999457594,
+    "dist_bp": 96539.0,
+    "n_credible_sets": 10
+  },
+  "figure": "genomics_1kg_adh1b_demo.png"
+}

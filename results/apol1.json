@@ -1,0 +1,67 @@
+{
+  "label": "APOL1",
+  "gene": "APOL1",
+  "chrom": "22",
+  "start": 36561000,
+  "end": 36761000,
+  "pop_a": "AFR",
+  "pop_b": "EUR",
+  "causal_pos": 36661906,
+  "causal_rsid": "rs73885319",
+  "n_individuals": 1164,
+  "n_snps": 1023,
+  "n_blocks": 258,
+  "cv_time_sec": 552.4271085262299,
+  "cv_results": [
+    {
+      "method": "L1-logistic (raw SNPs)",
+      "acc_mean": 0.990546713822576,
+      "acc_std": 0.00634333531732157,
+      "n_features": 90.3
+    },
+    {
+      "method": "Linear SVM (raw SNPs)",
+      "acc_mean": 0.9716327733569112,
+      "acc_std": 0.013536886015861348,
+      "n_features": 1023.0
+    },
+    {
+      "method": "PCA(258)+logistic",
+      "acc_mean": 0.9853816681402888,
+      "acc_std": 0.010006426193863197,
+      "n_features": 258.0
+    },
+    {
+      "method": "Random Forest (raw SNPs)",
+      "acc_mean": 0.9845122310639551,
+      "acc_std": 0.012062407306300068,
+      "n_features": 1023.0
+    },
+    {
+      "method": "SuSiE credible-set SNPs + logistic",
+      "acc_mean": 0.9793545534924846,
+      "acc_std": 0.014216351405245816,
+      "n_features": 15.3
+    },
+    {
+      "method": "hierboost (LD block-latent + spike-slab)",
+      "acc_mean": 0.9845343353964043,
+      "acc_std": 0.007918611224736345,
+      "n_features": 18.9
+    }
+  ],
+  "hierboost_full": {
+    "top_block": 125,
+    "top_pos": 36656376.5,
+    "top_theta": 0.9999983321970491,
+    "dist_bp": 5529.5,
+    "n_retained": 20
+  },
+  "susie_full": {
+    "top_pos": 36597141,
+    "top_pip": 1.0,
+    "dist_bp": 64765.0,
+    "n_credible_sets": 9
+  },
+  "figure": "genomics_1kg_apol1_demo.png"
+}

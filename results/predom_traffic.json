@@ -1,0 +1,192 @@
+{
+  "domain": "W5 urban traffic congestion network (NYC DOT Traffic Speeds NBE, Staten Island Expressway / West Shore Expressway interchange)",
+  "predicted": "WORK",
+  "data_source": "https://data.cityofnewyork.us/resource/i4gi-tjb9.json (Socrata SODA, no auth)",
+  "chicago_attempted": true,
+  "chicago_reachable": false,
+  "links": {
+    "4616193": "SIE E BRADLEY AVENUE - CLOVE ROAD",
+    "4616194": "SIE E WOOLEY AVENUE - BRADLEY AVENUE",
+    "4616195": "SIE E RICHMOND AVENUE - WOOLEY AVENUE",
+    "4616197": "SIE E SOUTH AVENUE - RICHMOND AVENUE",
+    "4616198": "WSE N-SIE E SOUTH AVENUE - SOUTH AVENUE",
+    "4616199": "SIE W - WSE S SOUTH AVENUE - SOUTH AVENUE",
+    "4616200": "WSE S SOUTH AVENUE - VICTORY BOULEVARD",
+    "4616201": "WSE S VICTORY BOULEVARD - ARDEN AVENUE",
+    "4616202": "WSE S ARDEN AVENUE - BLOOMINGDALE ROAD",
+    "4616208": "SIE W BRADLEY AVENUE - WOOLEY AVENUE",
+    "4616209": "SIE W WOOLEY AVENUE - RICHMOND AVENUE",
+    "4616211": "SIE W RICHMOND AVENUE - SOUTH AVENUE",
+    "4616212": "WSE N VICTORY BLVD - SOUTH AVENUE",
+    "4616213": "WSE N ARDEN AVENUE - VICTORY BLVD",
+    "4616214": "WSE N BLOOMUINGDALE ROAD - ARDEN AVENUE"
+  },
+  "target_id": "4616197",
+  "target_name": "SIE E SOUTH AVENUE - RICHMOND AVENUE",
+  "target_degree": 3,
+  "adjacency_threshold_m": 80.0,
+  "n_obs": 760,
+  "n_train": 608,
+  "n_test": 152,
+  "n_predictor_links": 14,
+  "hop_distances_target_to_others": {
+    "4616193": 4,
+    "4616194": 3,
+    "4616195": 1,
+    "4616198": 2,
+    "4616199": 3,
+    "4616200": 4,
+    "4616201": 5,
+    "4616202": 5,
+    "4616208": 2,
+    "4616209": 1,
+    "4616211": 1,
+    "4616212": 3,
+    "4616213": 4,
+    "4616214": 5
+  },
+  "generalization_gate": {
+    "best_feature": "4616195_lag1h",
+    "train_corr": 0.6834682183532474,
+    "test_corr": 0.7612748531523803,
+    "ratio": 1.1138408966353996,
+    "same_sign": true,
+    "passed": true
+  },
+  "baselines": {
+    "naive (train-mean constant)": {
+      "r2": -0.017035594976006152,
+      "corr": null,
+      "n_features": 0
+    },
+    "Lasso (raw lag features)": {
+      "r2": 0.6134818553830983,
+      "corr": 0.7901131380974259,
+      "n_features": 13,
+      "alpha": 0.08531678524172814
+    },
+    "PCA(8)+linear": {
+      "r2": 0.5769782062390435,
+      "corr": 0.7653836403177497,
+      "n_features": 8
+    },
+    "Random Forest (raw lag features)": {
+      "r2": 0.6776611603808637,
+      "corr": 0.8252502968594194,
+      "n_features": 14
+    }
+  },
+  "hierboost_flat": {
+    "r2": 0.6090071235011398,
+    "corr": 0.7866149471575241,
+    "n_features": 11
+  },
+  "hierboost_graph_bandwidth_sweep": [
+    {
+      "bandwidth": 1.0,
+      "r2": 0.6091524430576796,
+      "corr": 0.7870903932016813,
+      "n_features": 11
+    },
+    {
+      "bandwidth": 2.0,
+      "r2": 0.6090608470620607,
+      "corr": 0.786991194569272,
+      "n_features": 11
+    },
+    {
+      "bandwidth": 4.0,
+      "r2": 0.6088753422751346,
+      "corr": 0.7867699732501805,
+      "n_features": 11
+    },
+    {
+      "bandwidth": 8.0,
+      "r2": 0.6086356281119253,
+      "corr": 0.7864699281032066,
+      "n_features": 11
+    }
+  ],
+  "hierboost_graph_main": {
+    "bandwidth": 2.0,
+    "r2": 0.6090608470620607,
+    "corr": 0.786991194569272,
+    "n_features": 11
+  },
+  "kappa_sweep_flat": [
+    {
+      "kappa": 10.0,
+      "r2": 0.6127062854547067,
+      "n_features": 14,
+      "frac_retained": 1.0
+    },
+    {
+      "kappa": 100.0,
+      "r2": 0.6090071235011398,
+      "n_features": 11,
+      "frac_retained": 0.7857142857142857
+    },
+    {
+      "kappa": 1000.0,
+      "r2": 0.6077001358220425,
+      "n_features": 11,
+      "frac_retained": 0.7857142857142857
+    },
+    {
+      "kappa": 10000.0,
+      "r2": 0.6061319668700511,
+      "n_features": 11,
+      "frac_retained": 0.7857142857142857
+    }
+  ],
+  "kappa_sweep_graph": [
+    {
+      "kappa": 10.0,
+      "r2": 0.6131540060433105,
+      "n_features": 14,
+      "frac_retained": 1.0
+    },
+    {
+      "kappa": 100.0,
+      "r2": 0.6090608470620607,
+      "n_features": 11,
+      "frac_retained": 0.7857142857142857
+    },
+    {
+      "kappa": 1000.0,
+      "r2": 0.6076148367827402,
+      "n_features": 11,
+      "frac_retained": 0.7857142857142857
+    },
+    {
+      "kappa": 10000.0,
+      "r2": 0.6163362603024954,
+      "n_features": 14,
+      "frac_retained": 1.0
+    }
+  ],
+  "mechanism_check": {
+    "rho_flat": 0.23152118330519875,
+    "rho_graph": -0.37506431695442194,
+    "top3_by_theta_hat": [
+      "4616195",
+      "4616213",
+      "4616211"
+    ]
+  },
+  "verdict": "WORK",
+  "verdict_components": {
+    "gate_pass": true,
+    "hb_r2": 0.6090608470620607,
+    "best_conventional_r2": 0.6776611603808637,
+    "naive_r2": -0.017035594976006152,
+    "hb_n_feat": 11,
+    "n_raw_feat": 14,
+    "sparsity_engaged": true,
+    "cond2a": 0.0,
+    "cond2b": true,
+    "fail1": false,
+    "fail2": 0.0,
+    "fail3": false
+  }
+}

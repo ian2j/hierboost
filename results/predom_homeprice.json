@@ -1,0 +1,156 @@
+{
+  "domain": "F5",
+  "description": "Home price index (Zillow ZHVI), deliberately mis-blocked (alphabetical vs. geographic Census-division blocking)",
+  "predicted": "FAIL",
+  "target_city": "Saint Louis",
+  "target_state": "MO",
+  "target_division": "West North Central",
+  "n_predictor_cities": 148,
+  "n_months_total": 173,
+  "n_train": 138,
+  "n_test": 35,
+  "data_source": "https://files.zillowstatic.com/research/public_csvs/zhvi/City_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv",
+  "generalization_gate": {
+    "best_predictor": "Newark",
+    "train_corr": 0.6188622551951244,
+    "test_corr": -0.10703259887389593,
+    "ratio": 0.17295060084113395,
+    "same_sign": false,
+    "passed": false
+  },
+  "baselines": {
+    "naive (mean)": {
+      "r2": -0.9048378683984597,
+      "n_features": 0
+    },
+    "Lasso (raw cities)": {
+      "r2": -1.3754019357971772,
+      "n_features": 26
+    },
+    "PCA(10)+linear": {
+      "r2": -0.12409390324813674,
+      "n_features": 10
+    },
+    "Random Forest (raw cities)": {
+      "r2": -0.2042273730109292,
+      "n_features": 148
+    }
+  },
+  "arbitrary_blocking_arm": {
+    "description": "Blocks = first letter of predictor city's name (arbitrary, non-causal) -- the pre-registered F5 arm",
+    "n_blocks": 22,
+    "block_sizes": [
+      10,
+      10,
+      12,
+      6,
+      2,
+      7,
+      7,
+      5,
+      3,
+      2,
+      4,
+      11,
+      10,
+      7,
+      6,
+      7,
+      4,
+      21,
+      6,
+      2,
+      5,
+      1
+    ],
+    "sweep": {
+      "10.0": {
+        "r2": -1.9907424612073474,
+        "n_blocks_total": 22,
+        "n_blocks_retained": 22,
+        "retained_frac": 1.0
+      },
+      "100.0": {
+        "r2": -1.9883348052830145,
+        "n_blocks_total": 22,
+        "n_blocks_retained": 22,
+        "retained_frac": 1.0
+      },
+      "1000.0": {
+        "r2": -1.987455649232302,
+        "n_blocks_total": 22,
+        "n_blocks_retained": 22,
+        "retained_frac": 1.0
+      },
+      "10000.0": {
+        "r2": -1.9871724953540828,
+        "n_blocks_total": 22,
+        "n_blocks_retained": 22,
+        "retained_frac": 1.0
+      }
+    },
+    "main_kappa": 100.0,
+    "mechanism_check_spearman_rho": 0.2028871229069147
+  },
+  "geographic_bonus_arm": {
+    "description": "BONUS, NOT part of the pre-registered verdict. Blocks = US Census division (true geographic/regional adjacency).",
+    "n_blocks": 9,
+    "block_sizes": [
+      13,
+      9,
+      8,
+      16,
+      1,
+      31,
+      40,
+      8,
+      22
+    ],
+    "sweep": {
+      "10.0": {
+        "r2": -0.9719252497982371,
+        "n_blocks_total": 9,
+        "n_blocks_retained": 9,
+        "retained_frac": 1.0
+      },
+      "100.0": {
+        "r2": -0.9718244294659513,
+        "n_blocks_total": 9,
+        "n_blocks_retained": 9,
+        "retained_frac": 1.0
+      },
+      "1000.0": {
+        "r2": -0.9718162900341771,
+        "n_blocks_total": 9,
+        "n_blocks_retained": 9,
+        "retained_frac": 1.0
+      },
+      "10000.0": {
+        "r2": -0.9718158989251804,
+        "n_blocks_total": 9,
+        "n_blocks_retained": 9,
+        "retained_frac": 1.0
+      }
+    },
+    "main_kappa": 100.0,
+    "mechanism_check_spearman_rho": -0.5477225575051661
+  },
+  "outcome_rule": {
+    "fail_condition_1_gate_fails": true,
+    "fail_condition_2_worse_than_naive": true,
+    "fail_condition_3_sparsity_never_engages_and_no_mechanism": true,
+    "work_condition_1_gate_passes": false,
+    "work_condition_2a_within_5pts_and_sparse": false,
+    "work_condition_2b_beats_naive_and_mechanism": false,
+    "best_conventional_baseline_r2": -0.12409390324813674,
+    "naive_baseline_r2": -0.9048378683984597,
+    "hierboost_arbitrary_r2_main_kappa": -1.9883348052830145,
+    "retained_fracs_across_sweep": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "verdict": "FAIL"
+}
