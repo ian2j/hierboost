@@ -1,30 +1,8 @@
-"""Neuroimaging application of hierboost: spatial block-latent factors + spike-and-slab
-logistic regression on the Haxby (2001) face-vs-house fMRI decoding task.
-
-The core analogy to the dissertation's genomics setting: voxels within the ventral
-temporal (VT) cortex mask are spatially adjacent and strongly correlated (like SNPs in
-an LD block), for the same underlying reason -- BOLD signal is smooth over nearby
-tissue, the way genotypes are correlated over nearby chromosome positions. This script
-reuses hierboost.factor.gaussian_block_factor (the continuous, closed-form PPCA
-counterpart of Chapter 4's block-wise latent model) to collapse each spatial block of
-voxels into one shared latent factor, then runs the *same* generic spike-and-slab
-engine (hierboost.spike_slab) used for GWAS and finance -- unmodified -- to select
-which spatial blocks actually discriminate faces from houses.
-
-No informative relevance prior is used here (wr is flat/uniform): unlike the GWAS
-gene-relevance or finance sector-relevance priors, there's no cheap, non-circular
-external "which VT regions process faces" signal available without pulling in a
-functional atlas, so this demo isolates the value of the spatial block-latent
-decorrelation + spike-and-slab sparsity by itself, compared against standard
-raw-voxel baselines (L1-logistic, PCA+logistic, linear SVM -- the last being nilearn's
-own tutorial baseline on this exact dataset).
-
-Honest framing: the point isn't to beat a linear SVM's raw accuracy on 40-year-old
-fMRI data (it won't, meaningfully) -- it's whether the spike-and-slab posterior
-inclusion probabilities give a principled, sparse, spatially-coherent map of which VT
-sub-regions matter, at comparable accuracy to black-box baselines, instead of a
-post-hoc saliency map.
-"""
+"""fMRI face-vs-house decoding (Haxby 2001): spatially-adjacent, correlated voxels in
+ventral temporal cortex play the role of an LD block. Collapses each spatial block into
+one latent (gaussian_block_factor) and runs the same spike-and-slab engine used for
+GWAS/finance. No informative relevance prior -- isolates the value of block-latent
+decorrelation + sparsity alone against raw-voxel baselines."""
 import os
 import numpy as np
 import pandas as pd

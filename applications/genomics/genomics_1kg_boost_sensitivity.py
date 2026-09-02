@@ -1,27 +1,8 @@
-"""Tests Ian's original Spatial Boost idea (Ch.2 of the dissertation, the
-gene-proximity boosting prior) on top of the block-latent decorrelation used in the
-1000 Genomes case studies -- every case study so far used a FLAT prior on block
-inclusion (xi1=0, no boost). This script instead gives blocks near a candidate
-"region of interest" a boosted prior inclusion probability via
-hierboost.kernels.gaussian_affinity_1d, the exact mechanism from Sec 3.1-3.2 of the
-published Spatial Boost paper, generalized here from "SNP near an annotated gene" to
-"LD block near a candidate region."
-
-Explicitly NOT the same thing as the earlier oracle-hyperparameter sweep
-(genomics_1kg_sensitivity.py), which selected a setting after seeing which one landed
-closest to the causal SNP -- illegitimate as a tuning procedure since it uses ground
-truth no practitioner has. Here the boost is centered on a REGION (an interval, not a
-point -- gaussian_affinity_1d's kernel is degenerate for a zero-width group, and more
-importantly a point-boost would just be a duller version of the same oracle problem)
-around the causal SNP, with two knobs that directly operationalize "diluted, not a
-spike": REGION_HALFWIDTHS controls how wide the candidate region is (narrow ~ almost a
-point guess, wide ~ diffuse belief spread over a large chunk of the locus), and
-XI1_GRID controls how strongly that region's blocks are up-weighted relative to the
-flat-prior baseline. Still uses the true causal position as the region's center in this
-first pass -- a genuinely fair question in its own right (does a correctly-centered but
-DILUTED prior help, and how much dilution is too much?) distinct from the follow-up
-question of robustness to a mis-centered guess.
-"""
+"""Tests the original Spatial Boost gene-proximity prior on top of block-latent
+decorrelation: gives LD blocks near a candidate region a boosted prior inclusion
+probability (gaussian_affinity_1d), varying region width and boost strength. Uses the
+true causal SNP as the region center -- see genomics_1kg_boost_offset_sensitivity.py
+for robustness to a mis-centered guess."""
 import argparse
 import glob
 import json

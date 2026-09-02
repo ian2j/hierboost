@@ -1,34 +1,7 @@
-"""Pre-registered 10-domain test, domain F2 (predicted FAIL): a basket of near-identical
-gold-tracking ETFs (GLD, IAU, SGOL, OUNZ, BAR, AAAU -- all physically-backed gold trusts
-that track the same underlying spot price to within basis points). Predict one gold ETF's
-daily return from the OTHER gold ETFs in the basket.
-
-Mechanism under test (preregistration_10domain_test.md, F2): these ETFs are correlated
-already near-deterministically (>0.999 pairwise) -- there is essentially no idiosyncratic,
-denoisable noise left for hierboost's block-latent decorrelation to average away. The
-prediction is FAIL, but specifically because hierboost adds no VALUE on top of the raw
-correlation, not because the correlation is absent or non-stationary (the generalization
-gate is expected to PASS trivially here -- see module docstring in the prereg doc). Per
-the run instructions, the falsifiable WORK/FAIL/MIXED rule is applied mechanically to
-whatever numbers actually come out, not adjusted to match the prior verdict.
-
-Two contrast assets are pulled alongside the gold basket purely to document the
-saturation mechanism in the correlation matrix (SLV, a genuinely different metal with a
-correlated-but-not-saturated relationship to gold; GDX, gold-mining equities, which carry
-company/equity-market risk on top of the gold-price exposure) -- neither is used as a
-model predictor for the primary task, since the domain's task is specifically "predict
-one gold ETF from the OTHER gold ETFs," not from unrelated assets. A secondary block-
-structure sweep across the full 7-predictor set (gold + contrast) is included to show
-directly that the saturation is specific to the gold basket, not a generic "everything is
-one block" artifact of the correlation-threshold method.
-
-Baseline suite (Lasso, PCA+linear, Random Forest, naive) and hierboost (correlation-
-threshold blocking, em_filter spike-and-slab) are all evaluated on the same chronological
-train/test split, no leakage: block loadings, PCA components, and feature
-standardization are all fit on the TRAIN window only and applied out-of-sample to TEST
-(hierboost.factor.project_block_factor is the out-of-sample projection for the block
-score, mirroring how a real forecasting deployment would use a fitted block-latent model).
-"""
+"""F2, predicted FAIL: near-identical gold ETFs (GLD, IAU, SGOL, ...) correlated
+>0.999 pairwise -- essentially no idiosyncratic noise left for block-latent
+decorrelation to average away. Predicts hierboost adds no value over raw correlation,
+not that correlation is absent."""
 import json
 import os
 import numpy as np

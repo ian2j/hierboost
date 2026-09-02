@@ -1,22 +1,8 @@
-"""Fifth cross-domain application, and a return to hierboost's origin domain -- but with
-REAL genomic data for the first time (every prior GWAS demo in this project was
-synthetic simulation). Real LD-block structure from 1000 Genomes phase 3, LCT gene
-region (chr2:136.4-136.7Mb, GRCh37) -- the textbook population-genetics example of
-strong recent positive selection (European lactase persistence), predicting EUR vs AFR
-superpopulation ancestry from 659 biallelic SNPs (MAF>=0.05, 1164 individuals).
-
-Uses threshold_blocks_1d directly on real chromosomal position -- the ORIGINAL Chapter 4
-design (dissertation Sec 4.1.1), not the kmeans method built for Haxby's dense voxel
-mask, since genomic position along a chromosome is exactly the "has real gaps" 1D
-coordinate that blocking was designed for.
-
-Same continuous factor.py + functional-API pattern as haxby_demo.py/newsgroups_demo.py
-(not HierBoostClassifier, given the binomial+decorrelate API gap already documented) --
-genotype dosage (0/1/2) is treated as a continuous feature for the decorrelation step,
-consistent with how the model has been used successfully all session; the untested
-literal Ch4 discrete/Binomial latent.py path (which would treat dosage as genuinely
-Binomial n_trials=2) is a natural next step in .venv-jax, not attempted in this script.
-"""
+"""First real (non-synthetic) genomics application: 1000 Genomes LCT gene region
+(chr2:136.4-136.7Mb), predicting EUR vs AFR ancestry from 659 real SNPs, LD-blocked by
+chromosomal position (the original Chapter 4 design). Genotype dosage treated as
+continuous for the decorrelation step (factor.py), not the literal discrete/Binomial
+path -- see genomics_1kg_binomial_latent.py for that."""
 import argparse
 import os
 import numpy as np

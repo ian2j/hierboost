@@ -1,15 +1,7 @@
-"""Real-phenotype validation for the LCT locus, replacing the EUR-vs-AFR ancestry-label
-proxy used everywhere else in this project with actual measured gene expression from the
-Geuvadis project (RNA-seq on lymphoblastoid cell lines from 462 of these same 1000
-Genomes individuals, freely public via EBI ArrayExpress E-GEUV-1).
-
-Tests both LCT and MCM6 expression as outcomes -- MCM6 matters here because the causal
-regulatory SNP (rs4988235) sits in MCM6's intron 13, not LCT's own sequence, and MCM6 is
-a ubiquitously-expressed housekeeping (DNA replication licensing) gene, unlike LCT itself
-which is gut-specific and essentially silent in lymphoblastoid cell lines -- so MCM6 is
-expected to give the more measurable real eQTL signal in this particular tissue, and LCT
-itself is included for honesty about that limitation, not because it's expected to work.
-"""
+"""Real-phenotype validation for LCT, replacing the EUR/AFR ancestry-label proxy with
+actual Geuvadis gene expression. Tests both LCT (gut-specific, expected null in this LCL
+tissue) and MCM6 (the causal SNP's actual host gene, ubiquitously expressed -- expected
+to show the real eQTL signal)."""
 import argparse
 import os
 

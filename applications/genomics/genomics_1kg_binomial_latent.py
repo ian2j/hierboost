@@ -1,23 +1,8 @@
-"""Test hierboost.latent's literal Chapter 4 discrete/Binomial block-latent machinery
-(JAX Newton + reparameterized-MC moment matching) on real data for the first time all
-session -- every other application used the continuous factor.py branch, treating raw
-features as continuous even when (Haxby voxels, TF-IDF weights) or when not (genotype
-dosage) that was the honest description. Genotype dosage (0/1/2, "how many copies of the
-alternate allele") IS genuinely Binomial(n_trials=2) -- exactly the observation model
-latent.py was built around (the dissertation's own SNP allele-count setting), so this is
-the single best-matched real-data opportunity for this code path found all session.
-
-Reuses the same real LCT-region data and LD blocks as genomics_1kg_demo.py's continuous-
-branch run, so the two are a direct apples-to-apples comparison of "treat genotype as
-continuous and PCA-decorrelate it" vs "treat genotype as what it actually is (Binomial
-counts) and Newton-decorrelate it," not two different datasets.
-
-A single train/test split (not 10-fold CV) -- fit_latent_block_model's per-block JAX
-Newton/moment-matching loop is run once per unique block size during JIT tracing, and
-with 167 blocks of varying size, that compilation cost would multiply badly across many
-CV folds; one split is enough to see whether the method runs correctly on real data and
-how its predictions/selected blocks compare to the continuous branch's findings.
-"""
+"""Tests hierboost.latent's literal Chapter 4 discrete/Binomial block-latent machinery
+(JAX Newton + moment matching) on real data for the first time -- genotype dosage
+(0/1/2) is genuinely Binomial(n=2), the exact observation model this path was built for.
+Same LCT-region data/blocks as genomics_1kg_demo.py, for a direct continuous-vs-discrete
+comparison. Single train/test split (JAX recompilation cost makes CV impractical here)."""
 import argparse
 import numpy as np
 import jax.numpy as jnp

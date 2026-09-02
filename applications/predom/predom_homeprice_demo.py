@@ -1,45 +1,7 @@
-"""F5 from preregistration_10domain_test.md: "Home price index, deliberately
-mis-blocked" -- predicted FAIL. Run in isolation, per that document's rules, verbatim.
-
-Data: Zillow Research ZHVI, city-level, smoothed/seasonally-adjusted
-(files.zillowstatic.com/research/public_csvs/zhvi/City_zhvi_uc_sfrcondo_tier_
-0.33_0.67_sm_sa_month.csv), free, no auth. Verified live 2026-08-30 (200 OK, ~93MB,
-21378 city rows, monthly columns 2000-01 through 2026-07).
-
-Task: predict one target city's home-price deviation from OTHER cities' deviations,
-lagged one month (strict lag, no leakage) -- but the predictor cities are grouped into
-hierboost blocks by an ARBITRARY, non-causal variable (first letter of the city name)
-instead of true geographic/regional adjacency. This is the deliberate, load-bearing
-design choice of this domain, per the pre-registration document: "do not fix the
-blocking to be geographically sensible, the whole test is what happens when a
-plausible pipeline is run with a deliberately wrong grouping choice." A second,
-clearly-labeled BONUS arm reruns the identical pipeline with US Census
-division as the blocking variable instead, to isolate whether any failure found is
-really about "bad blocking" (F5's point) rather than "no real structure here at all."
-The pre-registered verdict is computed from the arbitrary (alphabetical) arm ONLY.
-
-Design choices carried over from this project's established house style (state_econ,
-the closest prior analog -- another cross-sectional panel with a plausible shared
-national trend):
-  - Deviation-from-national-mean detrending. Raw city-level ZHVI shares one enormous
-    common national housing-cycle factor (2008 crash, 2020-22 boom hit nearly every
-    city at once); an unexamined cross-city correlation on raw levels would mostly
-    just detect "both cities are in the same national cycle," not genuine regional
-    co-movement -- the actually interesting question for a regional-adjacency
-    variable. Every city's month-over-month log return is expressed as a deviation
-    from the cross-sectional mean return at that month before any correlation or fit
-    is computed. This changes what signal exists to be exploited; it does NOT touch
-    which grouping variable defines blocks, so it does not "fix" F5's deliberately
-    wrong blocking -- it only avoids re-discovering a confound this project already
-    knows to route around.
-  - Target city pre-registered by a deterministic rule fixed BEFORE any correlation is
-    computed (median SizeRank among the fully-complete top-150 cities since 2012),
-    mirroring earthquake_japan's "3rd-most-active" and state_econ's "3rd-highest
-    border-degree" logic: well-connected/representative, not hand-picked after seeing
-    results. This lands on Saint Louis, MO.
-  - Generalization gate run FIRST, exactly as the document requires, independent of
-    blocking choice (it operates on the single best RAW feature).
-"""
+"""F5, predicted FAIL: Zillow city-level home prices, deliberately blocked by an
+arbitrary, non-causal variable (first letter of city name) instead of true geographic
+adjacency -- the point is what happens when a plausible pipeline uses a wrong grouping.
+A bonus arm reruns with Census division as the (sensible) blocking variable instead."""
 import json
 import os
 import urllib.request

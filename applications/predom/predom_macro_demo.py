@@ -1,40 +1,7 @@
-"""F3 (pre-registered 10-domain test): cross-country macro indicators, predicted FAIL.
-
-World Bank API (api.worldbank.org, free, no auth). Panel: annual real GDP growth
-(NY.GDP.MKTP.KD.ZG) for every country with a FULLY COMPLETE series over 1962-2024
-(111 countries after excluding WB's own region/income aggregates) -- the longest
-common window the live API actually supports; GDP growth itself only exists back to
-1961 for a handful of countries and coverage degrades fast before 1962.
-
-Design, deliberately reusing state_econ/demo.py's logic wholesale (see its own
-docstring): raw GDP growth shares a large common GLOBAL business-cycle factor (every
-country's growth dips together in a global recession -- 2009, 2020), so a naive
-lag-1 cross-country correlation would mostly just detect "both countries are in the
-same global cycle," not genuine idiosyncratic co-movement. To isolate the latter,
-every country's growth is expressed as a DEVIATION from the cross-country mean at
-that year before any correlation or fit is computed -- exactly state_econ's
-deviation-from-national-average move, with "national" replaced by "global."
-
-Target country: fixed BEFORE any correlation/fit was run, by the same
-"prominent-but-not-the-single-most-extreme" logic as state_econ's 3rd-highest
-border-degree state / earthquake_japan's 3rd-most-active region -- here, the
-3rd-largest economy by mean nominal GDP (current US$) over the panel window among
-the 111 fully-complete countries. That is Japan (USA, then China, are 1st/2nd;
-China is later excluded as a predictor-only candidate is not needed here, it stays
-in the predictor set). Robust to the exact window choice (checked 1962-2024,
-1965-2024, 1980-2024 -- Japan wins all three).
-
-Two boosting-prior arms are built as this domain's analog of state_econ's two
-independent structures (graph-adjacency, centroid-distance) -- noted honestly in the
-final report that neither is as clean a structural analog as literal county-derived
-state-border adjacency, since no free/no-auth bilateral trade-linkage graph is used:
-  - "region": discrete distance 0 (same World Bank region as Japan, i.e. East Asia &
-    Pacific) / 1 (different region) -- a coarse trade/financial-integration-bloc
-    proxy, this domain's analog of graph hop-distance.
-  - "geo": continuous Euclidean distance between country-capital lat/lon (from the
-    same World Bank country-metadata endpoint), this domain's analog of state_econ's
-    state-capital centroid arm.
-"""
+"""F3, predicted FAIL: cross-country GDP growth (World Bank API), deviation-detrended
+against the global business cycle (state_econ's national-deviation trick, applied
+globally). Two boosting-prior arms: same-region indicator, and capital-to-capital
+distance."""
 import json
 import os
 

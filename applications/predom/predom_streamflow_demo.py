@@ -1,68 +1,9 @@
-"""W3 of the pre-registered 10-domain test (preregistration_10domain_test.md): river
-streamflow network, predicted WORK, plus the first real-data test of
-hierboost.kernels.causal_affinity_1d applied to a genuinely SPATIAL directed structure
-(upstream-can-affect-downstream-but-never-reverse) rather than the calendar-time regime
-structure it has only ever been used for before (finance's look-ahead-bias guard).
-
-Data: USGS NWIS water services (waterservices.usgs.gov, free REST API, no auth), four
-gauges on the Delaware River mainstem, strictly ordered downstream:
-
-    01434000  Port Jervis, NY   (drainage area 3,076 sq mi)   -- predictor, farthest upstream
-    01438500  Montague, NJ      (drainage area 3,480 sq mi)   -- predictor
-    01446500  Belvidere, NJ     (drainage area 4,535 sq mi)   -- predictor, closest upstream
-    01463500  Trenton, NJ       (drainage area 6,780 sq mi)   -- TARGET, most downstream
-
-Chosen after live verification (see fetch_daily_discharge below) that all four have
-essentially gap-free daily-mean discharge (parameter 00060) back to 1939 (Montague's
-start), the earliest common date across all four. Analysis window is restricted to
-1970-01-01 onward, not the full common record: NYC's Delaware-basin water-supply
-reservoirs (Neversink 1953, Pepacton 1955, Cannonsville 1967) materially changed the
-upstream/downstream flow relationship partway through the 1940s-60s by adding
-large-scale storage and diversion -- exactly the kind of slow-but-real regime change
-that should be disclosed and controlled for, not silently averaged over, the same
-discipline earthquake_japan/fetch.py applied when it excluded the Tohoku aftershock
-transient. 1970 onward is a single, internally-consistent, fully-regulated regime with
-56 years of daily data -- still enormous.
-
-Mapping the directed kernel onto real spatial structure (read carefully, this is the
-point of this domain, not just a domain-selection checkbox):
-
-causal_affinity_1d(feature_time, group_l, group_r, bandwidth) was written for a
-calendar-time axis: a feature "as of" some time may only be boosted by a group (a
-market regime, an event window) that has ALREADY RESOLVED by then -- group_r <=
-feature_time, zero affinity otherwise, no partial credit. Every prior use in this
-project (temporal_demo.py, uk_weather's rolling windows) has fed it literal calendar
-time. There is no calendar-time axis here that plays that role -- the thing that is
-genuinely directed here is PHYSICAL POSITION along the river, not time. The
-re-mapping used below treats each candidate raw predictor column (one upstream
-gauge's flow at one lag L days) as the "feature", with feature_time := L itself (the
-lag applied, in days) -- and treats each gauge's OWN minimum physically-possible
-travel time to the target as a single-point "group" (group_l = group_r =
-travel_time_gauge). elapsed = L - travel_time_gauge, exactly the docstring's
-semantics: a lag shorter than the water's physical travel time has NOT resolved --
-using it would not reflect routed upstream water at all, only a same-day/next-day
-correlation driven by shared regional precipitation hitting both gauges near-
-simultaneously (a real but different mechanism, see the diagnostic note near the
-bottom of this file) -- so it gets exactly zero prior credit, no partial credit,
-mirroring the anti-look-ahead discipline the function was built for. Lags at or just
-past the physical minimum get the most credit, decaying exponentially for lags much
-longer than physically necessary (stale, diluted signal). travel_time_gauge itself is
-NOT fit from the response data (that would contaminate the "independent structural
-variable" mechanism check below) -- it is a simple physically-motivated estimate:
-great-circle distance from gauge to target x a meander correction (1.3, a standard
-rule-of-thumb ratio of actual channel length to straight-line distance for a
-moderately sinuous river, disclosed not tuned) / an assumed order-of-magnitude flow
-velocity (2 mph, disclosed not tuned). Each gauge's own set of lag-features is run
-through causal_affinity_1d separately, against only its own single group -- avoiding
-cross-gauge contamination that a naive single shared-group-set call would introduce.
-
-Companion, more familiar use of the directed machinery: decorrelate="ar1"-style
-per-gauge temporal block-latent factor (hierboost.state_space.fit_temporal_block_factor)
-collapsing each gauge's 11 collinear lag-features into one smoothed AR(1) "recent flow
-state" latent -- exactly temporal_demo.py's/uk_weather_star_demo.py's mechanism,
-included so both machineries named in the assignment get exercised, not just the novel
-one.
-"""
+"""W3, predicted WORK: Delaware River streamflow, four USGS gauges strictly ordered
+downstream (1970-2024, post-reservoir regime). First real-data test of
+causal_affinity_1d on physical position rather than calendar time: a lag shorter than
+water's physical travel time from a gauge gets zero prior credit, mirroring the
+anti-look-ahead mechanism it was built for. Also runs the more familiar
+decorrelate="ar1" per-gauge trend-latent path."""
 import json
 import os
 import urllib.request

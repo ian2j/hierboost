@@ -1,28 +1,7 @@
-"""Real-data test of hierboost.copula's marginal transform: does the Gaussian-copula
-generalization of the block-latent model actually help on real, heterogeneous-marginal
-market data, not just the controlled synthetic check in copula_synthetic_validation.py?
-
-Motivation (real, citable stylized fact, not a made-up test case): for a given name/ETF,
-its own daily RETURN and daily dollar VOLUME are known to co-move -- the classic
-"volume-volatility relation" / Mixture-of-Distributions-Hypothesis (Clark 1973, "A
-Subordinated Stochastic Process Model with Finite Variance for Speculative Prices"):
-both are driven by a shared, unobserved daily "information flow"/activity intensity.
-That is exactly hierboost's block-latent premise -- a shared per-block latent driving
-several correlated observed features -- but return and dollar volume have wildly
-different marginal shapes (return ~ roughly symmetric, dollar volume ~ strongly
-right-skewed/lognormal-like), exactly the case factor.py's raw PPCA was never built for
-(see its own docstring: "ideally already standardized").
-
-Design: block ETFs' own {return, dollar_volume} pairs (one block per ETF, block
-structure supplied directly, not correlation-threshold-derived -- the pairing is
-economically motivated, not data-mined), fit each block's shared "activity" latent
-either the raw way (marginal=None) or through the copula transform first
-(marginal="copula"), then use those per-ETF latents to explain AAPL's own return via
-HierBoostRegressor's normal spike-and-slab step. Compared on a genuine chronological
-train/test split (no shuffling -- same no-look-ahead discipline as earthquake_japan/
-uk_weather), since in-sample correlation gains that don't survive an honest split are
-exactly the earthquake demo's cautionary lesson.
-"""
+"""Tests hierboost.copula on real market data: each ETF's own {return, dollar volume}
+pair shares a latent "activity" factor (Clark 1973's volume-volatility relation) but has
+very different marginal shapes. Compares raw vs. copula-transformed block factors for
+predicting AAPL's return, on a genuine chronological train/test split."""
 import numpy as np
 import pandas as pd
 import yfinance as yf

@@ -1,44 +1,6 @@
-"""W1 of preregistration_10domain_test.md: solar power generation across a regional
-grid (predicted WORK). Direct spatial-blocking analog of uk_weather/demo.py -- same
-"predict target from OTHER regions' preceding-window values, no leakage" design and
-the same hierboost.kernels.resolve_affinity(kind="gaussian") boosting-prior machinery
-on real lon/lat centroids -- but an independent physical process (photovoltaic output
-driven by cloud cover / synoptic weather systems) instead of precipitation.
-
-Data source: Open Power System Data time_series package (data.open-power-system-data.org),
-verified live before committing (2026-08-30): the project's maintenance snapshot at
-time_series/2020-10-06/ is still served (HTTP 200, ~130MB), and its 60-minute
-singleindex CSV genuinely contains solar_generation_actual columns for the 4 German
-TSO control zones (50Hertz, Amprion, TenneT, TransnetBW) plus one column per European
-country reporting to ENTSO-E -- exactly the "German/European TSO-zone solar
-generation" layout the preregistration document names. No substitution was needed.
-One honest caveat: OPSD itself stopped actively publishing new snapshots after 2020,
-so this is real historical grid-operator data (sourced originally from ENTSO-E's
-Transparency Platform) through 2020-09, not a live-updating feed -- the data is
-genuine and unmodified, just not current-day.
-
-Target zone: of the 4 German TSO zones (the "regional grid" the domain names), the
-3rd-highest by total 2015-2020 generation -- same "well-connected but not the single
-most extreme" pre-registered pick rule as earthquake_japan's "3rd-most-active point",
-uk_weather's "3rd-most-active grid point", and state_econ's "3rd-highest border-degree
-state", applied here before any model is fit.
-
-Predictor pool: the other 3 German TSO zones (the fine-grained regional grid) plus 15
-European country-level zones with clean (<2% missing over 2015-2020) reporting --
-AT, BE, BG, CH, CZ, DK, EE, ES, FR, GB (UKM), GR, LT, RO, SI, SK. HR/PL/HU (>80%
-missing) and NL/IT (10-13% missing, scattered gaps) were dropped for data-quality
-reasons, not cherry-picked to help the result. Each zone's coordinate is that
-zone's TSO-territory centroid (Germany) or national capital (countries) -- the same
-level of approximation as state_econ's "state capital as physical-distance stand-in",
-used only to build a distance-based boosting prior and mechanism check, not as a
-scientific claim about population-weighted solar centroids.
-
-Task: daily total generation (sum of hourly MW readings, a proxy for daily MWh) at
-the target zone on day t, predicted from every OTHER zone's trailing window of daily
-totals ending at day t-1 (strictly before t, matching uk_weather's no-leakage
-discipline) -- window=1 (yesterday only) is the headline run; window=3 is a secondary
-robustness check, exactly mirroring uk_weather/demo.py's lag-1 / trailing-3 pair.
-"""
+"""W1, predicted WORK: solar generation across 4 German TSO zones + 15 European country
+zones (Open Power System Data, through 2020-09). Same spatial-blocking design as
+uk_weather/demo.py, applied to cloud-cover-driven PV output instead of precipitation."""
 import json
 import os
 import urllib.request

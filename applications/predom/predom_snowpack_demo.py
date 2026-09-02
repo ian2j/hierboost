@@ -1,52 +1,8 @@
-"""Prospective v2 re-test (see preregistration_10domain_test.md, "Prospective re-test
-of v2" section) of hierboost's block-latent decorrelation criterion: snowpack (snow
-water equivalent, SWE) across a real SNOTEL network in a real mountain range.
-Predicted WORK, but -- per the whole point of this re-test -- that prediction must be
-checked against the two NEW, cheap, PRE-FIT conditions v2 added (max same-day
-cross-station correlation < ~0.9; target's own lag-1 autocorrelation not small
-relative to same-day cross-correlation) BEFORE trusting it, not just gestured at.
-
-Data source, verified live 2026-08-30: USDA NRCS's AWDB REST API at
-wcc.sc.egov.usda.gov/awdbRestApi (services/v1/stations, services/v1/data) -- free,
-no auth, no signup. Its own OpenAPI spec (GET /awdbRestApi/v3/api-docs) documents the
-real parameter names (stationTriplets, elements, duration, beginDate/endDate), which
-differ from a first guess (there is no stateCds/networkCds filter -- station
-selection is via stationTriplets wildcards, e.g. "*:CO:SNTL"). The "newer"
-awdb.ars.usda.gov API named in the assignment as an alternative does NOT resolve in
-this environment (curl: connection failure / HTTP 000, checked live); the older
-wcc.sc.egov.usda.gov REST API is the one that actually works, so it is the one used
-here -- exactly the "verify live which endpoint is actually working" instruction.
-
-Mountain range choice, verified live: Colorado has 118 active SNTL stations
-(queried via stationTriplets=*:CO:SNTL), the largest state SNOTEL footprint. Within
-Colorado, the San Juan Mountains (southwest CO) were picked for this domain: a real,
-named range with a dense cluster of 19 SNTL stations with long (1978-1990 start),
-clean daily WTEQ (snow-water-equivalent) records -- verified live by fetching all 19
-and checking missingness before committing to any of them as predictors or target.
-One station (Cascade #2, 387:CO:SNTL) has 2.1% missing days over 1990-2024, just
-above this project's standing <2% "clean" threshold (predom_solar's zone-filter
-precedent) and is dropped; the remaining 18 stations have <=0.5% missing each and a
-common fully-covered window of 12,740 consecutive days (1990-01-01 to 2024-12-31, 35
-years) with zero imputation -- the cleanest, longest raw panel of any domain in this
-project to date.
-
-Task: target station's daily SWE (inches) on day t, predicted from every OTHER San
-Juan station's trailing window of daily SWE ending at day t-1 (strictly before t, no
-leakage) -- window=1 (yesterday only) is the headline run, window=3 (trailing 3-day
-MEAN, since SWE is a level/state variable like PM2.5's concentration, not an additive
-quantity like solar generation or precipitation counts) is a secondary robustness
-check. Target station picked by this project's standing pre-registered-pick
-convention (3rd-highest of the pool by a metric fixed before any model is fit -- here,
-mean WTEQ across the 35-year sample, the natural "how snowy is this station"
-analogue of solar's "3rd-highest zone by total generation" and air quality's
-"3rd-highest site by observation count"): 713:CO:SNTL, "Red Mountain Pass" (11,060 ft,
-between Silverton and Ouray).
-
-THE KEY DIFFERENCE FROM EVERY PRIOR WORK-PREDICTED DOMAIN: the two new v2 conditions
-(condition2_precheck, condition5_precheck below) are computed and reported FIRST,
-directly from this raw fetched panel, before any model-fitting code runs -- per the
-document's explicit instruction that this is the entire point of the re-test.
-"""
+"""Prospective v2 re-test of the block-latent decorrelation criterion: real SNOTEL
+snow-water-equivalent network in Colorado's San Juan Mountains (18 clean stations,
+1990-2024). Predicted WORK, but checked against two new pre-fit conditions (max
+cross-station correlation, target's own autocorrelation) before trusting it -- computed
+and reported FIRST, per the whole point of this re-test."""
 import json
 import os
 import urllib.parse

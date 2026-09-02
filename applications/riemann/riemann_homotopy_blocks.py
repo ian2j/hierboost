@@ -1,22 +1,7 @@
-"""Genuine BLOCK-level analysis of the homotopy-exception pilot (riemann_homotopy_pilot.py).
-
-That first pilot ran HierBoostClassifier with decorrelate=None -- meaning every one of
-the 21 raw features (Re/Im at 9 checkpoints + 3 final-value summaries) was its own
-singleton unit in the spike-and-slab prior. That answers "does this feature set predict
-exceptions" but NOT hierboost's actual namesake question -- which BLOCKS of related
-features matter, and does that block importance vary systematically.
-
-Natural block structure here: the 9 checkpoints are ORDERED (10%, 20%, ..., 90% of the
-way through the partial sum), each checkpoint contributing a (Re, Im) pair -- collapse
-each pair into one shared latent block-factor via hierboost.factor.gaussian_block_factor
-(probabilistic PCA), same mechanism Haxby/20-Newsgroups used for continuous features with
-a binary outcome (HierBoostClassifier(decorrelate=...) can't do this directly for a
-binomial response -- it routes unconditionally through Chapter 4's discrete/JAX path,
-which assumes raw features are themselves Binomial; a known API gap documented in
-newsgroups_demo.py). The 3 final-value summary features (log|S_M|, cos/sin(arg S_M))
-form one additional "final" block. 10 blocks total, fit with hierboost.spike_slab.em_filter
-directly on the block scores.
-"""
+"""Block-level follow-up to riemann_homotopy_pilot.py: instead of treating all 21 raw
+features as singletons, groups the 9 ordered checkpoints' (Re, Im) pairs into shared
+latent blocks via gaussian_block_factor, asking which BLOCKS of related features predict
+a homotopy exception, not just which raw features."""
 import json
 import numpy as np
 import pandas as pd

@@ -1,34 +1,8 @@
-"""Pilot test: does the FINITE partial sum P(s) = sum_{n=1}^{M} (-1)^(n+1) n^(-s),
-M = floor(t/pi), carry structure predictive of whether a zero is a "homotopy exception"
-(files 39/40/43/48/49 of ~/Research/Riemann/writeup)?
-
-Why this response variable and not the original literal proposal (predict arg/modulus
-of P(s) from its own terms): that version is tautological -- P(s) IS the exact sum of
-those terms, so any regression trivially "solves" it with unit coefficients. The
-exception label is NOT computable from P(s)'s terms in closed form -- it comes from a
-separate homotopy continuation of P_sym(s) + lambda*T(s) as lambda: 1->0 (files 34/39),
-so there is a genuine question here: do the M raw terms, or some low-dimensional shape
-summary of them, carry independent signal about that downstream outcome?
-
-Ground truth: ~/Research/Riemann/writeup/homotopy_exception_gap_data.json, 150 real
-zeros, 17 already-classified as exceptions (re_landing off the critical line).
-
-Feature design, built to survive the two failure modes already logged elsewhere in this
-project (H(x)-at-7-points: too deterministic/collinear; MovieLens: too weak):
-  - M varies hugely across rows (32 to 385, since t spans 101 to 1210), so raw term
-    values at fixed n don't align across rows. Instead: sample the partial-sum
-    TRAJECTORY S_j = sum_{n=1}^{j} (-1)^(n+1) n^(-s), j=1..M, at 9 relative checkpoints
-    j = round(f*M) for f in {0.1,...,0.9}, and express each as a RATIO r_j = S_j / S_M
-    (approach-path shape relative to the final value) -- this is deliberately NOT just
-    re-deriving P(s) itself (r_M = 1 trivially, dropped), it's asking whether the SHAPE
-    of the approach to P(s) carries signal, independent of P(s)'s own final value.
-  - 3 summary features of the final value: log|S_M|, cos(arg S_M), sin(arg S_M).
-  - 21 features total (9*2 + 3), all on sigma=1/2 (the critical line, matching the zero).
-A separate 2-feature (log t, log M) "trivial" baseline is fit alongside, since M/t is a
-strong potential confound (files 39/40 already tie exceptions to local gap irregularity,
-which varies with height) -- the real test is whether the 21-feature model beats this,
-not whether it beats chance.
-"""
+"""Pilot: does the finite partial sum P(s) (M=floor(t/pi) terms) carry structure
+predictive of whether a zero is a "homotopy exception"? Features are the approach-path
+shape of the partial-sum trajectory (9 checkpoint ratios r_j = S_j/S_M) plus 3 final-value
+summaries -- not the raw sum itself, which would be tautological. Ground truth: Ian's
+150-zero, 17-exception dataset."""
 import json
 import os
 

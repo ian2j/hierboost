@@ -1,25 +1,7 @@
-"""Robustness check + deeper dig on the zeta_pair_residual.py "+75 degree dominant
-block" finding.
-
-Two concerns raised and checked here:
-
-1. WRAP-AROUND ARTIFACT (found real, fixed): a histogram of the raw `resid` values
-   showed 25/150 rows sitting right at the +-pi boundary, with a clear bimodal gap in
-   the middle of the range -- strong evidence the underlying quantity is a smoothly
-   varying angle that wraps across the branch cut, which would corrupt an ordinary
-   least-squares fit on the raw signed radian value (a wrap looks like a huge outlier
-   to OLS even though it's a tiny true change). Fixed by regressing on cos(resid) and
-   sin(resid) separately (the wrap-safe representation) instead of resid itself.
-
-2. BINNING-ARTIFACT check: does the dominant sector survive changing bin count and
-   phase offset? If it's a real concentration of "explaining power" at a specific
-   angle, the winning region should track a consistent real angle as the arbitrary
-   bin grid is moved/resized, not jump incoherently.
-
-Then: for whichever region survives both checks, actually look at which (m,n) pairs
-populate it, across a few different (t,u) rows, for a real arithmetic explanation
-rather than trusting the theta_hat number alone.
-"""
+"""Robustness check on zeta_pair_residual.py's dominant-block finding: (1) fixes a real
+wrap-around artifact by regressing on cos/sin of the residual angle instead of the raw
+signed value, (2) checks the finding survives changing the angular bin grid, (3) looks
+at which actual (m,n) term pairs populate the surviving block."""
 import numpy as np
 import pandas as pd
 

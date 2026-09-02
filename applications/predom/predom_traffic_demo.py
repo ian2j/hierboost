@@ -1,75 +1,7 @@
-"""W5 of the pre-registered 10-domain test (preregistration_10domain_test.md): urban
-traffic congestion across a road-sensor network, predicted WORK.
-
-Data source, verified live 2026-08-30 (see module history -- both candidates named in
-the assignment were actually tried, not assumed):
-  - Chicago's data.cityofchicago.org (Traffic Tracker historical congestion,
-    resource sxs8-h27x) was tried FIRST, per the assignment's instruction to check both
-    -- every request (curl, repeated with 20s/40s timeouts, from this environment)
-    timed out completely (HTTP 000, no response), while a Chicago-side dataset-metadata
-    request behaved identically. This reads as a network-reachability limitation of the
-    current sandbox toward that specific host, not a Socrata/API design problem -- but
-    per the assignment's "use whichever genuinely works" instruction, it is not usable
-    here and the decision is not revisited.
-  - NYC's data.cityofnewyork.us (Socrata, no auth) responded immediately and reliably.
-    Dataset used: "DOT Traffic Speeds NBE" (resource i4gi-tjb9) -- NYC DOT's live
-    Bluetooth/TRANSCOM travel-time sensor network, one row per (link, ~5-minute poll),
-    111M+ rows total, updated continuously, retained with genuine multi-month history
-    (verified: the 15 links used below each have ~24,000 polls spanning 2026-06-01
-    through 2026-08-29 with no gaps). This is the dataset actually used.
-
-Building a genuinely LOCAL road-network graph (the assignment's explicit design
-requirement -- "one city's arterial network, not something diffuse", the specific
-fix for state_econ's diffuse-nationwide-graph miss): the dataset's ~125 currently-
-polling "link_id" sensors each carry a `link_points` field, an ordered polyline of
-lat/lon vertices marking the physical stretch of roadway that TRANSCOM link covers.
-Two links are declared graph-adjacent here if one link's END vertex sits within 80m
-(haversine) of another link's START vertex -- i.e. adjacency is derived directly from
-real road geometry, not from name-matching or any coarser proxy. This is a stricter,
-more literal reading of "real road-network adjacency" than the state-border
-county_adjacency.txt precedent (hop-count on a literal, physically-verified graph
-rather than an administrative one), computed exactly the same way house style
-requires: from authoritative structural data, not fit to the response.
-
-Applying this to all ~125 currently-polling links (see explore_corridor() below, run
-once and result hard-coded here -- the search itself touches no response data) finds
-one clean, non-trivial connected component: 15 links along the Staten Island
-Expressway (I-278) / West Shore Expressway interchange in Staten Island, both
-directions, hop-distances 1-9. This is picked because it is the largest connected
-local cluster the live geometry search actually returned, not hand-selected for a
-particular narrative -- smaller components (e.g. a 3-node cluster in Queens) exist
-too but 15 nodes is closer to this project's usual predictor-set size (state_econ:
-51, streamflow: 4) and gives the sparsity machinery something real to chew on.
-
-Target segment: pre-registered rule, same "well-connected but not the single most
-extreme" logic as earthquake_japan's 3rd-most-active pick / state_econ's 3rd-highest
-border-degree state -- the 3rd-highest-degree node in the 15-node adjacency graph,
-computed from the graph alone before any response data is touched. Five nodes tie at
-degree 3 for the 3rd-highest slot (one node has degree 4, the other nine have degree
-1-2); the tie is broken by lowest link_id, also fixed before fitting. This lands on
-link_id 4616197, "SIE E SOUTH AVENUE - RICHMOND AVENUE" (Staten Island Expressway
-eastbound, between the Richmond Ave and South Ave interchanges), degree 3.
-
-Data-quality disclosure (real sensor-network messiness, not smoothed away): each poll
-carries a `status` code; 0 means a valid Bluetooth-matched travel-time read, negative
-codes (chiefly -101) mean too few vehicle reads were matched in that window to trust
-the estimate -- concentrated overnight when traffic volume is low. Coverage varies a
-lot by link (36%-99% valid-status rate across the 15 links here, checked live). Only
-status=0 reads are used; they are then aggregated to HOURLY MEAN speed per link (also
-damps residual 5-minute sensor noise) -- turning a noisy, irregularly-gapped 5-minute
-poll stream into a regular grid, the same kind of real-world cleanup step streamflow's
-gap-fill and uk_weather's rolling windows already established as this project's norm.
-Remaining sparse hourly gaps (mainly the two lower-coverage links) are forward-filled
-up to 3 hours, matching streamflow_delaware's disclosed small-gap tolerance; any
-hour where a link still has no value after that is dropped from the aligned matrix.
-
-Task: predict the target link's hourly mean speed at hour t from the 14 OTHER links'
-hourly mean speed at hour t-1 (strict lag, no leakage), graph-blocked by real hop-
-distance via hierboost.kernels.graph_affinity / resolve_affinity(kind="graph") -- the
-exact mechanism state_econ used for state-border adjacency, applied here at
-arterial-segment scale instead of state-border scale, per the assignment's explicit
-instruction to build the graph "genuinely local" this time.
-"""
+"""W5, predicted WORK: NYC DOT traffic-speed sensors on the Staten Island Expressway,
+graph-blocked by real road-segment adjacency (link endpoints within 80m) rather than an
+administrative proxy -- the fix for state_econ's diffuse nationwide graph. Predicts the
+target segment's hourly speed from 14 neighboring segments' prior-hour speed."""
 import json
 import math
 import os

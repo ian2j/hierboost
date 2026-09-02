@@ -1,66 +1,7 @@
-"""W2 of preregistration_10domain_test.md: urban air quality (PM2.5) across an EPA
-monitoring network (predicted WORK). Direct spatial-blocking analog of
-uk_weather/demo.py and predom_solar_demo.py -- same "predict target from OTHER
-sites' preceding-day value(s), no leakage" design and the same
-hierboost.kernels.resolve_affinity(kind="gaussian") boosting-prior machinery on real
-lon/lat centroids -- but an independent physical process (pollutant dispersion
-across a metro-area monitoring network) instead of precipitation or solar generation.
-
-Data source: EPA AQS pre-generated annual "daily summary" flat files
-(aqs.epa.gov/aqsweb/airdata/download_files.html), verified live before committing
-(2026-08-30): https://aqs.epa.gov/aqsweb/airdata/daily_88101_<year>.zip returns
-HTTP 200 (~5-10MB per year, all-US data for one pollutant/parameter code) with no
-signup or API key needed -- exactly the "pre-generated flat file, NOT the AQS API"
-route the assignment calls for. Parameter code 88101 = PM2.5 FRM/FEM Mass (the
-official reference/equivalent-method monitors), "24 HOUR" sample duration only.
-Per the practical note from the interrupted prior attempt, this run scopes to 5
-years (2018-2022) for one metro area -- a handful of years, not an excessive range;
-each year-file covers all US states, so the "handful of years" choice (not
-"handful of states", since download granularity is by year) is what keeps this
-fast: ~35MB total across 5 years, filtered locally to one metro.
-
-Metro-area choice, verified live rather than assumed: across the 2018-2022 files,
-Chicago-Naperville-Elgin, IL-IN-WI has 21 distinct PM2.5 (88101, 24 HOUR)
-monitoring sites -- tied with New York-Newark-Jersey City for the most in the
-country, and well ahead of Los Angeles (12, the assignment's own suggested
-example) and Riverside-San Bernardino (11). Chicago is used in preference to
-New York because its sites sit in a tighter radius (max 67km from the metro
-centroid vs New York's 85km, both computed live from the same files) -- i.e. a
-real substitution from the assignment's suggested LA, made because Chicago is
-live-verified to have both MORE stations and a comparably tight radius, not
-because LA was broken or unavailable.
-
-EPA FRM/FEM PM2.5 monitors do not all sample daily -- many run a legally-mandated
-1-in-3 or 1-in-6 day schedule, only some (typically the higher-population/
-non-attainment-relevant sites) run daily. This means a strict "all N stations
-present, no imputation" rectangular panel (the discipline uk_weather/predom_solar
-use) shrinks fast as more stations are added. Rather than impute values EPA never
-measured, the analysis pool is restricted to the N_STATIONS most-complete monitors
-in the metro (by total observation count across the 5 sample years) -- a
-data-completeness filter, decided before any model is fit, directly analogous to
-predom_solar's "clean <2% missing" zone filter. Target selection within that pool
-follows this project's standing pre-registered-pick convention: the 3rd-highest of
-the pool by total observation count (well-monitored, not the single most-extreme
-site) -- same rule family as earthquake_japan's "3rd-most-active point",
-uk_weather's "3rd-most-active grid point", and predom_solar's "3rd-highest DE TSO
-zone by generation".
-
-Task: target site's daily PM2.5 (arithmetic mean, ug/m3) on day t, predicted from
-every OTHER site's trailing window of daily means ending at day t-1 (strictly
-before t, no leakage) -- window=1 (yesterday only) is the headline run; window=3
-(trailing 3-day mean) is a secondary robustness check, mirroring
-uk_weather/predom_solar's lag-1 / trailing-window pair. Unlike solar's daily TOTAL
-generation (additive) or uk_weather's wet-day COUNT (additive), PM2.5 is a
-concentration level, so the trailing window is averaged, not summed.
-
-A same-day (contemporaneous, non-lagged) diagnostic is also run and reported
-alongside the official lag-1 gate -- NOT as an alternate gate or a way to rescue a
-FAIL, but to distinguish, if the lag-1 gate does fail, between "no real correlation
-exists in this domain" and "real, local, spatially-clustered correlation exists
-same-day but does not persist strongly enough day-to-day to survive a genuine
-one-day-ahead forecast" -- the latter being a different, more specific failure mode
-than the criterion's usual "correlation absent" case.
-"""
+"""W2 of the pre-registered 10-domain test: EPA PM2.5 monitoring network, predicted
+WORK. Same spatial-blocking design as uk_weather/predom_solar (predict target site from
+other sites' preceding value, no leakage) applied to pollutant dispersion instead of
+precipitation. Data: EPA AQS daily summary files, Chicago metro (21 sites)."""
 import json
 import os
 import urllib.request

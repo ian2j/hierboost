@@ -1,27 +1,7 @@
-"""Prototype: hierboost as a sparse "which ray-blocks drive the alignment" tool for
-g(u) = P_M(1/2-u+it) * P_M(1/2+u+it), P_M = truncated ORDINARY zeta partial sum
-(sum_{n=1}^M n^-s, no alternating sign -- per Ian's note that eta's sign isn't needed here).
-
-Exact identity (derived and numerically verified, see conversation): for the FULL zeta,
-  zeta(1/2-u+it) * zeta(1/2+u+it) = chi(1/2-u+it) * |zeta(1/2+u+it)|^2
-so arg(full g(u)) = arg(chi(1/2-u+it)) EXACTLY -- a known closed form (Gamma/sine/power
-functions only, no zeta zeros needed). Ian's question: for the TRUNCATED partial sum,
-which terms/blocks of terms are actually responsible for pulling the finite-M resultant
-vector toward that theoretical target direction, and does that subset shift as t slides.
-
-Term-level structure: term(m,n) = m^(-1/2+u) n^(-1/2-u) (mn)^(-it) has phase depending
-ONLY on the product k=mn (not on u, not on m/n individually) -- exactly -t*ln(mn) mod 2pi.
-So "alignment with the target direction" is organized by ANGULAR BLOCKS: for each (m,n)
-pair rotate its contribution by e^(-i*target_angle) (so alignment = positive real part)
-and bin by the rotated phase into K angular sectors. Summing all bins reproduces the
-exact residual (arg(g_M(u)) - target) -- so this is fundamentally a DESCRIPTIVE / sparse
-variance-decomposition use of hierboost (like a weighted PCA), not a "predict an unknown
-quantity" task the way the homotopy-exception classifier was -- flagged explicitly rather
-than oversold. What IS non-trivial: the features are a LOSSY, coarse-binned summary (12
-angular sectors, not the ~M^2 individual terms), so which sectors carry most of the
-CROSS-(t,u)-ROW VARIANCE in the residual is a real empirical question about where zeta's
-partial-sum "resultant vector" energy concentrates, not immediately obvious by inspection.
-"""
+"""Prototype: hierboost as a descriptive tool for which angular blocks of terms in the
+truncated zeta product g(u) = P_M(1/2-u+it)*P_M(1/2+u+it) pull its argument toward the
+known closed-form target angle (exact for the full zeta, via chi). A variance-
+decomposition use of hierboost, not a predictive one."""
 import numpy as np
 import pandas as pd
 import mpmath as mp

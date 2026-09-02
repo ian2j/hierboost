@@ -1,13 +1,6 @@
-"""Chapter 4's idea applied to real market data: decompose a stock's returns in terms
-of correlated ETFs, comparing raw multi-regression, ridge, and block-factor regression.
-
-Raw sector/index ETFs are extremely collinear (SPY, QQQ, XLK, VGT, SMH all move together
-on a given day) -- exactly the LD-block problem Chapter 4 was built for, just with tickers
-standing in for SNPs. For continuous returns, the block-latent estimation step has a
-closed-form solution (probabilistic PCA / a one-factor model per block) instead of the
-discrete SAR/Newton machinery latent.py uses for genotype counts -- see
-hierboost.factor.gaussian_block_factor, the Gaussian-observation analogue.
-"""
+"""Chapter 4's block-latent idea on real market data: decomposes a stock's returns
+against a set of collinear sector/index ETFs, comparing raw regression, ridge, and
+block-factor regression."""
 import os
 import numpy as np
 import pandas as pd

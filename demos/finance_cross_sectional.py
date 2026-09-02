@@ -1,16 +1,7 @@
-"""The cross-sectional version: run the same factor-selection screen independently
-across many stocks, with each stock's relevance prior built automatically from its
-own (Yahoo-reported) sector -- no more hand-picking one target and writing one
-relevance dict by hand.
-
-This is the direct "GWAS on stocks" analogy from the extension list: instead of one
-trait (one stock) screened against many markers (factors) once, screen MANY traits
-(many stocks) against the same marker panel, each with its own gene-proximity-style
-prior (here: "is this factor block in/adjacent to my own GICS sector"), and ask
-whether the informative prior *systematically* helps across the whole cross-section
--- the same aggregate-comparison logic as the original paper's simulation study,
-just run on real assets instead of simulated replicates.
-"""
+"""Runs the factor-selection screen across many stocks at once, each with its own
+sector-based relevance prior built automatically from Yahoo sector metadata -- the
+"GWAS on stocks" analogy: many traits (stocks) against one marker panel, each with its
+own proximity prior."""
 import os
 import numpy as np
 import pandas as pd

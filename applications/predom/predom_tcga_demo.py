@@ -1,55 +1,7 @@
-"""W4 of preregistration_10domain_test.md: gene co-expression predicting a real
-clinical/molecular trait (predicted WORK). Direct structural analog of
-genomics_1kg_eqtl.py -- same "raw feature -> hierboost.structure block-latent
-factor -> spike-and-slab regression, held-out split, baseline suite" pipeline --
-but this time genuinely designed to have a plausible biological signal end to end,
-closing the "real phenotype, not proxy" gap the eQTL thread (LCT/APOL1) never fully
-closed: LCT/APOL1 predicted GENE EXPRESSION from SNP genotype; this predicts a real
-QUANTITATIVE MOLECULAR/CLINICAL VARIABLE (tumor mutational burden) from
-gene-expression CO-EXPRESSION MODULES, blocked with the same
-hierboost.structure.blocks_from_correlation_threshold machinery used in
-finance_cross_sectional.py, instead of LD-distance blocking.
-
-Data source: cBioPortal public REST API (cbioportal.org/api), verified live
-2026-08-30, OPEN-ACCESS tier only (no auth used or required, no controlled-access
-TCGA data touched):
-  - study:      brca_tcga_pan_can_atlas_2018 (TCGA Breast Cancer, PanCancer Atlas)
-  - expression: <study>_rna_seq_v2_mrna_median_all_sample_Zscores (RNA Seq V2 RSEM,
-                z-scored relative to all samples in the cohort) -- 1082 samples with
-                complete data over the gene panel below, verified live (NA
-                fraction = 0.0 over the full fetched matrix).
-  - target:     TMB_NONSYNONYMOUS, a SAMPLE-level clinical attribute (tumor
-                mutational burden, nonsynonymous mutations per Mb) -- a genuinely
-                measured, continuous molecular variable, NOT an ancestry-label
-                proxy and NOT a gene-expression-derived signature score (the
-                cohort's hypoxia/ESTIMATE-style scores were deliberately avoided
-                for exactly that reason: they are themselves linear combinations of
-                expression, which would make "predicting them from expression
-                modules" circular by construction). 1066 of 1082 samples have a
-                non-missing TMB value; 1064 samples overlap after joining to the
-                expression matrix -- confirmed live before committing to this
-                cohort/variable pair.
-
-Why TMB is a fair, non-circular target: it is computed from an independent assay
-(the somatic mutation calls), not derived from the RNA-seq data at all. It also has
-a well-documented, moderate (not saturated) mechanistic link to gene expression: a
-higher neoantigen load from more somatic mutations recruits immune infiltration
-(cytolytic/interferon-response genes), and DNA-repair/replication-stress pathway
-activity both drives and responds to mutation accumulation -- exactly the kind of
-"real biological signal, plausible but not already a known-null single gene" this
-domain is supposed to test, in contrast to the eQTL thread's single-SNP-vs-single-
-gene design.
-
-Gene panel: 235 genes (see GENE_GROUPS below), chosen for an a priori biological
-rationale BEFORE any correlation with TMB was checked -- proliferation/cell-cycle,
-DNA-damage-response/repair, and immune/interferon-response genes (all with a
-documented mechanistic link to somatic mutation burden), plus PAM50-adjacent
-subtype-identity genes and a diffuse housekeeping/pan-cancer-driver background set
-(both included as genuine "should NOT particularly predict TMB" controls, not
-padding). This grouping is also used, unchanged, for the mechanism-validation check
-in outcome rule 2(b): each gene's a priori group is fixed at panel-design time and
-never revised after seeing results.
-"""
+"""W4, predicted WORK: TCGA breast cancer gene expression predicting tumor mutational
+burden (a real, independently-assayed molecular variable, not an expression-derived
+score) from 235 genes grouped into correlation-threshold co-expression blocks. Direct
+structural analog of the eQTL demos, with a genuinely non-circular target."""
 import json
 import os
 import time

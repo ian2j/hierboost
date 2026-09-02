@@ -1,13 +1,7 @@
-"""End-to-end demonstration of the spatial_boost package.
-
-Two parts:
-  1. A Monte Carlo comparison (many replicates) of single-SNP ranking vs. the
-     Spatial Boost model with and without the gene-proximity boost, echoing the
-     comparison in Sec 6.2 of the paper.
-  2. A single detailed walkthrough (one replicate) showing the full pipeline --
-     phi selection, EM filtering trace, kappa selection via EMBFDR, Gibbs
-     sampling, and the centroid estimator -- with plots saved to ./figures.
-"""
+"""GWAS demo: a Monte Carlo comparison of single-SNP ranking vs. Spatial Boost with and
+without a gene-proximity prior, plus a one-replicate walkthrough of the full pipeline
+(phi selection, EM filtering, kappa selection, Gibbs sampling, centroid estimator).
+Plots saved to figures/."""
 import os
 import time
 import numpy as np

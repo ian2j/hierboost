@@ -1,32 +1,7 @@
-"""Second cross-domain application of hierboost, and the first real dogfooding of the
-new unified `HierBoostRegressor` API (hierboost.estimator, built in a parallel session
-while haxby_demo.py was in progress): predicting one movie's rating from a broad universe
-of *other* movies' ratings, with movies grouped into genre blocks -- a direct structural
-match to finance_factor_selection.py's "predict AAPL from a universe of other assets,
-blocked by GICS sector," just with movies-by-genre standing in for assets-by-sector.
-
-Real, public, canonical data: MovieLens 100K (GroupLens Research, grouplens.org),
-downloaded on first run and cached locally (same pattern as nilearn's own fetch_* cache).
-
-Target: "Star Wars (1977)" (item 50), the single most-rated movie in ml-100k (583
-ratings) -- chosen the same principled way AAPL was chosen as the finance demo's target,
-as the best-populated column, not cherry-picked for a favorable result.
-
-Preprocessing: per-user mean-centering (standard collaborative-filtering practice --
-removes each user's own generosity/stinginess bias before modeling which OTHER movies'
-ratings move together) followed by zero-imputation of a user's unrated movies in the
-top-200 dense core (a centered 0 represents "this user's own average," a far better
-placeholder than a raw column mean once centering has already removed user bias).
-
-Genre blocks are the movies' *actual* listed genre (first flagged genre per movie, since
-hierboost's block partition is non-overlapping). Also runs a second hierboost variant
-blocked by `blocks_from_correlation_threshold` -- the actual method finance_factor_
-selection.py uses for asset blocks (data-driven co-movement, not metadata) -- as a
-direct methodological comparison: is a poor showing (if any) specific to genre being a
-weak correlation proxy, or does the block-latent premise (many features are strongly,
-locally correlated) just not hold for MovieLens ratings at all, the way it clearly does
-for LD-correlated SNPs / spatially-adjacent BOLD voxels / sector-correlated ETFs?
-"""
+"""First real dogfooding of HierBoostRegressor: predicts one movie's rating from other
+movies' ratings, blocked by genre -- the finance-factor-selection idea with movies
+standing in for assets. Target is "Star Wars (1977)", the most-rated movie. Also tries
+correlation-threshold blocking as a comparison to genre blocking."""
 import os
 import io
 import zipfile

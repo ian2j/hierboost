@@ -1,9 +1,6 @@
-"""Look at hierboost's FULL retained block set per locus (not just the single
-top-by-theta block used for the localization-distance metric elsewhere) -- Ian's
-question: is the model's sparsity actually useful, and are the non-top retained blocks
-picking up real secondary signal (independent hits, LD-adjacent structure, other genes
-in the fetched window) or just noise?
-"""
+"""Looks at hierboost's full retained block set per locus (not just the top block used
+for the localization metric elsewhere): are the secondary retained blocks picking up
+real signal, or just noise?"""
 import json
 import os
 

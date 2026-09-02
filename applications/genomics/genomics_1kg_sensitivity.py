@@ -1,30 +1,6 @@
-"""Hyperparameter/prior sensitivity sweep for hierboost's block-latent + spike-slab
-pipeline, across the same 10 1000 Genomes loci used in paper/main.tex -- added
-2026-08-28 at Ian's request, shifting focus from the SuSiE horse-race
-(genomics_1kg_locus.py) to a question the dissertation itself only ever asked on
-synthetic data (Ch2 Sec 2.3.3's kappa guidance, Ch3 Sec 3.3.1's kappa/xi1
-misspecification study, Ch4 Sec 4.1.1's zeta guidance): does tuning these actually
-change performance and/or localization on real data, or is the model's behavior flat
-across its own hyperparameter range?
-
-Three independent 1D sweeps around the paper's default operating point (kappa=100,
-gap_percentile=75 i.e. auto-zeta, prior inclusion prob=0.15), one parameter varied at a
-time with the other two held at default -- the same one-at-a-time design the
-dissertation's own Ch3 sensitivity studies used, rather than a full factorial grid,
-to keep each parameter's effect individually readable:
-
-  - kappa (spike/slab variance separation): {10, 100*, 1000, 10000}
-  - gap_percentile (block granularity -- what percentile of consecutive-SNP-gap
-    distances gets treated as a block boundary; higher = fewer, larger blocks):
-    {50, 75*, 90}
-  - prior inclusion probability (xi0 = logit(p)): {0.05, 0.15*, 0.30}
-  (* = default, shared across all three sweeps, fit only once per locus)
-
-Reuses the cached .npz region data already fetched for genomics_1kg_locus.py -- no new
-data fetching needed. Skips the baseline classifiers and SuSiE entirely
-(cross_validate_hierboost_only) since only hierboost's own fit changes across grid
-points, making this far cheaper than the original 10-locus benchmark run.
-"""
+"""Hyperparameter sensitivity sweep (kappa, block granularity, prior inclusion
+probability) across the same 10 loci used in the paper, one-at-a-time around the default
+operating point -- does tuning actually change performance/localization on real data?"""
 import argparse
 import glob
 import json

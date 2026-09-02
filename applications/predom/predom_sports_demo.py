@@ -1,58 +1,7 @@
-"""F4 of preregistration_10domain_test.md: NBA player per-game statistics, grouped by
-position, predicted to FAIL for the same reason MovieLens failed -- a plausible-
-sounding grouping variable ("position") that individual athletic performance is
-expected NOT to share much structure with, since scoring on a given night is
-dominated by idiosyncratic skill, role/usage, matchup and health, not shared
-position identity across different teams and games. This script is the fresh-domain
-analog: same overall design as movielens_demo.py (dense core of most-observed
-"items", per-entity mean-centering, zero-imputation of missing entity-context cells,
-genre/position block-latent hierboost vs. a correlation-threshold block-latent
-variant vs. a conventional baseline suite), just with NBA players standing in for
-movies and game-date standing in for user.
-
-Real, public, canonical data: nba_api (unofficial wrapper around stats.nba.com's own
-public JSON endpoints, no key needed). Verified live before committing to it --
-`nba_api.stats.endpoints.leaguegamelog` (all players' box scores for a season in one
-call) and `commonteamroster` (roster + listed POSITION per team-season) both returned
-clean data on the first attempt with no rate-limiting, so no MLB fallback was needed
-(the preregistration document flags this as a real decision point to report either
-way -- here the primary source worked, no substitution to flag).
-
-Target metric: points per game (PTS), the standard box-score performance number.
-Two full regular seasons are fetched (2022-23, 2023-24) to give a *season-based*
-held-out split with zero leakage -- train on 2022-23 in full, evaluate on 2023-24 in
-full, exactly the "held-out window" structure the project's own generalization gate
-was designed around (same logic as the train-window/held-out-window checks used
-elsewhere in this project, just with a season boundary standing in for a time
-boundary within one season).
-
-Player universe ("dense core"): players with >=40 games played in BOTH seasons (a
-stable-roster analog of MovieLens's "top-200 most-rated movies" -- filters out noisy,
-low-sample call-ups/two-way players the same way MovieLens's cutoff filtered out
-barely-rated movies), then the top 200 of those by combined games played, mirroring
-N_CORE_MOVIES=200 exactly. The target player is the single one with the most combined
-games played across both seasons -- chosen the same principled, non-cherry-picked way
-Star Wars was chosen in movielens_demo.py (best-populated column), not for a
-favorable result.
-
-Preprocessing: per-player mean-centering using TRAIN-season (2022-23) means only,
-applied to both train and test (avoids leaking any test-season information into the
-centering step, a step stricter than movielens_demo.py's pooled centering since here
-the two halves are genuinely disjoint seasons, not CV folds of one exchangeable pool).
-A centered 0 on a date a player didn't play represents "this player's own average" --
-the same zero-imputation logic movielens_demo.py used for a user's unrated movies.
-
-Position blocks are the literal roster-listed POSITION string from
-commonteamroster for the 2023-24 season (e.g. "G", "F", "C", "G-F", "F-C" -- these
-combo tags are nba_api's actual granularity; there is no PG/SG/SF/PF/C split
-available without a non-free source). Each player has exactly one such string, so
-unlike MovieLens's multi-flag genre field there is no "primary genre" argmax step
-needed -- the listed position already is a non-overlapping label. A second hierboost
-variant blocked by `blocks_from_correlation_threshold` (fit on TRAIN only, rho=0.2,
-same threshold movielens_demo.py used) is run alongside it for the same diagnostic
-reason: is any failure specific to position being a weak proxy, or does the
-block-latent premise not hold for player-level scoring variation at all.
-"""
+"""F4, predicted FAIL for the same reason MovieLens failed: NBA player scoring grouped
+by position, a plausible-sounding label that individual performance isn't expected to
+share much with. Same design as movielens_demo.py (dense core, mean-centering,
+genre/position blocks vs. correlation-threshold blocks), season-based train/test split."""
 import os
 import json
 import time

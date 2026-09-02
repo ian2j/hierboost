@@ -1,34 +1,8 @@
-"""Real-data stretch goal for hierboost.sumstats: fit the summary-statistics-only
-spike-and-slab model to real GLGC 2021 LDL cholesterol GWAS summary statistics (EUR
-ancestry) at the LDLR locus (chr19, GRCh37), using real 1000 Genomes EUR genotypes as
-the LD reference panel -- the two data sources genomics_glgc_fetch.py and
-genomics_1kg_fetch.py already fetch separately. LDLR is the standard textbook LDL locus
-(also one of the loci SuSiE-RSS's own paper validates on), chosen for exactly that
-reason -- not an arbitrary pick.
-
-Runs entirely in the main env (numpy<2/scipy/hierboost); assumes genomics_glgc_fetch.py
-and genomics_1kg_fetch.py have already been run once under .venv-genomics to produce
-the two cached .npz files (shells out to .venv-genomics automatically if they're
-missing, same pattern genomics_1kg_locus.py uses).
-
-Harmonization (position + allele, GRCh37 both sides so no liftover needed):
-  - restrict both sides to single-base ref/alt (drop indels)
-  - drop strand-ambiguous SNPs (A/T or C/G ref/alt pairs) -- cannot be resolved to a
-    strand without extra info, so dropped rather than guessed
-  - drop allele mismatches (neither direct nor flipped match) rather than guessed
-  - flip EFFECT_SIZE's sign when GLGC's ALT equals 1000G's REF (i.e. align every
-    effect to a "per 1000G-ALT-allele" convention, since that's what the reference
-    panel's genotype dosage counts)
-
-Known, stated-plainly limitation: R comes from 503 UNRELATED 1000G EUR genomes, not
-GLGC's own up-to-1.23M-person EUR GWAS sample -- the reference-panel-vs-original-sample
-LD mismatch this project's task brief (and the RSS literature generally) flags as a
-real, general limitation, not a bug specific to this run. The robustness check at the
-bottom (splitting the 503 reference individuals in half and refitting on each half)
-is a direct, if partial, check for whether that mismatch is visibly distorting this
-particular locus's result: a real reference-panel-driven artifact would be expected to
-show up as instability between the two halves, whereas a robust signal should not.
-"""
+"""Fits hierboost.sumstats (summary-stats-only spike-and-slab) to real GLGC LDL
+cholesterol GWAS summary statistics at LDLR, using 1000 Genomes EUR genotypes as the LD
+reference panel. Known limitation: the 503-person reference panel is far smaller than
+GLGC's actual GWAS sample -- the split-half robustness check below is a direct check for
+whether that mismatch is visibly distorting the result."""
 import argparse
 import json
 import os

@@ -1,49 +1,8 @@
-"""F1 (pre-registered 10-domain test, preregistration_10domain_test.md) -- Wikipedia
-article pageviews. PREDICTED FAIL. Mechanism: "viral/news-driven spikes are
-event-driven and idiosyncratic per-article -- same failure mode as earthquakes (real
-in-sample correlation, collapses out-of-sample)."
-
-Data: Wikimedia REST pageviews API (wikimedia.org/api/rest_v1/metrics/pageviews/
-per-article, free, no auth -- verified live before committing to it, see the fetch()
-docstring below). Daily, en.wikipedia, access=all-access, agent=user (excludes bot
-traffic), 2022-01-01 through yesterday (UTC).
-
-Domain design (the MovieLens-genre analog this document calls for -- "a plausible-
-sounding but not mechanistically-causal grouping"): target = Taylor_Swift, predictors
-= 12 other prominent pop/R&B musicians (Beyonce, Ariana Grande, Dua Lipa, Billie
-Eilish, Olivia Rodrigo, Adele, Rihanna, Katy Perry, Lady Gaga, Justin Bieber, Drake,
-The Weeknd). "Same music industry" is exactly the kind of plausible-but-not-causal
-grouping MovieLens's genre label was -- there's no mechanistic reason Beyonce's
-Wikipedia traffic on a given day should predict Taylor Swift's, only a vague
-"topically related" story, which is precisely the F1 mechanism under test: each
-artist's real spikes are driven by their OWN idiosyncratic news cycle (an album drop,
-a tour date, an awards show, a breakup story), not a shared one.
-
-Two confounds are removed before any correlation is computed or any model is fit,
-matching this project's established discipline of not trusting an unexamined raw
-correlation (earthquake_japan: strict lag; state_econ: subtract the national-average
-business cycle before looking at cross-state correlation):
-  1. Shared global Wikipedia traffic (weekday/weekend browsing patterns, overall site
-     growth, a globally newsy day bumping everything at once) is removed by
-     subtracting, from each article's log1p(views) on day t, the mean log1p(views)
-     across all 13 fetched articles (target + 12 predictors) on that SAME day t --
-     the direct pageviews analog of state_econ's "deviation from national average."
-     What's left is each article's IDIOSYNCRATIC deviation from the group's shared
-     day-to-day pull, which is the only thing a "topically related articles" story
-     could plausibly explain.
-  2. Same-day leakage: the task is a genuine one-step-ahead forecast, not a same-
-     instant correlation fit -- X_t is every predictor's deviation on day t-1, y_t is
-     the target's deviation on day t (strict lag, no leakage), the same discipline
-     earthquake_japan/state_econ use for exactly this reason.
-
-Per the document's General Discipline, the generalization gate (single best-correlated
-raw feature, train-window correlation vs. held-out-window correlation, chronological
-split) is run and reported FIRST, before anything else. Then hierboost (correlation-
-threshold blocking, same as movielens_demo.py/newsgroups_demo.py) vs. the standard
-baseline suite (Lasso, PCA+linear, Random Forest, naive) on the same held-out split.
-The document's WORK/FAIL/MIXED rule is then applied mechanically to the actual
-numbers -- no substituting judgment for the stated thresholds.
-"""
+"""F1, predicted FAIL: Wikipedia pageviews for Taylor Swift predicted from 12 other pop
+musicians' pageviews -- "same industry" is a MovieLens-genre-style plausible-but-not-
+causal grouping; each artist's real spikes are driven by their own idiosyncratic news
+cycle. Global-traffic deviation removed before fitting, same discipline as
+state_econ's national-average subtraction."""
 import os
 import json
 import time

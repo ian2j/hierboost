@@ -1,22 +1,6 @@
-"""Fourth cross-domain application of hierboost: binary text classification between two
-topically similar, genuinely hard-to-separate newsgroups (comp.sys.mac.hardware vs
-comp.sys.ibm.pc.hardware -- a classic hard pair in 20 Newsgroups benchmarks), using
-TF-IDF word features grouped by co-occurrence correlation.
-
-Tests a deliberately different kind of "proximity" than any prior application this
-session: not physical space (Haxby voxels), not a metadata label (MovieLens genre,
-which failed), but semantic/co-occurrence structure -- the most general form of
-"features with a hierarchical relationship" hierboost was built to support. A
-diagnostic run first (median |corr| ~0.016, but a real tail up to 0.74, and
-correlation-threshold blocking at rho=0.15 spreads into 174 blocks with max size 40 --
-NOT the one-giant-cluster collapse MovieLens genre/correlation blocking produced)
-suggested this might land in the "real but not overwhelming" correlation regime where
-Haxby succeeded, rather than MovieLens's "essentially no local structure" regime.
-
-Same binary-classification template as haxby_demo.py (HierBoostClassifier, em_filter,
-factor.py's continuous SAR branch, same baseline suite) since this is a classification
-task like Haxby, not regression like MovieLens.
-"""
+"""Binary text classification (comp.sys.mac.hardware vs ibm.pc.hardware, a hard pair)
+using TF-IDF word features grouped by co-occurrence correlation -- a semantic notion of
+"proximity" rather than physical space or metadata. Same template as haxby_demo.py."""
 import os
 import numpy as np
 import pandas as pd

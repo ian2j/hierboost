@@ -1,24 +1,7 @@
-"""Triangulation study (2026-09-01, Ian's own framing): instead of treating hierboost,
-SuSiE, and classical single-SNP association tests as a horse race for which one alone
-gets closest to the known causal SNP, test whether COMBINING all three -- an ensemble
-selection rule -- beats every one of them individually. Reuses the same 10 loci already
-fetched/cached for the paper (results/*.json has each locus's metadata + individual
-method distances, sec:synthesis in paper/main.tex documents the horse-race baseline this
-is trying to beat: hierboost wins localization on 4/10, SuSiE on 4/10, both miss on 2/10).
-
-Adds exactly one new baseline that didn't exist in genomics_1kg_demo.py -- a classical
-single-SNP association test -- then combines all three methods' per-SNP evidence via
-three different ensemble rules (rank-average, floored geometric mean, pairwise-agreement
-consensus). Reuses load_data/build_blocks/full_data_fit/susie_full_fit/hierboost_fold/
-susie_fold from genomics_1kg_demo.py unchanged.
-
-Single-SNP test convention: per-SNP Pearson correlation between raw dosage and the 0/1
-ancestry label, vectorized across all SNPs at once, converted to a t-statistic p-value
-(df = n-2) -- the linear-probability-model analogue of a per-SNP GWAS test, chosen to
-match SuSiE's own already-documented linear-probability convention in this project
-(genomics_1kg_demo.py's susie_fold docstring) rather than mixing a logistic single-SNP
-test with a linear-probability multi-SNP one.
-"""
+"""Tests whether combining hierboost, SuSiE, and a classical single-SNP test (three
+ensemble rules: rank-average, geometric mean, pairwise consensus) beats any one method
+alone across the 10 cached loci -- the horse race they already ran individually finds
+hierboost/SuSiE splitting localization wins 4/10 to 4/10."""
 import argparse
 import json
 import os

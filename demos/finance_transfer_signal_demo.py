@@ -1,49 +1,10 @@
-"""Does a fitted block latent generalize, or is it glued to the one regression it was
-estimated in?
-
-Every finance/genomics/weather demo in this codebase so far fits a block latent Z on
-some predictor panel and evaluates it ONLY against the single target it was built to
-predict (finance_factor_selection.py: AAPL return only; finance_cross_sectional.py:
-fits a fresh set of blocks -- reused across stocks, but never tests those blocks'
-predictive latents out-of-sample on a NEW downstream task). Nobody has asked whether
-gaussian_block_factor's closed-form PPCA compression of a predictor universe is a
-reusable, general-purpose *representation* of that universe, or just a one-off
-artifact tied to the regression it happened to be fit alongside.
-
-This script tests that directly, with a real held-out split (no shuffling -- this is
-a time series) and three transfer scenarios sharing one frozen block latent:
-
-  (a) same target (AAPL return), held-out PERIOD          -- the ordinary OOS check
-  (b) same stock, DIFFERENT target variable (AAPL realized volatility instead of
-      return) -- reusing the compressed representation for a new downstream task
-  (c) DIFFERENT target stock (JPM, a different GICS sector than AAPL) -- reusing the
-      representation for an entirely different regression problem
-
-For each, three arms:
-  - frozen transfer   : project_block_factor'd version of the block latent fit once
-                        on AAPL/FIT (blocks + loadings never re-estimated)
-  - raw features      : skip the latent, regress directly on the 31 zscored raw ETFs
-  - task-specific refit: what you'd get re-running gaussian_block_factor from scratch,
-                        "as if" you'd never reused anything
-
-A structural point falls out of running this (spoiler, see bottom of __main__):
-blocks_from_correlation_threshold and gaussian_block_factor are both pure functions of
-the PREDICTOR panel -- neither one ever looks at y. So "refit from scratch on the same
-FIT-window ETF panel" is not an independent estimate at all: it is bit-identical to the
-"frozen" latent already in hand, for every scenario, by construction. That's a real
-finding about this pipeline's design, not a coding shortcut -- see the interpretation
-in __main__ for what it implies about what a genuinely target-aware "refit ceiling"
-would require (target-aware block MEMBERSHIP, not just re-estimated loadings).
-
-House-style notes carried over from finance_cross_sectional.py / finance_factor_selection.py:
-same 31-ETF predictor universe, same rho=0.9 correlation-threshold blocking, same
-em_filter_gaussian spike-and-slab engine, same period="3y" yfinance window. Departures,
-specific to this experiment: simple pct_change returns (not log returns) and a flat/
-uninformative prior throughout (xi1=0) -- the sector-relevance prior is a different,
-already-tested axis (see finance_factor_selection.py); mixing it in here would
-confound "does the LATENT transfer" with "does the PRIOR transfer", which is a
-separate question.
-"""
+"""Tests whether a fitted block latent generalizes beyond the regression it was
+estimated in: (a) same target, held-out period, (b) same stock/different target
+(volatility), (c) different target stock. Finding: since blocks_from_correlation_
+threshold and gaussian_block_factor are pure functions of the predictor panel (never
+look at y), "refit from scratch" is bit-identical to "frozen" -- a real fact about this
+pipeline, not a shortcut. See finance_transfer_signal_supervised_demo.py for the
+target-aware follow-up."""
 import os
 import numpy as np
 import pandas as pd

@@ -1,20 +1,7 @@
-"""Synthetic validation of hierboost.sumstats (the (R, bhat, n)-only spike-and-slab fit)
-against hierboost.spike_slab_gaussian's individual-level (X, y) fit, on REAL 1000
-Genomes LD structure -- the must-pass sanity gate specified before ever touching real
-GWAS summary statistics (see hierboost/sumstats.py's module docstring for the
-sufficient-statistics identity this checks, and test_sumstats.py for the unit-test-level
-version of the same check on a smaller SNP window).
-
-Unlike test_sumstats.py (which shortcuts straight to bhat = X'y/n), this script also
-demonstrates the FULL real-GWAS-file reconstruction path the module docstring
-describes: per-SNP OLS gives a beta_j/se_j pair per SNP, from which
-z_j = beta_j/se_j and bhat_j = z_j*se_j == beta_j (an identity, included here to make
-concrete exactly what "reconstruct bhat from a summary-stats file's z and se columns"
-means before doing it for real on a GLGC file that only reports z/se, not beta,
-directly).
-
-Run: python genomics_sumstats_validate.py [--p P] [--n-true K] [--snr SNR]
-"""
+"""Synthetic sanity check: hierboost.sumstats' (R, bhat, n)-only fit must match
+spike_slab_gaussian's individual-level (X, y) fit on real 1000 Genomes LD structure.
+Also demonstrates the full beta/se -> z -> bhat reconstruction path a real GWAS summary
+file requires."""
 import argparse
 import json
 import os

@@ -1,12 +1,6 @@
-"""Real variable selection (not just OLS) for explaining AAPL's returns: a broader
-factor universe, a genuine sector-relevance prior (GICS-classification based, not
-fit to the data -- the finance analogue of a MalaCards gene-relevance score), and
-the Gaussian spike-and-slab engine (EM filter + Gibbs) instead of plain regression.
-
-Mirrors the GWAS "informative vs non-informative" comparison directly: does knowing
-that a factor is in AAPL's own sector actually help identify which factors matter,
-or does an uninformative/flat prior do just as well?
-"""
+"""Real variable selection (not just OLS) for AAPL's returns: a broad factor universe,
+a real GICS-based sector-relevance prior, and the Gaussian spike-and-slab engine.
+Mirrors the GWAS informative-vs-flat-prior comparison in a finance setting."""
 import os
 import numpy as np
 import pandas as pd

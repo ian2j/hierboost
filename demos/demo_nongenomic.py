@@ -1,15 +1,6 @@
-"""Proves hierboost isn't genomics-specific: a 2D sensor-network anomaly-detection
-problem, using the *same* generic core (hierboost.kernels, hierboost.spike_slab) as
-spatial_boost's GWAS demo, but with:
-  - features = sensors at 2D spatial coordinates (not SNPs at a 1D genomic position)
-  - groups = point-like "zones of interest" with a relevance score (not genes with
-    a 1D start/end extent) -- so this exercises gaussian_affinity_points instead of
-    the interval-integral kernel gaustotal_affinity_1d used for genes
-  - outcome = a binary event (e.g. "anomaly") driven by a handful of causal sensors
-    that happen to sit near relevant zones
-
-No genomics code is imported or reused; everything comes from hierboost directly.
-"""
+"""Proves hierboost isn't genomics-specific: a 2D sensor-network anomaly-detection task
+using the same generic core as the GWAS demo, with point-like sensors/zones
+(gaussian_affinity_points) instead of 1D genes/SNPs. No genomics code involved."""
 import os
 import numpy as np
 import matplotlib

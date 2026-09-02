@@ -1,31 +1,8 @@
-"""Third real-data test of hierboost.copula, and the one Ian specifically asked about:
-does the Gaussian-copula marginal transform help back on hierboost's own origin domain,
-1000 Genomes LD-block fine-mapping (genomics_1kg_demo.py)?
-
-Motivating check, run BEFORE any CV (same discipline as the finance/weather copula
-demos -- confirm the mechanism's premise holds before trusting a result): genotype
-dosage (0/1/2) is Binomial(2, MAF) in distribution, and MAF varies substantially *within*
-a single LD block (SNPs a few hundred bp apart can have very different minor allele
-frequencies while still being in strong LD) -- confirmed empirically on the LCT region,
-118 multi-member blocks, mean within-block MAF spread 0.221 (range 0-0.44), mean
-within-block dosage-skewness spread 2.50. So the same "real correlation (LD/r^2), very
-different marginal shapes (different MAFs)" case the finance/weather demos targeted is
-genuinely present here too -- genomics_1kg_demo.py's own `fit_block_factors` runs
-`gaussian_block_factor` directly on raw 0/1/2 dosage, the same "ideally already
-standardized" assumption mismatch.
-
-Note this is the CONTINUOUS branch only (factor.py, dosage treated as continuous, same
-convention genomics_1kg_demo.py itself uses) -- NOT genomics_1kg_binomial_latent.py's
-literal discrete/Binomial Ch4 JAX path, which is a different mechanism already handling
-each SNP's own Binomial marginal correctly via its link function (see project memory:
-that branch is already an unlabeled copula in the sense discussed with Ian). The
-question here is narrower: does explicitly copula-transforming the raw dosage help the
-*existing, already-validated* continuous PPCA block-latent pipeline specifically.
-
-Reuses genomics_1kg_demo.py's own data loading/blocking/CV-fold structure unchanged
-(imported, not duplicated) for a fair apples-to-apples comparison; only
-`fit_block_factors` gets a copula-transform variant.
-"""
+"""Third copula test, back on hierboost's origin domain: does the Gaussian-copula
+transform help 1000 Genomes LD-block fine-mapping? Genotype dosage is Binomial(2, MAF),
+and MAF varies substantially within an LD block, so the same "real correlation, different
+marginal shapes" setup applies. Continuous branch only (factor.py), reusing
+genomics_1kg_demo.py's data/blocking/CV unchanged."""
 import os
 import numpy as np
 import pandas as pd

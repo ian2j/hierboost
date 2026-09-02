@@ -1,18 +1,6 @@
-"""Robustness of the Spatial Boost regional prior (genomics_1kg_boost_sensitivity.py) to
-a MIS-CENTERED candidate region -- the natural follow-up question: that script always
-centered the boosted region exactly on the true causal SNP, which answers "does dilution
-help when you're already looking in the right place" but not "how far off can your prior
-guess be and still help." Here the boost region is centered on causal_pos + offset (a
-deliberately wrong guess), for signed offsets up to +-60kb, while distance is still
-measured to the TRUE causal SNP -- so a setting only looks good here if the model finds
-the real signal despite being pointed somewhat away from it.
-
-Reuses the same 3 region widths as the parent script (2kb/15kb/75kb -- narrow/moderate/
-wide) at a single fixed boost strength (xi1=4.0, the previous script's representative
-"moderate" setting) to keep the grid tractable: 6 offsets x 3 widths x 10 loci = 180 new
-fits, plus the offset=0 column reused directly from boost_sensitivity_results.json
-(same width, xi1=4.0 rows already computed there -- not re-run).
-"""
+"""Follow-up to genomics_1kg_boost_sensitivity.py: how far off can the boosted region's
+center be from the true causal SNP and still help? Offsets the boost region by up to
++-60kb while measuring distance to the true SNP, across the same 3 region widths."""
 import argparse
 import json
 import os

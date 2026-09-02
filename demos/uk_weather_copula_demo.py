@@ -1,17 +1,7 @@
-"""Second real-data test of the Gaussian-copula marginal transform, deliberately reusing
-uk_weather -- the one domain this project already confirmed has genuine, generalizing
-signal (see project memory: weekly best-point train r=0.806 -> test r=0.835). That prior
-work only used the boosting-prior mechanism (step 1); it never exercised block-latent
-DECORRELATION (step 2, factor.py) at all. This demo adds that: each station's own weekly
-{wet-day COUNT, total precipitation AMOUNT in mm} pair shares an obvious real latent
-("how wet was this week"), but a Poisson-ish bounded count and a continuous, right-skewed
-mm total have very different marginal shapes -- structurally the same "real correlation,
-wrong shared-Gaussian-marginal assumption" case as finance_copula_demo.py, on a domain
-already known (unlike the finance target) to carry real, generalizing spatial signal.
-
-Reuses uk_weather/data/weekly_wetdays.npz (wet-day counts, already built) and
-precip_raw.npz (raw daily mm, aggregated here to the same weekly bins) -- no new fetch.
-"""
+"""Second real-data copula test, on uk_weather -- the one domain already confirmed to
+have genuine, generalizing spatial signal. Each station's {wet-day count, mm total} pair
+shares an obvious latent but has different marginal shapes; compares raw vs.
+copula-transformed block factors."""
 import numpy as np
 from scipy import stats
 from sklearn.metrics import mean_poisson_deviance

@@ -1,37 +1,7 @@
-"""Fetch a bounded genomic region's worth of rows from a GLGC 2021 (Graham et al.,
-Nature 2021; Kanoni/Willer group at U Michigan) ancestry-specific lipid GWAS summary
-statistics file, via remote range-restricted tabix access -- same "no full-file
-download" pattern genomics_1kg_fetch.py already uses for 1000 Genomes VCFs, just
-against a bgzip+tabix-indexed plain-text results file instead of a VCF. Needs pysam,
-so lives in .venv-genomics like genomics_1kg_fetch.py (kept out of the main numpy<2 env
-on purpose -- see README/pyproject.toml's `genomics` extra).
-
-Files, access, and units all verified LIVE (2026-08-30), not assumed:
-  - Download root: https://csg.sph.umich.edu/willer/public/glgc-lipids2021/ (freely
-    browsable directory listing, no registration/login anywhere in the flow -- linked
-    from the GLGC's own site, www.lipidgenetics.org).
-  - Ancestry-specific single-variant results:
-    .../results/ancestry_specific/{TRAIT}_INV_{ANCESTRY}_..._ALL.meta.singlevar.results.gz
-    (+ a .tbi index sitting right next to it -- confirmed bgzip via the file's magic
-    bytes, not just its .gz name, before assuming tabix random access would even work).
-  - README.txt in that directory documents the columns explicitly (reproduced below);
-    POS_b37 = GRCh37/hg19, matching 1000 Genomes phase 3's own coordinate system, so no
-    liftover is needed to use both together:
-        rsID, CHROM, POS_b37, REF (non-effect allele), ALT (effect allele), N,
-        N_studies, POOLED_ALT_AF, EFFECT_SIZE (per ALT allele), SE,
-        pvalue_neg_log10, pvalue, pvalue_neg_log10_GC, pvalue_GC
-  - EFFECT_SIZE's underlying scale (raw lipid units vs already-standardized) is NOT
-    resolved here, deliberately: hierboost.sumstats's z-score reconstruction
-    (bhat_std = z/sqrt(n), z = EFFECT_SIZE/SE, computed downstream of this fetch, in
-    genomics_ldlr_sumstats.py) only ever uses the dimensionless ratio EFFECT_SIZE/SE,
-    which is invariant to whatever scale EFFECT_SIZE itself is reported in -- exactly to
-    avoid having to silently guess a phenotype-scale convention this fetch script can't
-    itself verify from the README alone.
-  - The server serves both http and https; https hit a local libcurl/SSL-CA-bundle
-    problem in the .venv-genomics environment (curl itself and https work fine outside
-    that venv) -- http is used here since the server supports it and this is public,
-    non-sensitive summary-level data with no credentials in the request.
-"""
+"""Fetches a bounded region's rows from a GLGC 2021 ancestry-specific lipid GWAS summary
+statistics file via remote tabix range access, same no-full-download pattern as
+genomics_1kg_fetch.py. Needs pysam (.venv-genomics). Only ever uses the dimensionless
+EFFECT_SIZE/SE ratio downstream, so the phenotype's raw scale doesn't matter."""
 import argparse
 import os
 import numpy as np

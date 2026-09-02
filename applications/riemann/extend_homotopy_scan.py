@@ -1,16 +1,6 @@
-"""Generate ADDITIONAL homotopy-exception-labeled zeros, filling gaps the original
-~/Research/Riemann/writeup/homotopy_exception_gap_scan.py left unscanned between its
-10 window centers (110,200,...,1200, width 22 each -- big gaps between them). Reuses
-that script's exact scan_window() method (same mpmath dps=20/n_steps=35 settings) so
-results are directly poolable with the original 150-zero dataset.
-
-Deliberately writes to a SEPARATE file, not Ian's original homotopy_exception_gap_data.json
--- this is my own analysis extension, not an edit to his research artifact. Sticks to
-t<1200 (new centers fill gaps strictly BETWEEN the original windows) since a timing probe
-at t~1500 showed cost rises sharply with t (single window >3.5min and still running,
-vs ~90s for a similar-width window at t~160) -- likely because M=floor(t/pi) (and hence
-the size of every sum in the homotopy tracking) grows with t.
-"""
+"""Extends Ian's homotopy-exception zero dataset by scanning the gaps between his
+original 10 window centers (reusing his exact scan_window() method), writing to a
+separate file rather than editing his original data."""
 import sys, time, json
 sys.path.insert(0, '/home/ian/Research/Riemann/writeup')
 import mpmath as mp

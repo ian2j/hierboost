@@ -1,18 +1,6 @@
-"""Fetch a bounded genomic region from 1000 Genomes phase 3 via remote region-restricted
-VCF access (pysam/htslib range requests against the .tbi index -- no full-chromosome
-download, keeps memory/disk small by construction). Restricts samples to two
-superpopulations (any pair of EUR/AFR/EAS/SAS/AMR, not just EUR vs AFR) and SNPs to
-biallelic, MAF>=0.05. Saves a compact .npz (dosage matrix int8, positions, labels,
-sample ids) for reuse.
-
-Parameterized (generalized 2026-08-28 from the original LCT-only script, and again
-2026-08-28 to accept --pop_a/--pop_b) so the same pipeline can replicate the "does the
-Binomial model localize known biology better than the continuous approximation" finding
-on other well-characterized selection loci -- not just LCT, and not just EUR-vs-AFR
-sweeps: several textbook loci (EDAR, ABCC11, ADH1B) are EAS-specific, so the population
-contrast that actually shows the selection signal has to be chosen per locus, not fixed.
-Call with --chrom/--start/--end/--pop_a/--pop_b/--out, or import fetch_region() directly.
-"""
+"""Fetches a bounded genomic region from 1000 Genomes phase 3 via remote range-restricted
+VCF access (pysam/htslib, no full-chromosome download). Restricts to two superpopulations
+and biallelic SNPs (MAF>=0.05). Parameterized by --chrom/--start/--end/--pop_a/--pop_b."""
 import argparse
 import os
 import numpy as np

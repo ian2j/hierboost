@@ -1,25 +1,8 @@
-"""Unified per-locus driver for the 1000 Genomes case-study suite (added 2026-08-28,
-building toward ~10 case studies for a paper launching the block-latent model).
-
-For a given locus (chrom/start/end/pop_a/pop_b/known causal SNP position), this script:
-  1. fetches the region from 1000 Genomes phase 3 (genomics_1kg_fetch.fetch_region),
-     reusing a cached .npz if one already exists at --data
-  2. builds LD blocks and runs the same 10-fold CV baseline comparison as
-     genomics_1kg_demo.py (L1-logistic, PCA+logistic, linear SVM, Random Forest,
-     hierboost continuous block-latent + spike-slab), now with SuSiE (Wang et al. 2020)
-     added as a modern fine-mapping baseline (genomics_1kg_demo.susie_fold)
-  3. runs a full-data fit for both hierboost (em_filter) and SuSiE (susie_full_fit),
-     and computes each method's distance from its top-ranked SNP/block to the locus's
-     known causal variant -- the same "does it land in the right neighborhood" metric
-     used for LCT/SLC24A5/DARC
-  4. writes a machine-readable JSON summary (results/<label>.json) and the existing
-     two-panel figure, so the eventual paper's results table can be built by reading
-     JSON files rather than re-transcribing printed output by hand
-
-Does NOT run the discrete/Binomial JAX branch (hierboost.latent) -- that needs
-.venv-jax and is run separately per locus via genomics_1kg_binomial_latent.py, same
-two-environment split as the rest of the project.
-"""
+"""Unified per-locus driver for the 1000 Genomes case-study suite: fetches a region,
+builds LD blocks, runs the same 10-fold CV baseline comparison as genomics_1kg_demo.py
+(now including SuSiE), does a full-data fit, and writes a JSON summary + figure. Does not
+run the discrete/Binomial JAX branch -- see genomics_1kg_binomial_latent.py for that,
+per-locus."""
 import argparse
 import json
 import os

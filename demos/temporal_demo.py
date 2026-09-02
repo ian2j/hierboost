@@ -1,13 +1,7 @@
-"""The temporal counterpart of finance_demo.py: instead of decorrelating several
-cross-sectionally collinear ETFs at one point in time (Chapter 4's original axis), this
-decorrelates several *rolling-window* return features of one predictor through time --
-5/10/20/60-day momentum windows are exactly as collinear as LD-correlated SNPs, for the
-same underlying reason: they're all noisy, overlapping views of one evolving momentum
-state. hierboost.state_space.fit_temporal_block_factor replaces each predictor's four
-window-return columns with one AR(1)-smoothed trend latent, closed-form (EM + Kalman/RTS
-smoother, no autodiff) since returns are already continuous -- see
-hierboost.latent's structure="ar1" for the discrete/binomial analogue.
-"""
+"""Temporal counterpart of finance_demo.py: decorrelates several collinear rolling-window
+return features of one stock (5/10/20/60-day momentum) into one AR(1)-smoothed trend
+latent via hierboost.state_space, instead of decorrelating across stocks at one point in
+time."""
 import os
 import numpy as np
 import pandas as pd

@@ -1,11 +1,6 @@
-"""Generalized real-phenotype (Geuvadis gene expression) validation, extending
-genomics_1kg_lct_eqtl.py's LCT/MCM6 test to any locus. LCT/MCM6 came back null in
-lymphoblastoid cell lines (LCL) -- expected for a gut-specific gene, and confirmed not a
-pipeline bug via a raw univariate sanity check. APOL1, by contrast, is robustly expressed
-in this exact Geuvadis LCL dataset (mean RPKM ~60 vs LCT's ~0.09), consistent with its
-documented role as an interferon-inducible innate immune gene -- a much better candidate
-tissue for a real, detectable cis-eQTL signal.
-"""
+"""Generalized real-phenotype (Geuvadis expression) eQTL validation, extending
+genomics_1kg_lct_eqtl.py to any locus. LCT/MCM6 came back null (gut-specific gene, wrong
+tissue); APOL1 is a better candidate since it's robustly expressed in this LCL dataset."""
 import argparse
 import gzip
 import os

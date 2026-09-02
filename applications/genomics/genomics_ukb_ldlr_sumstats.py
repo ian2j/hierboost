@@ -1,72 +1,8 @@
-"""Ancestry-matching follow-up to genomics_ldlr_sumstats.py: same locus (LDLR, chr19
-GRCh37), same causal SNP (rs6511720), same hierboost.sumstats fitter and hyperparameters
--- but swap GLGC's pooled multi-cohort EUR summary statistics for UK Biobank's own
-GWAS (Neale lab round 2 release), and swap the 1000 Genomes EUR reference panel (which
-pools GBR/FIN/IBS/TSI/CEU) for GBR alone, since UK Biobank's standard release population
-is overwhelmingly "White British" -- a much closer ancestry match to 1000G's GBR
-subpopulation specifically than to pooled EUR. This isolates the ancestry-match variable
-from genomics_ldlr_sumstats.py's original run: everything else (locus, causal SNP,
-fitter, hyperparameters, block-partition method, harmonization approach, robustness-
-check design) is kept identical on purpose so the two results are directly comparable.
-
-Data sources, verified LIVE 2026-08-30, not assumed from training data:
-  - UK Biobank GWAS summary stats: Neale lab UK Biobank round 2 results
-    (http://www.nealelab.is/uk-biobank). Phenotype manifest is a public Google Sheet
-    (docs.google.com/spreadsheets/d/1kvPoupSzsSFBNSztMzl04xMoSC3Kcx3CrjVf4yBmESU),
-    "Manifest 201807" tab (gid=178908679), searched live for field 30780 ("LDL direct").
-    Two variants exist per sex stratum: "30780_raw" (mmol/L) and "30780_irnt"
-    (inverse-rank-normalized) -- this script uses 30780_irnt, both_sexes
-    (n_complete_samples ~343,621, confirmed from the file's own column), Neale lab's
-    recommended primary version for association analysis. Choice is immaterial to the
-    actual model input either way: like genomics_ldlr_sumstats.py, this script only ever
-    uses the dimensionless ratio beta/se (=tstat, already provided as its own column
-    here) to reconstruct a standardized bhat, which is invariant to whatever scale the
-    phenotype itself is on.
-    File: https://broad-ukb-sumstats-us-east-1.s3.amazonaws.com/round2/additive-tsvs/
-    30780_irnt.gwas.imputed_v3.both_sexes.varorder.tsv.bgz -- confirmed via HEAD request
-    to be a real, genome-wide, ~464MB bgzip file (Content-Length 463932840, "Accept-
-    Ranges: bytes"), with NO accompanying .tbi index (confirmed 404) and no per-
-    chromosome split. Row order matches the shared variants.tsv.bgz's order (chr-sorted,
-    confirmed live: file starts at 1:15791:... and a 50MB range-fetch reached
-    2:108680007:... before running out, i.e. chromosome-sorted ascending as expected),
-    but there is no coordinate->byte-offset index, so genuine tabix-style random access
-    isn't available for this release the way it was for GLGC's file. Per this project's
-    "be judicious" instruction, this script does NOT download the whole 464MB file:
-    it streams the response body through zcat+awk, printing only rows whose "variant"
-    column falls in chr19:11,100,000-11,299,999 (an "variant" column pattern-match --
-    e.g. "^19:11[12][0-9]{5}:" -- since the file's own variant identifier already encodes
-    chr:pos:ref:alt, so no join against variants.tsv.bgz is needed at all), and exits the
-    awk process as soon as it sees a "20:" row, which sends the upstream curl a SIGPIPE
-    and stops the transfer. Measured transfer speed on this connection was slow
-    (~0.9 MB/s), and chr19 sits after chr1-18 in sort order, so this still requires
-    streaming roughly 370-400MB (not the full 464MB, and nothing is ever written to disk
-    beyond the small filtered region) -- flagged here honestly rather than silently
-    treated as free, but it is a real, bounded reduction from downloading the whole file,
-    consistent with the "streaming-decompress-and-grep-by-position" fallback the task
-    brief names when no index/byte-range access is available. See `_fetch_ukb_region`.
-  - LD reference panel: 1000 Genomes GBR individuals, extracted from the SAME cached
-    genotype matrix genomics_ldlr_sumstats.py already fetched for the full EUR
-    superpopulation at this exact locus (~/genomics_1kg/ldlr_eur_region.npz, 503
-    individuals x 532 SNPs) -- NO new network fetch for genotypes. GBR is a
-    subpopulation of EUR, so all 91 GBR individuals present in the original 503-person
-    EUR fetch are recovered by joining that file's `sample_ids` against
-    ~/genomics_1kg/panel.txt's per-individual `pop` column (confirmed live by counting:
-    91 GBR of 503 EUR, matching 1000 Genomes phase 3's known GBR cohort size).
-
-Known, deliberately introduced confound (see module docstring's task-brief instructions,
-and reported honestly in the results JSON and final report): the GBR-only reference
-panel has only 91 individuals vs the original run's 503 EUR individuals. A reference
-panel that is simultaneously better ancestry-matched AND much smaller cannot cleanly
-isolate "did ancestry-matching help" from "did losing ~82% of the reference sample hurt"
--- both act on the same outcome (localization stability) in this one experiment. The
-split-half robustness check below is run on the GBR panel exactly as the original script
-ran it on the EUR panel, but each GBR half now has only ~45 individuals (vs ~251
-originally) purely from arithmetic, which by itself would be expected to increase
-instability even with no ancestry-mismatch problem at all. This is not fixed here (fixing
-it would require e.g. downsampling EUR to 91 as an additional control run, which is
-explicitly out of scope for this comparison) -- it is a known limitation of this specific
-follow-up, on top of anything the ancestry match itself does or doesn't fix.
-"""
+"""Ancestry-matching follow-up to genomics_ldlr_sumstats.py: same locus/SNP/fitter, but
+UK Biobank's own GWAS (Neale lab) instead of GLGC, and a GBR-only reference panel instead
+of pooled EUR (UK Biobank's population is overwhelmingly White British). Confound,
+disclosed: the better-matched GBR panel is also much smaller (91 vs 503), so ancestry-
+match and sample-size effects can't be cleanly separated in this one comparison."""
 import json
 import os
 import subprocess

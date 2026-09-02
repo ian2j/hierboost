@@ -1,36 +1,7 @@
-"""First real-data test of decorrelate="star" (hierboost.spacetime's Kronecker space x
-time block-latent model) -- validated so far only on synthetic recovery tests (see
-project memory). Reuses uk_weather/data/precip_raw.npz, the one real domain this project
-already confirmed carries genuine, generalizing spatial signal (earthquake/weather
-contrast: weekly best-point train r=0.806 -> test r=0.835).
-
-Design: each of the 51 UK/Ireland stations is one BLOCK, with 4 raw member features --
-backward-looking rolling 1/2/4/8-WEEK precipitation totals (weekly cadence, mirroring
-temporal_demo.py's 5/10/20/60-DAY stock-momentum windows exactly, just rescaled to
-weather's natural synoptic timescale) -- that all share one latent "wetness trend" state
-per station. Instead of fitting each station's trend independently (decorrelate="ar1",
-state_space.py, no cross-station information at all), "star" lets neighbouring stations'
-trends couple through Phi = rho1*I + rho2*W, W built from the REAL station lon/lat
-(kernels.sar_weight_matrix) -- moving weather systems should show up as rho2 > 0 and,
-if that coupling is real, as sharper/more useful smoothed trend estimates for predicting
-a held-out target station that was never used to fit the model.
-
-Uses hierboost.spacetime.fit_spacetime_block_factor directly (the low-level functional
-API) rather than HierBoostRegressor(decorrelate="star") purely for the hyperparameter
-sweep below (STAR's O(T*M*K^2) cost makes repeated high-level re-fits impractical, see
-N_NEAREST's comment) -- not, as originally written here, to route around a coords bug:
-estimator.py's star branch used to compute each block's coupling centroid via a bare
-`self.coords_[blocks[b]].mean()`, which silently collapsed 2-D (lon, lat) coordinates
-into one meaningless scalar instead of raising, and hierboost.kernels.sar_weight_matrix
-(called below) rejected non-1-D coords outright. Both are now fixed (`.mean(axis=0)` in
-estimator.py; sar_weight_matrix generalized to Euclidean distance in kernels.py, mirroring
-gaussian_affinity_points's existing 1D->ND generalization) and the high-level API now
-works fine with real 2-D station coordinates -- this demo just doesn't need it for the
-reason above.
-
-Target station (k=45) and weekly binning (7-day bins) reuse uk_weather/build_dataset.py's
-existing choices unchanged, for a fair comparison with all prior uk_weather results.
-"""
+"""First real-data test of decorrelate="star" (Kronecker space x time block-latent):
+each of 51 UK/Ireland stations gets a shared trend state coupled to its neighbors via
+real lon/lat distance, instead of independent per-station AR(1)s. Tests whether that
+spatial coupling improves prediction for a held-out target station."""
 import numpy as np
 from sklearn.linear_model import RidgeCV
 from sklearn.metrics import r2_score

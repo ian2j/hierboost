@@ -1,41 +1,7 @@
-"""Closes a gap left open by finance_transfer_signal_demo.py: that script set out to
-compare a FROZEN block latent against a "task-specific refit" arm, but discovered
-(numerically, max abs diff = 0.0) that blocks_from_correlation_threshold and
-gaussian_block_factor are both pure functions of the predictor panel alone -- neither
-ever looks at y. So there was never a genuinely target-AWARE alternative in that
-experiment to compare against; "refit from scratch" was bit-identical to "frozen"
-by construction, for every scenario.
-
-This script builds that missing target-aware alternative -- hierboost.factor's new
-supervised_block_factor (1-component PLS: w = Xb.T @ y, normalized; the direction of
-MAXIMUM COVARIANCE with y, instead of gaussian_block_factor's direction of maximum
-variance within the block) -- and uses it to ask the sharper question the original
-script's structural finding left unanswered: is a target-aware factor actually
-target-SPECIFIC, in the sense that matters? Not "does knowing y help" (trivially yes,
-any signal at all beats none) but: does a factor fit to maximize covariance with STOCK
-A's return do better predicting A and WORSE predicting STOCK B than a factor that never
-looked at either -- i.e. does supervision buy specificity, or does it just buy a
-slightly different flavor of the same market-wide co-movement structure that the
-unsupervised PPCA factor was already capturing?
-
-Design: fit the supervised block factor TWICE on the FIT window -- once against AAPL's
-own FIT-window return ("AAPL-supervised"), once against JPM's own FIT-window return
-("JPM-supervised") -- freeze each via apply_supervised_block_factor, and cross-evaluate
-both against both stocks' held-out returns (own-target and wrong-target transfer),
-alongside the original unsupervised frozen factor as a target-blind reference point.
-Block MEMBERSHIP itself is still computed by blocks_from_correlation_threshold, which
-still never looks at y (that is unavoidable without also restructuring the blocking
-step itself -- out of scope here, see finance_transfer_signal_demo.py's closing note on
-what a genuinely target-aware "refit ceiling" would require of block membership, not
-just loadings) -- what varies between the AAPL-supervised and JPM-supervised transforms
-below is only the per-block factor DIRECTION w, never which raw ETFs land in which block.
-
-Reuses finance_transfer_signal_demo.py's data loading/splitting/outcome-regression
-helpers verbatim (load_data, chronological_split, zscore_apply, fit_outcome, predict,
-oos_r2, safe_corr, fit_block_latent, apply_block_latent) -- nothing about that machinery
-needed to change, only the factor-construction step. See that script for the full
-house-style rationale (flat prior, 31-ETF universe, rho=0.9, 70/30 chronological split).
-"""
+"""Follow-up to finance_transfer_signal_demo.py: builds a genuinely target-aware block
+factor (supervised_block_factor, direction of max covariance with y) and asks whether
+supervision buys real target-specificity or just a different flavor of the same
+market-wide co-movement. Fits it against AAPL and JPM separately and cross-evaluates."""
 import os
 import numpy as np
 import pandas as pd
