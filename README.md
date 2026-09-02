@@ -4,7 +4,7 @@ Spike-and-slab feature selection where a feature's prior odds of being kept
 can be boosted by how close it is to a relevant group (genes, sensors, time
 lags, ...), and correlated features can optionally be collapsed into one
 shared latent per group before selection runs. Generalized from Ian
-Johnston's PhD work on GWAS models (`paper/`, arXiv:1311.0431).
+Johnston's PhD work on GWAS models (arXiv:1311.0431).
 
 ## Install
 
@@ -40,26 +40,16 @@ option combination.
 | Path | What's there |
 |---|---|
 | `hierboost/` | The library. One module per concern (kernels, blocking, spike-and-slab fit, block-latent decorrelation, the `HierBoost*` estimator API). Each file's docstring explains what it does. |
-| `spatial_boost/` | Thin GWAS-specific wrapper kept for backward compatibility. |
-| `demos/` | Runnable examples of the framework on different domains. |
-| `applications/` | Deeper per-domain analyses (`genomics/`, `predom/`, `riemann/`). |
-| `validation/` | Calibration/coverage/efficiency studies — not part of the test suite. |
 | `tests/` | The pytest suite — see [`tests/README.md`](tests/README.md). |
-| `paper/` | LaTeX draft benchmarking the block-latent model against SuSiE on real 1000 Genomes data. |
-
-Everything else at the top level (`earthquake_japan/`, `m6_backtest/`,
-`predom_*/`, `state_econ/`, `streamflow_delaware/`, `uk_weather/`) is a
-self-contained domain folder: its own fetch/build/demo scripts plus a
-`data/` cache.
+| `hierboost_tutorial.ipynb` | The demo — a runnable walkthrough. |
 
 ## Environments
 
-- **Main** (`pip install -e .`): everything except the two items below.
+- **Main** (`pip install -e .`): everything except the item below.
 - **`.venv-jax`** (`pip install -e ".[jax]"`, separate virtualenv — needs
   numpy≥2, which conflicts with the main env): `hierboost.latent`,
   `hierboost.joint`, and `HierBoostClassifier(decorrelate=...)` on a
   Binomial response.
-- **`.venv-genomics`**: only for fetching 1000 Genomes data (`pysam`).
 
 Run the suite: `pytest tests/` (main env) and, separately,
 `.venv-jax/bin/pytest tests/test_hierboost_jax.py`.

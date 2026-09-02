@@ -5,19 +5,46 @@ Run inside the isolated environment:
 """
 import numpy as np
 from scipy.special import expit
+from scipy.stats import norm
 
-from spatial_boost.simulate import simulate_genotypes
 from hierboost.blocks import threshold_blocks_1d
 from hierboost.latent import fit_block_hyperparameters, fit_latent_block_model
 from hierboost.joint import run_joint_inference, posterior_association_summary
 from hierboost.estimator import HierBoostClassifier
 
 
+def _simulate_ld_haplotype(n, positions, ld_length, rng):
+    """AR(1)-in-space latent Gaussian: Corr(z_i, z_j) = exp(-|pos_i-pos_j|/ld_length)."""
+    positions = np.asarray(positions, dtype=float)
+    p = positions.shape[0]
+    order = np.argsort(positions)
+    pos_sorted = positions[order]
+    rho = np.exp(-np.diff(pos_sorted) / ld_length)
+
+    z = np.empty((n, p))
+    z[:, 0] = rng.standard_normal(n)
+    eps = rng.standard_normal((n, p - 1))
+    for j in range(1, p):
+        z[:, j] = rho[j - 1] * z[:, j - 1] + np.sqrt(1.0 - rho[j - 1] ** 2) * eps[:, j - 1]
+
+    z_unsorted = np.empty_like(z)
+    z_unsorted[:, order] = z
+    return z_unsorted
+
+
+def _simulate_genotypes(n, positions, maf, ld_length, rng):
+    """Additive 0/1/2 genotypes from two independent LD-correlated haplotypes."""
+    thresh = norm.ppf(1.0 - maf)
+    h1 = (_simulate_ld_haplotype(n, positions, ld_length, rng) > thresh[None, :]).astype(int)
+    h2 = (_simulate_ld_haplotype(n, positions, ld_length, rng) > thresh[None, :]).astype(int)
+    return h1 + h2
+
+
 def _make_causal_block_dataset(seed=1, n=100, p=24):
     rng = np.random.default_rng(seed)
     positions = np.sort(rng.uniform(0, 6000, p))
-    X = simulate_genotypes(n=n, positions=positions, maf=rng.uniform(0.15, 0.4, p),
-                            ld_length=600, rng=rng)
+    X = _simulate_genotypes(n=n, positions=positions, maf=rng.uniform(0.15, 0.4, p),
+                             ld_length=600, rng=rng)
     block_id = threshold_blocks_1d(positions, zeta=500)
     causal_block = 0
     idx0 = np.where(block_id == causal_block)[0]

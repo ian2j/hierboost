@@ -17,20 +17,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Chapter 4's discrete/binomial block-latent model (hierboost.latent) and joint NUTS
-# inference (hierboost.joint) need JAX/NumPyro, which pull in numpy>=2 -- incompatible
-# with the numpy<2 pin above (needed for scikit-learn/scipy). Install this extra into a
-# SEPARATE virtualenv (see README's .venv-jax instructions), never alongside the base
-# install.
+# hierboost.latent (Chapter 4's discrete/binomial block-latent model) and hierboost.joint
+# (joint NUTS inference) need JAX/NumPyro, which pull in numpy>=2 -- incompatible with the
+# numpy<2 pin above (needed for scikit-learn/scipy). Install this extra into a SEPARATE
+# virtualenv (see README), never alongside the base install.
 jax = ["jax", "jaxlib", "numpyro"]
-# Only needed to run the demo scripts (demos/finance_demo.py, demos/temporal_demo.py,
-# ...), not the installable package itself.
-demos = ["pandas", "yfinance", "statsmodels", "pysusie"]
-# applications/genomics/genomics_1kg_fetch.py needs pysam for remote region-restricted
-# VCF access; kept as its
-# own extra (installed into .venv-genomics in this project) since pysam's htslib build
-# has caused environment friction before -- see README.
-genomics = ["pysam", "pandas"]
 
 [tool.setuptools]
-packages = ["hierboost", "spatial_boost"]
+packages = ["hierboost"]
