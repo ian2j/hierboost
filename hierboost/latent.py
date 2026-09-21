@@ -314,11 +314,45 @@ class BlockLatentFit:
         return delta
 
 
+def fit_block_latent_fits(X, coords, block_id, n_trials=2, tau2=1.0, hyper_n_steps=200,
+                           seed=0, structure="sar"):
+    """Per-block moment-matching hyperparameter fit (fit_block_hyperparameters) plus the
+    resulting BlockLatentFit construction -- Step 1 of fit_latent_block_model's pipeline,
+    factored out (2026-09-21) because it's entirely y-INDEPENDENT (only ever touches X,
+    coords, block_id: MAF and within-block correlation), unlike Step 2's Newton
+    alternation below, which needs y. hierboost.joint's NUTS pipeline needs exactly this
+    step's output (`block_fits`) and NONE of Step 2 -- it re-derives the block latents'
+    posterior jointly with the outcome model itself, so running the (known-degenerate,
+    see newton_update_ztilde's docstring) plug-in EM alternation first would be wasted
+    work at best and would bias the "prior" hyperparameters toward the plug-in's own
+    already-overfit Z-tilde at worst. fit_latent_block_model below calls this unchanged;
+    behavior for existing callers is identical, this is a pure extraction.
+
+    Returns dict block_id -> BlockLatentFit, keyed the same way self.latent_fits_
+    already is elsewhere in this project.
+    """
+    coords = np.asarray(coords, dtype=float)
+    blocks = block_membership_lists(block_id)
+    block_ids = sorted(blocks.keys())
+    fits = {}
+    for k, b in enumerate(block_ids):
+        idx = blocks[b]
+        Xb = X[:, idx]
+        cb = coords[idx]
+        maf = Xb.mean(axis=0) / n_trials
+        corr = np.abs(np.nan_to_num(np.corrcoef(Xb.T), nan=0.0)) if len(idx) > 1 else np.ones((1, 1))
+        mu, phi, _ = fit_block_hyperparameters(cb, maf * n_trials, corr, n_trials=n_trials,
+                                                tau2=tau2, n_steps=hyper_n_steps, seed=seed + k,
+                                                structure=structure)
+        fits[b] = BlockLatentFit(cb, mu, phi, tau2=tau2, n_trials=n_trials, structure=structure)
+    return fits
+
+
 def fit_latent_block_model(X, y, coords, block_id, group_wr, xi0, xi1, kappa, nu, lam,
                             n_trials=2, tau2=1.0, n_outer=15, n_inner_newton=8,
                             hyper_n_steps=200, seed=0, verbose=False, structure="sar"):
     """Orchestrates the full Ch4 pipeline, generalized:
-      1. Per-block moment-matching hyperparameter fit (fit_block_hyperparameters).
+      1. Per-block moment-matching hyperparameter fit (fit_block_latent_fits).
       2. Alternating: Newton-update every block's Z-tilde/delta (autodiff, Sec 4.3.1),
          then re-fit gamma/theta/sigma2 by calling hierboost.spike_slab.fit_em on the
          resulting block-level design matrix -- reusing the *same* generic EM engine
@@ -341,18 +375,12 @@ def fit_latent_block_model(X, y, coords, block_id, group_wr, xi0, xi1, kappa, nu
     block_ids = sorted(blocks.keys())
     K = len(block_ids)
 
-    fits, deltas, Z = {}, {}, np.zeros((n, K))
+    fits = fit_block_latent_fits(X, coords, block_id, n_trials=n_trials, tau2=tau2,
+                                  hyper_n_steps=hyper_n_steps, seed=seed, structure=structure)
+    deltas, Z = {}, np.zeros((n, K))
     for k, b in enumerate(block_ids):
         idx = blocks[b]
         Xb = X[:, idx]
-        cb = coords[idx]
-        maf = Xb.mean(axis=0) / n_trials
-        corr = np.abs(np.nan_to_num(np.corrcoef(Xb.T), nan=0.0)) if len(idx) > 1 else np.ones((1, 1))
-        mu, phi, _ = fit_block_hyperparameters(cb, maf * n_trials, corr, n_trials=n_trials,
-                                                tau2=tau2, n_steps=hyper_n_steps, seed=seed + k,
-                                                structure=structure)
-        fit = BlockLatentFit(cb, mu, phi, tau2=tau2, n_trials=n_trials, structure=structure)
-        fits[b] = fit
         deltas[b] = jnp.zeros(max(len(idx) - 1, 0))
         # cheap init for Z-tilde: standardized block mean genotype
         Z[:, k] = (Xb.mean(axis=1) - Xb.mean()) / (Xb.std() + 1e-8)

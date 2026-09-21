@@ -42,7 +42,7 @@ from .kernels import resolve_affinity, sar_weight_matrix
 from .structure import determine_blocks
 from .blocks import block_membership_lists
 from .spike_slab import (fit_em, em_filter, gibbs_sampler, centroid_estimate, embfdr,
-                          ppl as ppl_binomial, _precision_from_theta)
+                          ppl as ppl_binomial, _precision_from_theta, GibbsResult)
 from .spike_slab_gaussian import fit_em_gaussian, em_filter_gaussian, gibbs_sampler_gaussian, ppl_gaussian
 from .spike_slab_glm import (fit_em_poisson, em_filter_poisson, ppl_poisson,
                               fit_em_nb, em_filter_nb, gibbs_sampler_nb, ppl_nb)
@@ -179,6 +179,16 @@ class _HierBoostBase:
         resample's own fit didn't retain the name).
         """
         self._check_fitted()
+        if self.fit_method == "joint":
+            raise ValueError(
+                "bootstrap_ci refits the whole pipeline n_boot times per call (200 by "
+                "default) -- combined with fit_method='joint' that means n_boot full NUTS "
+                "runs, which is both prohibitively expensive and largely redundant: the "
+                "whole point of fit_method='joint' is that its own posterior samples "
+                "(self.gibbs_.beta, feeding self.beta_cov_/self.beta_se_) already "
+                "propagate the block-latent's estimation uncertainty directly, without "
+                "needing an outer bootstrap wrapper. Use self.beta_cov_/beta_se_ (or "
+                "self.gibbs_.beta's own samples) instead.")
         X = np.asarray(X, dtype=float)
         y = np.asarray(y, dtype=float)
         n = X.shape[0]
@@ -298,28 +308,34 @@ class _HierBoostBase:
                 "does not yet have a spatiotemporal option.")
 
         if self._response == "binomial":
-            if self.fit_method != "em":
-                raise ValueError("decorrelate with a binomial response always uses Chapter 4's "
-                                  "EM-based pipeline internally (fit_latent_block_model); "
-                                  "fit_method must be 'em' in this configuration")
+            if self.fit_method not in ("em", "joint"):
+                raise ValueError("decorrelate with a binomial response uses either Chapter 4's "
+                                  "EM-based plug-in pipeline (fit_method='em', "
+                                  "fit_latent_block_model) or the fully-Bayesian joint pipeline "
+                                  "(fit_method='joint', hierboost.joint) internally; fit_method "
+                                  "must be one of those two in this configuration")
             try:
-                from .latent import fit_latent_block_model
+                from .latent import fit_latent_block_model, fit_block_latent_fits
             except ImportError as e:
                 raise ImportError(
                     "decorrelate with a binomial response needs JAX (hierboost.latent) -- "
                     "install it in a separate environment, see README ('pip install jax jaxlib') "
                     "and run from there") from e
-            result = fit_latent_block_model(X, y, self.coords_, self.block_id_, wr_block,
-                                             self.xi0, self.xi1, self.kappa, self.nu, self.lam,
-                                             n_trials=n_trials, tau2=self.tau2,
-                                             structure=self.decorrelate, verbose=verbose)
-            self.latent_fits_ = result["fits"]
-            self.latent_deltas_ = result["deltas"]
-            em = result["em_result"]
-            X_design = np.column_stack([np.ones(n), result["Z"]])
-            glm_result = dict(kind="em", beta=em.beta, sigma2=em.sigma2, theta_hat=em.theta_hat,
-                               mu=em.mu, ppl=ppl_binomial(y, em.mu), history=None,
-                               retained_idx=None, gibbs=None)
+
+            if self.fit_method == "joint":
+                glm_result, X_design = self._fit_joint(X, y, wr_block, n_trials, verbose)
+            else:
+                result = fit_latent_block_model(X, y, self.coords_, self.block_id_, wr_block,
+                                                 self.xi0, self.xi1, self.kappa, self.nu, self.lam,
+                                                 n_trials=n_trials, tau2=self.tau2,
+                                                 structure=self.decorrelate, verbose=verbose)
+                self.latent_fits_ = result["fits"]
+                self.latent_deltas_ = result["deltas"]
+                em = result["em_result"]
+                X_design = np.column_stack([np.ones(n), result["Z"]])
+                glm_result = dict(kind="em", beta=em.beta, sigma2=em.sigma2, theta_hat=em.theta_hat,
+                                   mu=em.mu, ppl=ppl_binomial(y, em.mu), history=None,
+                                   retained_idx=None, gibbs=None)
         else:
             # Continuous-feature block-latent path (factor.py/state_space.py, no JAX):
             # response-agnostic, since it only ever transforms the raw X into a shared
@@ -443,6 +459,86 @@ class _HierBoostBase:
         self._store_common(X_design, y, wr_block, glm_result, block_names)
         self.fitted_ = True
         return self
+
+    def _fit_joint(self, X, y, wr_block, n_trials, verbose):
+        """fit_method='joint' for decorrelate + binomial: hierboost.joint's NUTS/
+        regularized-horseshoe pipeline in place of Chapter 4's plug-in EM
+        (fit_latent_block_model). See hierboost.joint's module docstring and
+        hierboost.latent.BlockLatentFit.newton_update_ztilde's "KNOWN LIMITATION" for
+        the calibration gap this exists to close -- the plug-in's Z-tilde estimation
+        error never propagates into the outcome model's reported uncertainty
+        (calibration-tested: closed-form correction only reaches ~59-63% coverage
+        against a 95% nominal target, bootstrap_ci reaches ~88%; see its docstring).
+        Only needs Step 1 of the plug-in pipeline (fit_block_latent_fits, entirely
+        y-independent per-block hyperparameters) -- NUTS re-derives the block latents'
+        posterior JOINTLY with gamma/beta0, so the plug-in's Newton alternation (Step
+        2, fit_latent_block_model's y-dependent loop) is skipped entirely, not just
+        unused; running it first would be wasted work at best and would bias the
+        "prior" hyperparameters toward the plug-in's own already-overfit Z-tilde at
+        worst.
+
+        Stores posterior MEANS as the point estimates everything else in this class
+        treats as fixed (self.latent_deltas_, X_design's Z column) -- same convention
+        self.beta_ already uses for the Gibbs path. The full posterior beta samples go
+        into a hierboost.spike_slab.GibbsResult (theta replaced by a practical-
+        significance indicator |gamma_b| > practical_threshold_joint, since a
+        continuous horseshoe has no literal spike-and-slab indicator to sample) so
+        _compute_approx_covariance's existing `if self.gibbs_ is not None` branch
+        computes beta_cov_/beta_se_ from these samples with NO new covariance code --
+        that branch doesn't care how the samples were generated, and posterior samples
+        from a joint model already reflect the block-latent's own estimation
+        uncertainty directly, making the errors-in-variables closed-form correction
+        this class also carries (see _compute_approx_covariance) unnecessary here.
+        """
+        from .latent import fit_block_latent_fits
+        try:
+            from .joint import run_joint_inference, posterior_beta_samples
+        except ImportError as e:
+            raise ImportError(
+                "fit_method='joint' needs numpyro on top of JAX (`pip install numpyro`) "
+                "-- install it in the same environment as JAX and run from there") from e
+        import jax.numpy as jnp
+
+        n = X.shape[0]
+        seed = self.random_state if self.random_state is not None else 0
+        fits = fit_block_latent_fits(X, self.coords_, self.block_id_, n_trials=n_trials,
+                                      tau2=self.tau2, structure=self.decorrelate, seed=seed)
+        self.latent_fits_ = fits
+
+        mcmc, block_ids_order = run_joint_inference(
+            X, y, self.block_id_, fits, n_trials=n_trials, p0=self.p0_joint,
+            slab_scale=self.slab_scale_joint, num_warmup=self.burn_in, num_samples=self.n_samples,
+            seed=seed, progress_bar=verbose)
+        # block_ids_order = sorted(fits.keys()), the same construction self.block_ids_
+        # already used above -- assert rather than silently trust two independently-
+        # sorted lists agree (NUTS sample sites below are indexed by POSITION in this
+        # list, e.g. "Zt_0"/"delta_0" for block_ids_order[0], not by block_id value).
+        assert block_ids_order == self.block_ids_, \
+            "block ordering mismatch between fit() and run_joint_inference -- internal bug"
+
+        samples = mcmc.get_samples()
+        beta_samples = posterior_beta_samples(mcmc)  # (n_samples, K+1): [beta0, gamma_1..gamma_K]
+        gamma_samples = beta_samples[:, 1:]
+        theta_pseudo = np.abs(gamma_samples) > self.practical_threshold_joint
+
+        K = len(self.block_ids_)
+        Z_mean = np.column_stack([np.array(samples[f"Zt_{k}"]).mean(axis=0) for k in range(K)])
+        self.latent_deltas_ = {
+            b: (jnp.asarray(np.array(samples[f"delta_{k}"]).mean(axis=0)) if f"delta_{k}" in samples
+                else jnp.zeros(0))
+            for k, b in enumerate(self.block_ids_)
+        }
+        X_design = np.column_stack([np.ones(n), Z_mean])
+        beta_mean = beta_samples.mean(axis=0)
+        mu_train = expit(X_design @ beta_mean)
+
+        gibbs_result = GibbsResult(beta=beta_samples, theta=theta_pseudo,
+                                    sigma2=np.array(samples["tau"]))
+        glm_result = dict(kind="joint", beta=beta_mean, sigma2=float(gibbs_result.sigma2.mean()),
+                           theta_hat=gibbs_result.pi_hat, mu=mu_train,
+                           ppl=ppl_binomial(y, mu_train), history=None, retained_idx=None,
+                           gibbs=gibbs_result)
+        return glm_result, X_design
 
     def _store_common(self, X_design, y, wr, result, names):
         retained_idx = result.get("retained_idx")
@@ -678,16 +774,32 @@ class _HierBoostBase:
                       + (f" (of {len(self.feature_names_in_)} raw features)"
                          if self.decorrelate_ is None and len(self.names_) < len(self.feature_names_in_) else ""))
         lines.append("-" * 72)
-        lines.append(f"{'Hyperparameters:':<22}xi0={self.xi0}  xi1={self.xi1}  kappa={self.kappa}  "
-                      f"nu={self.nu}  lam={self.lam}")
-        lines.append(f"{'sigma2 (slab var):':<22}{self.sigma2_:.4f}")
-        if self._response == "gaussian":
-            lines.append(f"{'sigma_y2 (noise var):':<22}{self.sigma_y2_:.4f}")
-        lines.append(f"{'PPL:':<22}{self.ppl_:.4f}")
-        bfdr = embfdr(self.theta_hat_, gamma=gamma)
-        n_selected = int(centroid_estimate(self.theta_hat_, gamma=gamma).sum())
-        lines.append(f"{'EMBFDR @ gamma={:.1f}:'.format(gamma):<22}{bfdr:.4f}")
-        lines.append(f"{'Selected (centroid):':<22}{n_selected} / {len(self.theta_hat_)}")
+        if self.fit_kind_ == "joint":
+            # Regularized-horseshoe hyperparameters (hierboost.joint), not the discrete
+            # spike-and-slab's xi0/xi1/kappa -- this fit has no literal inclusion
+            # indicator to report EMBFDR/centroid_estimate against (both assume a
+            # genuine point-mass-at-0 posterior; theta_hat_ here is instead
+            # P(|gamma_b| > practical_threshold_joint), a continuous-shrinkage proxy --
+            # see _fit_joint's docstring), so this branch reports what the model
+            # actually is instead of forcing it into spike-and-slab-shaped fields.
+            lines.append(f"{'Hyperparameters:':<22}p0_joint={self.p0_joint}  "
+                          f"slab_scale_joint={self.slab_scale_joint}  "
+                          f"practical_threshold_joint={self.practical_threshold_joint}")
+            lines.append(f"{'tau (shrinkage, mean):':<22}{self.sigma2_:.4f}")
+            lines.append(f"{'PPL:':<22}{self.ppl_:.4f}")
+            n_selected = int(np.sum(self.theta_hat_ >= 0.5))
+            lines.append(f"{'Selected (P(assoc)>=0.5):':<22}{n_selected} / {len(self.theta_hat_)}")
+        else:
+            lines.append(f"{'Hyperparameters:':<22}xi0={self.xi0}  xi1={self.xi1}  kappa={self.kappa}  "
+                          f"nu={self.nu}  lam={self.lam}")
+            lines.append(f"{'sigma2 (slab var):':<22}{self.sigma2_:.4f}")
+            if self._response == "gaussian":
+                lines.append(f"{'sigma_y2 (noise var):':<22}{self.sigma_y2_:.4f}")
+            lines.append(f"{'PPL:':<22}{self.ppl_:.4f}")
+            bfdr = embfdr(self.theta_hat_, gamma=gamma)
+            n_selected = int(centroid_estimate(self.theta_hat_, gamma=gamma).sum())
+            lines.append(f"{'EMBFDR @ gamma={:.1f}:'.format(gamma):<22}{bfdr:.4f}")
+            lines.append(f"{'Selected (centroid):':<22}{n_selected} / {len(self.theta_hat_)}")
         lines.append("-" * 72)
 
         order = np.argsort(self.theta_hat_)[::-1]
@@ -795,6 +907,17 @@ class HierBoostClassifier(_HierBoostBase):
     boosting/decorrelation pipeline; this subclass supplies the logistic spike-and-slab
     GLM layer (hierboost.spike_slab)."""
     _response = "binomial"
+
+    def __init__(self, p0_joint=None, slab_scale_joint=2.0, practical_threshold_joint=0.1,
+                 **kwargs):
+        """`p0_joint`/`slab_scale_joint`/`practical_threshold_joint` only matter for
+        `decorrelate` + `fit_method='joint'` (hierboost.joint) -- see _fit_joint and
+        hierboost.joint.run_joint_inference's docstrings. `p0_joint=None` (default)
+        lets run_joint_inference pick its own mildly-sparse default (max(1, K/10))."""
+        self.p0_joint = p0_joint
+        self.slab_scale_joint = slab_scale_joint
+        self.practical_threshold_joint = practical_threshold_joint
+        super().__init__(**kwargs)
 
     def _link_inv(self, eta):
         return expit(eta)

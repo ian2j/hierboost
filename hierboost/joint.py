@@ -120,6 +120,16 @@ def run_joint_inference(X, y, block_id, block_fits, n_trials=2, p0=None, slab_sc
     sigma_approx=2 (their published rule-of-thumb pseudo-residual-SD for a binary
     logistic response). Defaults to max(1, K/10) -- a mildly-sparse prior guess,
     matching xi0's own EM-path default reasoning -- when not supplied.
+
+    `p0` must satisfy 0 < p0 < K (the formula's denominator is K - p0; a user-supplied
+    p0 outside that range raises ValueError rather than silently producing a non-finite
+    tau0). BUG FIXED (2026-09-21, found wiring fit_method='joint' into
+    HierBoostClassifier -- the very first caller to exercise K<=10): the auto-default
+    `max(1, K/10)` equals K exactly for every K<=10 -- e.g. any single-block fit
+    (K=1) -- making tau0's denominator exactly 0 and crashing with ZeroDivisionError
+    before a single NUTS sample was ever drawn. Every decorrelate="ar1"/"sar" call
+    with 10 or fewer blocks (a common case, e.g. one block per stability-selection-
+    admitted region) hit this. Fixed by capping the auto-default strictly below K.
     """
     block_ids = sorted(block_fits.keys())
     from .blocks import block_membership_lists
@@ -133,7 +143,10 @@ def run_joint_inference(X, y, block_id, block_fits, n_trials=2, p0=None, slab_sc
 
     n, K = y.shape[0], len(block_ids)
     if p0 is None:
-        p0 = max(1.0, K / 10.0)
+        p0 = min(max(1.0, K / 10.0), K - 0.5)
+    elif not (0 < p0 < K):
+        raise ValueError(f"p0={p0} must satisfy 0 < p0 < K={K} (Piironen & Vehtari's "
+                          f"tau0 formula divides by K - p0)")
     tau0 = (p0 / (K - p0)) * (2.0 / np.sqrt(n))
 
     kernel = NUTS(joint_block_model)
@@ -159,3 +172,16 @@ def posterior_association_summary(mcmc, block_ids, practical_threshold=0.1):
         "gamma_ci_lo": ci_lo,
         "gamma_ci_hi": ci_hi,
     }
+
+
+def posterior_beta_samples(mcmc):
+    """(n_samples, K+1) array of [beta0, gamma_1..gamma_K] posterior draws, intercept
+    first -- the same (n_samples, p1) shape/column order hierboost.spike_slab.
+    GibbsResult.beta already uses, so downstream consumers (estimator.py's
+    _compute_approx_covariance, which computes np.cov/.std over exactly this shape
+    without caring how the samples were generated) work unchanged on a joint-inference
+    fit. Added (2026-09-21) for wiring run_joint_inference into HierBoostClassifier --
+    posterior_association_summary alone only ever surfaced gamma, not beta0 or the
+    samples needed for a full posterior covariance."""
+    samples = mcmc.get_samples()
+    return np.column_stack([np.array(samples["beta0"]), np.array(samples["gamma"])])
