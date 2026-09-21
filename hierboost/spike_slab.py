@@ -28,6 +28,43 @@ def theta_conditional(beta_features, sigma2, kappa, xi0, xi1, wr):
     return expit(logit_theta)
 
 
+def theta_conditional_pmom(beta_features, sigma2, tau, xi0, xi1, wr, eps=1e-8):
+    """Non-local-prior counterpart of theta_conditional: the "included" (slab) density
+    is Johnson & Rossell's product-MOM prior pi_1(beta) = (beta^2/(tau*sigma2)) *
+    N(beta; 0, tau*sigma2) instead of a local N(0, kappa*sigma2) slab -- the "excluded"
+    (spike) density is left as the existing local N(0, sigma2), unchanged. Derived
+    2026-09-18/19 (see project memory for the full derivation and a numerically-
+    verified sanity check of the qualitative behavior below) by taking the same
+    log-likelihood-ratio construction theta_conditional uses, with pi_1 swapped in:
+
+        logit(theta_j) = log(beta_j^2) - 1.5*log(tau) - log(sigma2)
+                          + (beta_j^2 / 2*sigma2) * (1 - 1/tau) + xi0 + xi1*wr_j
+
+    Same quadratic term as theta_conditional (kappa -> tau) plus exactly one new
+    term, log(beta_j^2), which -> -inf as beta_j -> 0 -- the mechanism this variant
+    exists for: it drives theta_j toward 0 for any near-zero coefficient regardless
+    of what the quadratic term alone would say, unlike the local slab (which has
+    positive density at 0 and therefore gives weak/near-zero evidence real credit).
+    `eps` floors beta_j^2 away from exactly 0 to avoid -inf/NaN.
+
+    IMPORTANT: tau is NOT directly comparable to a local prior's kappa. The pMOM
+    slab's mode (peak density) sits at beta = sqrt(2*tau*sigma2), not at 0, and its
+    variance is 3*tau*sigma2 (vs. the local slab's kappa*sigma2) -- reusing an
+    existing kappa value directly as tau silently produces a wildly miscalibrated
+    prior (confirmed empirically: tau=kappa=100 with sigma2=1 gives a slab mode at
+    beta~14, far past any coefficient scale seen in this project's real fits, and
+    theta stayed ~0 even for beta=2). Variance-match via tau = kappa/3 if porting an
+    existing kappa value; don't reuse it as-is.
+    """
+    b2 = np.maximum(beta_features ** 2, eps)
+    logit_theta = (np.log(b2)
+                   - 1.5 * np.log(tau)
+                   - np.log(sigma2)
+                   + (beta_features ** 2 / (2.0 * sigma2)) * (1.0 - 1.0 / tau)
+                   + xi0 + xi1 * wr)
+    return expit(logit_theta)
+
+
 def ppl(y, mu):
     """Posterior predictive loss under squared error."""
     return float(np.sum((y - mu) ** 2 + mu * (1.0 - mu)))
@@ -146,6 +183,7 @@ class FilterStep:
     beta: np.ndarray
     sigma2: float
     theta_hat: np.ndarray
+    cv_ppl: float = None  # held-out PPL used for step selection when cv_folds is set; None otherwise
 
 
 @dataclass
@@ -154,12 +192,50 @@ class EMFilterResult:
     best: "FilterStep" = None
 
 
+def _cv_ppl_bernoulli(X, y, wr, xi0, xi1, kappa, nu, lam, rank, beta_init, sigma2_init,
+                       cv_folds, cv_seed):
+    """K-fold held-out PPL for a FIXED feature set (opt-in fix for em_filter's default
+    in-sample step-selection criterion -- see the 2026-09-17/18 diagnosis in project
+    memory: in-sample PPL only stays sparse when the true signal is strong enough that
+    extra features genuinely can't reduce in-sample loss further (e.g. near-saturated
+    ancestry classification); under moderate SNR + a sparse-relative-to-candidate-pool
+    true architecture, in-sample PPL over-selects because held-out generalization was
+    never checked. Folds are a fixed, reproducible (not data-order-dependent)
+    permutation, not tied to any global random state."""
+    n = X.shape[0]
+    fold_id = np.random.default_rng(cv_seed).permutation(n) % cv_folds
+    total = 0.0
+    for k in range(cv_folds):
+        test = fold_id == k
+        train = ~test
+        res_fold = fit_em(X[train], y[train], wr, xi0, xi1, kappa, nu, lam, rank=rank,
+                           beta_init=beta_init, sigma2_init=sigma2_init)
+        mu_test = expit(X[test] @ res_fold.beta)
+        total += ppl(y[test], mu_test)
+    return total
+
+
 def em_filter(X, y, wr, xi0, xi1, kappa, nu, lam,
               filter_frac=0.25, min_features=10, max_outer=200,
-              rank=None, patience=3, verbose=False):
+              rank=None, patience=3, verbose=False, cv_folds=None, cv_seed=0):
     """EM filtering pipeline (distilled-sensing style): fit, drop lowest-theta
     features, refit warm-started, track PPL, stop when it stops improving or too
     few features remain. Returns the full trace plus the best (min-PPL) step.
+
+    `cv_folds=None` (default): step selection uses the original in-sample PPL,
+    UNCHANGED behavior from every prior use of this function in this project.
+
+    `cv_folds=K`: step selection instead uses a K-fold held-out PPL (see
+    `_cv_ppl_bernoulli`) -- opt-in fix for the over-selection failure mode diagnosed
+    via genomics_1kg_simulated_causal{,_binary}.py (2026-09-17/18): in-sample PPL
+    retained ~35-56% of LD blocks against a true 2.4% causal fraction under a
+    moderate-SNR simulated architecture, in BOTH response families, because nothing
+    in the original criterion ever checked held-out generalization. The feature-
+    elimination step itself (which features to drop each round) is UNCHANGED --
+    still driven by the full-data fit's theta_hat, only the STOPPING/BEST-step
+    decision changes. The returned `best.beta`/`theta_hat` still come from a full-
+    data refit at that step's feature count (CV picks the size, full data gives the
+    final coefficients -- the same two-stage discipline as e.g. LassoCV).
     """
     p = X.shape[1] - 1
     idx = np.arange(p)
@@ -177,14 +253,24 @@ def em_filter(X, y, wr, xi0, xi1, kappa, nu, lam,
         res = fit_em(X_cur, y, wr_cur, xi0, xi1, kappa, nu, lam, rank=rank,
                      beta_init=beta, sigma2_init=sigma2)
         ppl_val = ppl(y, res.mu)
+        cv_ppl_val = None
+        if cv_folds is not None:
+            cv_ppl_val = _cv_ppl_bernoulli(X_cur, y, wr_cur, xi0, xi1, kappa, nu, lam,
+                                            rank, beta, sigma2, cv_folds, cv_seed)
+        select_val = cv_ppl_val if cv_folds is not None else ppl_val
         record = FilterStep(step=step, n_features=idx.shape[0], ppl=ppl_val,
                              rppl=ppl_val / ppl_null, retained_idx=idx.copy(),
-                             beta=res.beta, sigma2=res.sigma2, theta_hat=res.theta_hat)
+                             beta=res.beta, sigma2=res.sigma2, theta_hat=res.theta_hat,
+                             cv_ppl=cv_ppl_val)
         history.append(record)
         if verbose:
-            print(f"step {step:3d}  p={idx.shape[0]:6d}  PPL={ppl_val:.2f}  rPPL={record.rppl:.4f}")
+            msg = f"step {step:3d}  p={idx.shape[0]:6d}  PPL={ppl_val:.2f}  rPPL={record.rppl:.4f}"
+            if cv_ppl_val is not None:
+                msg += f"  CV-PPL={cv_ppl_val:.2f}"
+            print(msg)
 
-        if best is None or ppl_val < best.ppl:
+        best_select_val = (best.cv_ppl if cv_folds is not None else best.ppl) if best is not None else None
+        if best is None or select_val < best_select_val:
             best, bad_streak = record, 0
         else:
             bad_streak += 1
