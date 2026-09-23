@@ -13,7 +13,10 @@ from .spike_slab import (
     fit_em, em_filter, gibbs_sampler, centroid_estimate, embfdr,
     select_kappa_by_embfdr, theta_conditional, ppl, xi_bounds,
 )
-from .factor import gaussian_block_factor, project_block_factor
+from .factor import (
+    gaussian_block_factor, project_block_factor,
+    sar_shrinkage_block_factor, project_shrinkage_block_factor, sar_loading_direction,
+)
 from .spike_slab_gaussian import (
     fit_em_gaussian, em_filter_gaussian, gibbs_sampler_gaussian, ppl_gaussian,
 )
@@ -38,6 +41,7 @@ __all__ = [
     "fit_em", "em_filter", "gibbs_sampler", "centroid_estimate", "embfdr",
     "select_kappa_by_embfdr", "theta_conditional", "ppl", "xi_bounds",
     "gaussian_block_factor", "project_block_factor",
+    "sar_shrinkage_block_factor", "project_shrinkage_block_factor", "sar_loading_direction",
     "fit_em_gaussian", "em_filter_gaussian", "gibbs_sampler_gaussian", "ppl_gaussian",
     "fit_em_sumstats", "em_filter_sumstats", "gibbs_sampler_sumstats", "ppl_sumstats",
     "ssr_sumstats", "summarize_by_block", "effective_rank",

@@ -10,7 +10,11 @@ leading eigenvector of the block's covariance matrix (probabilistic PCA, Tipping
 Bishop 1999). No iteration needed -- this is the same idea, just simpler because the
 observation model is already conjugate.
 """
+from dataclasses import dataclass
 import numpy as np
+from scipy.optimize import minimize_scalar
+
+from .kernels import sar_weight_matrix
 
 
 def gaussian_block_factor(X_block, return_variance=False):
@@ -121,3 +125,214 @@ def apply_supervised_block_factor(X_new_block, w):
     """
     X = np.asarray(X_new_block, dtype=float)
     return X @ w
+
+
+# ---------------------------------------------------------------------------
+# sar_shrinkage_block_factor: a SAR-STRUCTURED counterpart of gaussian_block_factor,
+# for when physical coordinates are available for a block's raw members and you want
+# the block-latent's loading direction to actually USE that structure (unlike
+# gaussian_block_factor itself, which is purely empirical and ignores coords even when
+# they're supplied -- coords only ever decide block MEMBERSHIP upstream in blocks.py/
+# structure.py, never the within-block loading shape).
+#
+# Motivation and validation are recorded in project memory ("spatial-ppca-sign-flip"):
+# a first attempt (a HARD constraint pinning the loading to ell(phi) = (I -
+# B(phi))^-1 @ 1, dissertation Ch4's own SAR mixing mechanism applied to a continuous/
+# Gaussian observation instead of Ch4's discrete/Binomial one) won cleanly on one real
+# 1000-Genomes LD block (LCT) but lost badly on three others (DARC/ACKR1, SLC24A5,
+# EDAR) -- diagnosed to a real, previously-undocumented structural gap: whenever the
+# SAR fit is in its stable/convergent regime (spectral radius of B below 1 -- true for
+# any phi a reasonable moment-match or profile-likelihood fit would pick, since B's
+# probit-kernel entries are in [0,1] and (I-B)^-1 = I + B + B^2 + ... converges there),
+# ell(phi) is entrywise NON-NEGATIVE, so it cannot represent a feature that's
+# anti-correlated with its block's shared factor -- an ordinary artifact of arbitrary
+# reference-allele coding in genomics, and plausibly common in
+# other domains too (sensor polarity, short-vs-long instruments, ...). This also
+# affects hierboost.latent's actual discrete Ch4 model, which uses the identical
+# (I-B)^-1 @ 1 quantity as the coefficient multiplying its own per-individual latent.
+#
+# The fix implemented here: replace the hard constraint with a soft, empirical-Bayes
+# shrinkage prior, w_j ~ N(mu0 * ell_j(phi), tau_c2), pulling the loading toward the
+# SAR shape rather than pinning it there. tau_c2 -> 0 recovers the hard-constrained
+# model; tau_c2 -> infinity recovers gaussian_block_factor's own free-loading PPCA
+# exactly (every M-step below reduces to the ordinary FA/PPCA update in that limit,
+# see _em_shrunk_direction's docstring). mu0 and tau_c2 are both estimated from the
+# data by their own closed-form M-steps (empirical Bayes), not hand-picked -- a
+# feature (or a whole block) that genuinely disagrees with the SAR shape automatically
+# loosens the prior instead of needing a manual override.
+#
+# Validated (see project memory for the full numbers): ties or beats plain
+# gaussian_block_factor on every real block tried so far (4 independent 1000-Genomes
+# LD blocks plus one real UK-weather station cluster), including improving on the one
+# case where the hard-constrained model had already won outright. Synthetic tests
+# confirm the mechanism directly: matches the hard-constrained model when the SAR
+# shape is exactly correct, and degrades gracefully toward plain PPCA (rather than
+# collapsing, as the hard-constrained model does) when 2 of 10 features are
+# deliberately sign-flipped relative to the true shape.
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ShrinkageFactorResult:
+    z: np.ndarray            # (n,) factor scores (posterior mean)
+    loading: np.ndarray      # (m,) FREE per-feature loading -- unlike ell(phi) alone,
+                             # this can be negative
+    sigma2: np.ndarray       # (m,) idiosyncratic variances
+    phi: float               # fitted SAR bandwidth (correlation length)
+    mu0: float                # fitted prior-mean scale along ell(phi)
+    tau_c2: float             # fitted empirical-Bayes prior variance -- how much the
+                             # data was allowed to deviate from the SAR shape
+    z_var: float              # posterior variance of z (population-level scalar, same
+                             # role as gaussian_block_factor's own z_var)
+    train_mean: np.ndarray    # per-column means used to center training data
+
+
+def sar_loading_direction(coords, phi):
+    """ell(phi) = (I - B(phi))^-1 @ 1, normalized to a unit vector -- the SAR-implied
+    "effective loading" of a shared per-individual scalar factor onto each block
+    member (dissertation Ch4's own mixing matrix, hierboost.kernels.sar_weight_matrix,
+    applied to a vector of ones instead of a discrete/Binomial observation model).
+    Entrywise non-negative whenever the SAR fit is in its stable/convergent regime
+    (spectral radius of B below 1 -- true for any phi a reasonable fit would pick
+    relative to the block's physical span; an implausibly large phi can push B's
+    spectral radius above 1 and break this, but that phi would also be a degenerate
+    fit for other reasons) -- see this module's SAR-shrinkage section docstring for
+    why the non-negativity matters."""
+    coords = np.asarray(coords, dtype=float)
+    B = sar_weight_matrix(coords, phi)
+    m = B.shape[0]
+    C = np.linalg.inv(np.eye(m) - B)
+    ell = C @ np.ones(m)
+    norm = np.linalg.norm(ell)
+    return ell / norm if norm > 0 else ell
+
+
+def _rank1_loglik_total(Xc, w, sigma2):
+    """Total Gaussian log-likelihood of centered data Xc under Sigma = outer(w, w) +
+    diag(sigma2), via the matrix-determinant-lemma/Sherman-Morrison rank-1 update --
+    avoids ever forming or inverting the m x m covariance matrix, the same low-rank-
+    plus-diagonal trick hierboost.rank_utils uses throughout this codebase. Used by
+    fit_phi_shrinkage's profile-likelihood search below (evaluated once per candidate
+    phi)."""
+    inv_sigma2 = 1.0 / sigma2
+    S = np.sum(w ** 2 * inv_sigma2)
+    denom = 1.0 + S
+    proj = Xc @ (w * inv_sigma2)
+    quad = np.sum(Xc ** 2 * inv_sigma2, axis=1) - (1.0 / denom) * proj ** 2
+    logdet = np.sum(np.log(sigma2)) + np.log(denom)
+    m = Xc.shape[1]
+    ll_per_row = -0.5 * (m * np.log(2.0 * np.pi) + logdet + quad)
+    return float(ll_per_row.sum())
+
+
+def _em_shrunk_direction(Xc, ell, n_em=100, tol=1e-8, min_var_frac=0.02):
+    """EM for a FREE loading w with empirical-Bayes prior w_j ~ N(mu0*ell_j, tau_c2),
+    given a fixed SAR shape `ell`. Every M-step is closed form:
+
+      w_j    = (Sjz_j/sigma2_j + mu0*ell_j/tau_c2) / (Ez2_sum/sigma2_j + 1/tau_c2)
+               -- ridge regression of feature j on the factor, shrunk toward
+               mu0*ell_j instead of toward 0. tau_c2 -> 0 forces w -> mu0*ell (the
+               hard-constrained model); tau_c2 -> infinity drops the 1/tau_c2 terms,
+               recovering ordinary PPCA/factor-analysis's own (sigma2-independent)
+               free M-step exactly: w_j -> sum_i(x_ij*E[z_i]) / sum_i(E[z_i^2]).
+      sigma2 = standard per-feature residual-variance M-step (unchanged in form from
+               gaussian_block_factor's implicit one), floored at a small fraction of
+               the feature's own raw variance -- guards a real Heywood-case failure
+               mode confirmed on 1000-Genomes data (with the loading direction
+               partially fixed by the prior, the sigma2 M-step can still drive one
+               feature's residual variance toward 0 if `ell` happens to align
+               unusually well with it), the same role hierboost.spike_slab's
+               Inv-Gamma prior on sigma2 plays elsewhere in this codebase.
+      mu0    = dot(ell, w) -- least-squares fit of w against the unit vector ell.
+      tau_c2 = mean((w - mu0*ell)^2) -- how much the data-fitted w actually deviates
+               from the SAR shape, re-estimated every iteration so a genuinely
+               sign-flipped or off-shape feature automatically loosens the prior
+               instead of needing a hand-picked shrinkage strength.
+
+    Returns (w, sigma2, mu0, tau_c2).
+    """
+    n, m = Xc.shape
+    var_floor = min_var_frac * (Xc.var(axis=0) + 1e-12)
+    sigma2 = Xc.var(axis=0) + 1e-6
+    w = ell.copy()
+    mu0 = 1.0
+    tau_c2 = 0.1
+    prev_w = w.copy()
+    for _ in range(n_em):
+        z_var = 1.0 / (1.0 + np.sum(w ** 2 / sigma2))
+        z_mean = z_var * (Xc @ (w / sigma2))
+        Ez2_sum = np.sum(z_mean ** 2) + n * z_var
+
+        Sjz = Xc.T @ z_mean
+        w = (Sjz / sigma2 + mu0 * ell / tau_c2) / (Ez2_sum / sigma2 + 1.0 / tau_c2)
+
+        sigma2 = (np.sum(Xc ** 2, axis=0) - 2.0 * w * Sjz + w ** 2 * Ez2_sum) / n
+        sigma2 = np.maximum(sigma2, var_floor)
+
+        mu0 = float(np.dot(ell, w))
+        tau_c2 = float(np.mean((w - mu0 * ell) ** 2)) + 1e-8
+
+        if np.linalg.norm(w - prev_w) < tol * (np.linalg.norm(prev_w) + 1e-12):
+            break
+        prev_w = w.copy()
+    return w, sigma2, mu0, tau_c2
+
+
+def fit_phi_shrinkage(Xc, coords, phi_bounds=(1e-2, 1e6), n_em=100, min_var_frac=0.02):
+    """Profile-likelihood fit of phi: for each candidate phi, ell(phi) is
+    deterministic, so run _em_shrunk_direction to its exact conditional MLE of
+    (w, sigma2, mu0, tau_c2) given that shape, then evaluate the exact marginal
+    log-likelihood there (_rank1_loglik_total) -- a genuine profile likelihood, not a
+    cruder correlation-pattern moment-match. 1-D bounded scalar search over log(phi).
+    """
+    def neg_ll(log_phi):
+        phi = np.exp(log_phi)
+        ell = sar_loading_direction(coords, phi)
+        w, sigma2, mu0, tau_c2 = _em_shrunk_direction(Xc, ell, n_em=n_em, min_var_frac=min_var_frac)
+        return -_rank1_loglik_total(Xc, w, sigma2)
+
+    lo, hi = np.log(phi_bounds[0]), np.log(phi_bounds[1])
+    res = minimize_scalar(neg_ll, bounds=(lo, hi), method="bounded", options={"xatol": 1e-3})
+    return float(np.exp(res.x))
+
+
+def sar_shrinkage_block_factor(X_block, coords, phi=None, n_em=100, min_var_frac=0.02):
+    """SAR-structured counterpart of gaussian_block_factor: one shared latent factor
+    per block, with the loading direction softly shrunk toward the SAR mechanism's
+    ell(phi) instead of estimated purely empirically. Requires physical (or temporal/
+    any metric-space) coordinates for the block's raw members, unlike
+    gaussian_block_factor. See this module's SAR-shrinkage section docstring above for
+    the mechanism, motivation, and validation.
+
+    `phi=None` (default): fit via profile likelihood (fit_phi_shrinkage). Pass a fixed
+    value to skip that search (e.g. reusing a value already fit on a training fold).
+
+    Returns a ShrinkageFactorResult.
+    """
+    X = np.asarray(X_block, dtype=float)
+    train_mean = X.mean(axis=0)
+    Xc = X - train_mean
+
+    if phi is None:
+        phi = fit_phi_shrinkage(Xc, coords, n_em=n_em, min_var_frac=min_var_frac)
+    ell = sar_loading_direction(coords, phi)
+    w, sigma2, mu0, tau_c2 = _em_shrunk_direction(Xc, ell, n_em=n_em, min_var_frac=min_var_frac)
+
+    z_var = 1.0 / (1.0 + np.sum(w ** 2 / sigma2))
+    z_mean = z_var * (Xc @ (w / sigma2))
+    return ShrinkageFactorResult(z=z_mean, loading=w, sigma2=sigma2, phi=phi, mu0=mu0,
+                                  tau_c2=tau_c2, z_var=z_var, train_mean=train_mean)
+
+
+def project_shrinkage_block_factor(X_new_block, loading, sigma2, train_mean):
+    """Out-of-sample counterpart of sar_shrinkage_block_factor: project new raw block
+    observations onto an already-fitted (loading, sigma2), holding both fixed. Uses
+    the model's own posterior-mean formula (weighted by sigma2), NOT
+    project_block_factor's unweighted least-squares projection -- the two coincide
+    when sigma2 is constant across features, but sar_shrinkage_block_factor's sigma2
+    is typically more heterogeneous (a feature the prior mostly overrode keeps a
+    larger sigma2), so weighting matters more here, and using the same formula the
+    training fit itself uses keeps train- and test-time scoring consistent.
+    """
+    Xc = np.asarray(X_new_block, dtype=float) - train_mean
+    z_var = 1.0 / (1.0 + np.sum(loading ** 2 / sigma2))
+    return z_var * (Xc @ (loading / sigma2))

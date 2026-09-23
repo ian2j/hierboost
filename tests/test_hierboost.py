@@ -14,7 +14,9 @@ from hierboost.structure import blocks_from_correlation_threshold, blocks_from_g
 from hierboost.relevance import TextEmbeddingRelevance
 from hierboost.state_space import fit_temporal_block_factor
 from hierboost.spacetime import fit_spacetime_block_factor, filter_spacetime_block_factor
-from hierboost.factor import supervised_block_factor, apply_supervised_block_factor
+from hierboost.factor import (supervised_block_factor, apply_supervised_block_factor,
+                               gaussian_block_factor, sar_shrinkage_block_factor,
+                               project_shrinkage_block_factor, sar_loading_direction)
 
 
 def test_gaussian_affinity_1d_matches_manual_gene_weight_example():
@@ -346,6 +348,75 @@ def test_apply_supervised_block_factor_matches_fit_on_same_data():
     score_fit, w = supervised_block_factor(X_block, y)
     score_applied = apply_supervised_block_factor(X_block, w)
     assert np.allclose(score_fit, score_applied)
+
+
+def test_sar_shrinkage_block_factor_beats_plain_ppca_when_truly_sar_shaped_at_small_n():
+    """The motivating case (see project memory 'spatial-ppca-sign-flip'): when a
+    block's true loading really does follow the SAR mechanism's distance-decay shape,
+    shrinking toward it should recover the shared factor better than gaussian_block_
+    factor's purely empirical eigenvector, especially at small n where the empirical
+    estimate is noisiest."""
+    m = 10
+    coords = np.linspace(0, 9, m)
+    # phi=0.8 keeps B's spectral radius well below 1 (the SAR fit's stable/convergent
+    # regime -- see sar_loading_direction's docstring); a too-large phi relative to
+    # this block's span makes (I-B)^-1 lose its non-negativity guarantee entirely, an
+    # unrelated degenerate-fit issue this test isn't about.
+    ell_true = sar_loading_direction(coords, phi=0.8)
+    tau_true = 1.5
+    n = 15
+
+    def corr_with_truth(seed):
+        rng = np.random.default_rng(seed)
+        z_true = rng.normal(size=n)
+        X = tau_true * np.outer(z_true, ell_true) + rng.normal(size=(n, m))
+        score_ppca, _ = gaussian_block_factor(X)
+        result = sar_shrinkage_block_factor(X, coords)
+        return abs(np.corrcoef(score_ppca, z_true)[0, 1]), abs(np.corrcoef(result.z, z_true)[0, 1])
+
+    corr_ppca = np.mean([corr_with_truth(s)[0] for s in range(20)])
+    corr_shrink = np.mean([corr_with_truth(s)[1] for s in range(20)])
+    assert corr_shrink > corr_ppca
+
+
+def test_sar_shrinkage_block_factor_handles_a_sign_flipped_feature():
+    """The actual bug this was built to fix: within its stable/convergent regime,
+    hierboost's SAR mechanism ell(phi) = (I-B(phi))^-1 @ 1 is entrywise non-negative,
+    so a HARD SAR-constrained loading cannot represent a feature anti-correlated with
+    the block's shared factor (an ordinary ref/alt allele-coding artifact in
+    genomics). Confirms the free-loading fix here recovers a loading of OPPOSITE sign
+    for that feature relative to the rest of the block -- the identifiable claim (a
+    factor model's overall sign is only determined up to a global flip, so checking an
+    absolute sign on one feature alone isn't meaningful; checking it disagrees with
+    the block's own majority sign is)."""
+    m = 8
+    coords = np.linspace(0, 7, m)
+    ell_true = sar_loading_direction(coords, phi=0.8).copy()  # stable regime -- see test above
+    assert np.all(ell_true >= 0)  # sanity: the property being tested requires this to start positive
+    ell_true[3] *= -1  # one feature genuinely anti-correlated with the shared factor
+    rng = np.random.default_rng(0)
+    n = 500
+    z_true = rng.normal(size=n)
+    X = 1.5 * np.outer(z_true, ell_true) + rng.normal(size=(n, m))
+
+    result = sar_shrinkage_block_factor(X, coords)
+    majority_sign = np.sign(np.median(np.delete(result.loading, 3)))
+    assert np.sign(result.loading[3]) != majority_sign
+    assert abs(np.corrcoef(result.z, z_true)[0, 1]) > 0.7
+
+
+def test_project_shrinkage_block_factor_matches_fit_on_same_data():
+    m = 8
+    coords = np.linspace(0, 7, m)
+    rng = np.random.default_rng(2)
+    n = 300
+    z_true = rng.normal(size=n)
+    ell_true = sar_loading_direction(coords, phi=0.8)
+    X = np.outer(z_true, ell_true) + rng.normal(scale=0.3, size=(n, m))
+
+    result = sar_shrinkage_block_factor(X, coords)
+    z_projected = project_shrinkage_block_factor(X, result.loading, result.sigma2, result.train_mean)
+    assert np.corrcoef(result.z, z_projected)[0, 1] > 0.999
 
 
 def test_text_embedding_relevance_ranks_related_group_higher():

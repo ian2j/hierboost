@@ -124,6 +124,51 @@ def test_regressor_sar_decorrelate_predicts_held_out():
     assert r2 > 0.8
 
 
+def test_regressor_sar_shrink_decorrelate_predicts_held_out():
+    """decorrelate='sar_shrink' end-to-end: same synthetic generator as the plain 'sar'
+    test above (a genuine SAR-shaped block-latent, real physical coords), confirming
+    the new option is fully wired through fit/predict, not just the low-level
+    hierboost.factor functions tested directly in test_hierboost.py."""
+    rng = np.random.default_rng(0)
+    n, m_per_block, n_blocks = 400, 4, 3
+    coords = np.concatenate([np.arange(m_per_block, dtype=float) + b * 100 for b in range(n_blocks)])
+
+    def gen(n, seed):
+        r = np.random.default_rng(seed)
+        latents = r.normal(size=(n, n_blocks))
+        X = np.zeros((n, m_per_block * n_blocks))
+        for b in range(n_blocks):
+            loadings = r.normal(1, 0.3, m_per_block)
+            X[:, b * m_per_block:(b + 1) * m_per_block] = (
+                np.outer(latents[:, b], loadings) + r.normal(0, 0.3, (n, m_per_block)))
+        y = latents @ np.array([2.0, 0.0, -1.5]) + r.normal(0, 0.5, n)
+        return X, y
+
+    X, y = gen(n, 0)
+    reg = HierBoostRegressor(decorrelate="sar_shrink", zeta=50, fit_method="em")
+    reg.fit(X, y, coords=coords)
+    assert len(reg.block_ids_) == n_blocks
+
+    X_new, y_new = gen(80, 99)
+    pred = reg.predict(X_new, return_std=True)
+    r2 = 1 - np.sum((y_new - pred.mean) ** 2) / np.sum((y_new - y_new.mean()) ** 2)
+    assert r2 > 0.8
+
+
+def test_classifier_sar_shrink_decorrelate_raises_not_implemented():
+    """No discrete/JAX counterpart exists for sar_shrink (see the module docstring in
+    hierboost.factor) -- must fail clearly, the same way 'star' already does for a
+    binomial response, rather than silently mis-dispatching into hierboost.latent's
+    structure=/"sar"/"ar1"/-only dictionary lookup."""
+    X, y, _ = _binomial_dataset(n=100, p=6, causal=(1, 3))
+    clf = HierBoostClassifier(decorrelate="sar_shrink")
+    try:
+        clf.fit(X, y, coords=np.arange(6, dtype=float))
+        assert False, "expected NotImplementedError"
+    except NotImplementedError:
+        pass
+
+
 def test_regressor_sar_copula_marginal_beats_raw_under_heterogeneous_block_marginals():
     """The block-latent factor model (hierboost.factor.gaussian_block_factor) assumes each
     raw feature is already roughly Gaussian -- marginal='copula' (hierboost.copula) relaxes

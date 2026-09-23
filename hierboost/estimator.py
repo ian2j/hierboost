@@ -6,15 +6,21 @@ Composes, in order:
   1. Boosting-prior structure (optional): raw features -> group affinity -> relevance ->
      inclusion-prior boost `wr` (hierboost.kernels.resolve_affinity, with auto bandwidth
      fitting). Omit entirely (default) for plain, non-boosted spike-and-slab.
-  2. Block-latent decorrelation (optional, `decorrelate="sar"|"ar1"|"star"`): raw
-     features -> one shared latent per block, via Chapter 4's SAR mechanism (spatial),
-     its AR(1) counterpart (temporal), or "star" (hierboost.spacetime: the two combined
-     -- one VAR(1) latent trajectory PER block, all blocks coupled jointly through one
-     structured, SAR-weighted transition matrix instead of independent AR(1)s) --
-     hierboost.factor/state_space/spacetime for continuous outcomes, hierboost.latent
-     for discrete/binomial ones (sar/ar1 only; "star" has no discrete/JAX counterpart
-     yet). Blocks either supplied (`block_id`) or determined data-driven
-     (hierboost.structure.determine_blocks). Optional `marginal="copula"` (continuous
+  2. Block-latent decorrelation (optional, `decorrelate="sar"|"sar_shrink"|"ar1"|"star"`):
+     raw features -> one shared latent per block, via Chapter 4's SAR mechanism
+     (spatial), its AR(1) counterpart (temporal), or "star" (hierboost.spacetime: the
+     two combined -- one VAR(1) latent trajectory PER block, all blocks coupled jointly
+     through one structured, SAR-weighted transition matrix instead of independent
+     AR(1)s) -- hierboost.factor/state_space/spacetime for continuous outcomes,
+     hierboost.latent for discrete/binomial ones (sar/ar1 only; "star"/"sar_shrink" have
+     no discrete/JAX counterpart yet). "sar_shrink" (continuous only) is "sar"'s
+     structure-USING counterpart: plain "sar" (hierboost.factor.gaussian_block_factor)
+     fits a purely empirical PPCA loading and ignores `coords` entirely once block
+     membership is decided, while "sar_shrink" (hierboost.factor.
+     sar_shrinkage_block_factor) softly shrinks the loading toward the SAR mechanism's
+     distance-based shape -- see that function's docstring for the sign-flip limitation
+     this was built to fix and its validation. Blocks either supplied (`block_id`) or
+     determined data-driven (hierboost.structure.determine_blocks). Optional `marginal="copula"` (continuous
      branch only): each block's raw features are passed through their own fitted
      empirical marginal CDF onto a shared Gaussian scale first (hierboost.copula) --
      the Gaussian-copula/nonparanormal generalization for blocks whose members have
@@ -46,7 +52,8 @@ from .spike_slab import (fit_em, em_filter, gibbs_sampler, centroid_estimate, em
 from .spike_slab_gaussian import fit_em_gaussian, em_filter_gaussian, gibbs_sampler_gaussian, ppl_gaussian
 from .spike_slab_glm import (fit_em_poisson, em_filter_poisson, ppl_poisson,
                               fit_em_nb, em_filter_nb, gibbs_sampler_nb, ppl_nb)
-from .factor import gaussian_block_factor, project_block_factor
+from .factor import (gaussian_block_factor, project_block_factor,
+                      sar_shrinkage_block_factor, project_shrinkage_block_factor)
 from .state_space import fit_temporal_block_factor, filter_temporal_block_factor
 from .copula import fit_block_transforms, apply_block_transforms
 
@@ -151,8 +158,8 @@ class _HierBoostBase:
 
         Why this exists (see project memory for the full diagnosis): `.summary()`'s
         Laplace-approximation CIs, even with `_compute_approx_covariance`'s errors-in-
-        variables correction (closed-form for all three of "sar"/"ar1"/"star", scalar
-        for the former and per-row/heteroscedastic for the latter two), only partially fix a real,
+        variables correction (closed-form for "sar"/"sar_shrink" (scalar) and "ar1"/"star"
+        (per-row/heteroscedastic)), only partially fix a real,
         calibration-tested undercoverage problem -- the classical "generated
         regressors" issue (Pagan 1984): a block's raw features are used TWICE, once to
         estimate the block-latent factor's loadings and once (via the fitted factor
@@ -234,8 +241,8 @@ class _HierBoostBase:
         """`coords` plays two independent roles, matching dissertation Ch4 vs Ch2/5:
         it is the axis `group_l/group_r/group_coords` boost affinity is computed over
         (step 1), and, separately, the axis blocks are formed over for decorrelation
-        (step 2) when `decorrelate` is set -- pass "sar" with physical position, "ar1"
-        with a time/lag index, or "star" with physical position (rows must still be
+        (step 2) when `decorrelate` is set -- pass "sar" or "sar_shrink" with physical
+        position, "ar1" with a time/lag index, or "star" with physical position (rows must still be
         time-ordered like "ar1" -- "star" additionally uses `coords` to compute each
         block's spatial centroid for the cross-block coupling matrix, and `phi_star`
         controls that coupling kernel's bandwidth). Both may use the same `coords`
@@ -299,13 +306,14 @@ class _HierBoostBase:
         wr_block = np.array([wr_raw[blocks[b]].mean() if blocks[b].size else 0.0
                               for b in self.block_ids_])
 
-        if self.decorrelate == "star" and self._response == "binomial":
+        if self.decorrelate in ("star", "sar_shrink") and self._response == "binomial":
             raise NotImplementedError(
-                "decorrelate='star' (space x time block-latent) is only implemented for "
-                "the continuous factor.py/state_space.py path (Gaussian, Poisson, "
+                f"decorrelate={self.decorrelate!r} is only implemented for the continuous "
+                "factor.py/state_space.py/spacetime.py path (Gaussian, Poisson, "
                 "Negative-Binomial) -- HierBoostClassifier's Binomial response needs "
-                "Chapter 4's literal discrete/JAX machinery (hierboost.latent), which "
-                "does not yet have a spatiotemporal option.")
+                "Chapter 4's literal discrete/JAX machinery (hierboost.latent), which has no "
+                "'star' (spatiotemporal) or 'sar_shrink' (empirical-Bayes shrinkage toward "
+                "the SAR shape) counterpart yet.")
 
         if self._response == "binomial":
             if self.fit_method not in ("em", "joint"):
@@ -432,6 +440,12 @@ class _HierBoostBase:
                         Z[:, k] = scores
                         fits[b] = ("sar", loadings)
                         self.latent_zvar_[b] = z_var
+                    elif self.decorrelate == "sar_shrink":
+                        sf = sar_shrinkage_block_factor(Xb, self.coords_[idx])
+                        train_means[b] = sf.train_mean
+                        Z[:, k] = sf.z
+                        fits[b] = ("sar_shrink", sf.loading, sf.sigma2)
+                        self.latent_zvar_[b] = sf.z_var
                     elif self.decorrelate == "ar1":
                         res_ts = fit_temporal_block_factor(Xb)
                         train_means[b] = res_ts.train_mean
@@ -450,7 +464,7 @@ class _HierBoostBase:
                         self.latent_zvar_[b] = res_ts.z_var
                     else:
                         raise ValueError(f"unknown decorrelate={self.decorrelate!r}; "
-                                          f"choose 'sar', 'ar1', or 'star'")
+                                          f"choose 'sar', 'sar_shrink', 'ar1', or 'star'")
             self.latent_fits_ = fits
             self.train_mean_ = train_means
             X_design = np.column_stack([np.ones(n), Z])
@@ -688,6 +702,10 @@ class _HierBoostBase:
                 elif kind == "sar":
                     (loadings,) = payload
                     Z_new[:, k] = project_block_factor(Xb_new, loadings, self.train_mean_[b])
+                elif kind == "sar_shrink":
+                    loadings, sigma2 = payload
+                    Z_new[:, k] = project_shrinkage_block_factor(Xb_new, loadings, sigma2,
+                                                                  self.train_mean_[b])
                 elif kind == "ar1":
                     (res_ts,) = payload
                     z_new, _, _ = filter_temporal_block_factor(
@@ -864,7 +882,7 @@ class _HierBoostBase:
         binomial, no closed-form variance available in that path)."""
         self._check_fitted()
         if self.decorrelate_ is None:
-            raise RuntimeError("plot_latent needs a model fit with decorrelate='sar'/'ar1'/'star'")
+            raise RuntimeError("plot_latent needs a model fit with decorrelate='sar'/'sar_shrink'/'ar1'/'star'")
         block = self.block_ids_[0] if block is None else block
         if self._response != "binomial":
             kind, *payload = self.latent_fits_[block]
@@ -875,6 +893,10 @@ class _HierBoostBase:
             if kind == "sar":
                 from .viz import plot_loadings
                 (loadings,) = payload
+                return plot_loadings(loadings, ax=ax)
+            if kind == "sar_shrink":
+                from .viz import plot_loadings
+                loadings, _sigma2 = payload
                 return plot_loadings(loadings, ax=ax)
             if kind == "star":
                 from .viz import plot_temporal_latent
@@ -1034,7 +1056,7 @@ class HierBoostCountRegressor(_HierBoostBase):
     rather than a fully Bayesian draw (no simple conjugate full conditional exists for
     it) -- see that function's docstring for the honest caveat.
 
-    `decorrelate="sar"|"ar1"|"star"` is supported via the same continuous factor.py/
+    `decorrelate="sar"|"sar_shrink"|"ar1"|"star"` is supported via the same continuous factor.py/
     state_space.py/spacetime.py block-latent path HierBoostRegressor uses (no JAX
     needed) -- it only ever transforms the raw covariates into a shared per-block
     latent, never touching the response, so it is response-family-agnostic. Only a
