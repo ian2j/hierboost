@@ -32,6 +32,7 @@ import jax.numpy as jnp
 
 from .blocks import block_membership_lists
 from .spike_slab import fit_em, ppl as ppl_fn
+from .factor import gaussian_block_factor
 
 
 def _sar_B_jax(coords, phi):
@@ -312,6 +313,61 @@ class BlockLatentFit:
             step = jnp.linalg.solve(H - 1e-4 * jnp.eye(m - 1), g)
             delta = delta - jnp.clip(step, -max_step, max_step)
         return delta
+
+
+def compute_sign_flips(X, block_id, n_trials):
+    """Binomial counterpart of hierboost.factor's sign_align_flips (see project memory
+    "spatial-ppca-sign-flip" for the full diagnosis): this module's SAR/AR1 mechanism
+    gives every raw feature in a block a coefficient (C @ 1)_j on the per-individual
+    latent z_tilde_i that is entrywise NON-NEGATIVE whenever the SAR/AR1 fit is in its
+    stable/convergent regime (the regime a reasonable phi fit lands in) -- see
+    BlockLatentFit's u = z_tilde*(C@1) + C@delta_padded expansion for why `delta`
+    (the population-shared per-feature deviation) does NOT fix this: it only shifts a
+    feature's baseline, it cannot rescale or flip how that feature responds to
+    INDIVIDUAL-LEVEL variation in z_tilde_i. So a raw feature that is genuinely
+    anti-correlated with its block's shared latent -- the ordinary case of an
+    arbitrarily-coded reference allele running opposite to its physically-linked
+    neighbors -- cannot be represented by this model, no matter how well phi is fit.
+
+    Fix (ported from the validated hierboost.factor.sar_shrinkage_block_factor work,
+    the cheap "Fix 1" preprocessing rather than the fuller empirical-Bayes
+    generalization "Fix 2" -- porting Fix 2 itself into this Binomial/non-conjugate
+    model would need the ridge M-step redone in Newton's-method space, not attempted
+    here): detect the sign pattern via one cheap continuous-PPCA pass (treating raw
+    dosage as continuous purely for sign detection, the same approximation
+    hierboost.factor's continuous branch already makes elsewhere), then recode any
+    disagreeing feature before it ever reaches the SAR/moment-matching/Newton
+    machinery. Singleton blocks have nothing to align against and are left alone.
+
+    Returns a boolean (p,) mask aligned with X's raw columns, for use with
+    apply_sign_flips. Compute this ONCE on training data and reuse the same mask at
+    prediction time (apply_sign_flips is deterministic given the mask) -- do not
+    recompute it on new/held-out data, the same "fit on train, apply same transform"
+    discipline hierboost.factor.project_block_factor and friends already follow.
+    """
+    X = np.asarray(X, dtype=float)
+    p = X.shape[1]
+    flip_mask = np.zeros(p, dtype=bool)
+    blocks = block_membership_lists(block_id)
+    for idx in blocks.values():
+        if len(idx) <= 1:
+            continue
+        _, loadings = gaussian_block_factor(X[:, idx])
+        flip_mask[idx[loadings < 0]] = True
+    return flip_mask
+
+
+def apply_sign_flips(X, flip_mask, n_trials):
+    """Recode flagged raw features: x -> n_trials - x, i.e. swap which of the two
+    Binomial outcomes is being counted (e.g. which allele is "the alternative" for a
+    genotype dosage feature) -- the valid, count-preserving analogue of the continuous
+    branch's negation (x -> -x), which would produce an invalid negative count here.
+    `flip_mask` should come from compute_sign_flips, computed once on training data and
+    reapplied unchanged to new data at prediction time.
+    """
+    X = np.asarray(X, dtype=float).copy()
+    X[:, flip_mask] = n_trials - X[:, flip_mask]
+    return X
 
 
 def fit_block_latent_fits(X, coords, block_id, n_trials=2, tau2=1.0, hyper_n_steps=200,

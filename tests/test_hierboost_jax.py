@@ -8,7 +8,8 @@ from scipy.special import expit
 from scipy.stats import norm
 
 from hierboost.blocks import threshold_blocks_1d
-from hierboost.latent import fit_block_hyperparameters, fit_latent_block_model
+from hierboost.latent import (fit_block_hyperparameters, fit_latent_block_model,
+                               compute_sign_flips, apply_sign_flips)
 from hierboost.joint import run_joint_inference, posterior_association_summary
 from hierboost.estimator import HierBoostClassifier
 
@@ -186,6 +187,89 @@ def _make_temporal_binomial_dataset(seed=1, n=200, m=6, n_trials=2, rho_true=0.7
     decay = rho_true ** lag
     X = rng.binomial(n_trials, expit(np.outer(signal, decay) * 2.0))
     return X, y, lag, signal
+
+
+def _make_multimember_causal_block_dataset(seed=1, n=150, m_causal=6, m_null=12):
+    """Like _make_causal_block_dataset, but deliberately constructed (a tight causal
+    cluster, well separated from a spread-out null pool) so the causal block always
+    comes out with multiple members -- needed for the sign-flip tests below, which are
+    about within-block sign disagreement and have nothing to test on a singleton."""
+    rng = np.random.default_rng(seed)
+    positions_causal = np.sort(rng.uniform(0, 400, m_causal))
+    positions_null = np.sort(rng.uniform(2000, 8000, m_null))
+    positions = np.concatenate([positions_causal, positions_null])
+    maf = rng.uniform(0.15, 0.4, m_causal + m_null)
+    X = _simulate_genotypes(n=n, positions=positions, maf=maf, ld_length=600, rng=rng)
+    block_id = threshold_blocks_1d(positions, zeta=500)
+    causal_block = block_id[0]
+    idx0 = np.where(block_id == causal_block)[0]
+    assert len(idx0) > 1  # sanity: this test needs a genuine multi-member block
+    signal = X[:, idx0].mean(axis=1)
+    signal = (signal - signal.mean()) / signal.std()
+    eta = 1.5 * signal + rng.normal(0, 0.3, n)
+    y = (rng.random(n) < expit(eta)).astype(float)
+    return X, y, positions, block_id, causal_block, signal
+
+
+def test_compute_sign_flips_detects_and_reverses_a_flipped_feature():
+    """The Binomial counterpart of the continuous branch's sign-flip fix (see project
+    memory "spatial-ppca-sign-flip"): hierboost.latent's SAR mechanism gives every raw
+    feature a coefficient on the shared latent that is structurally non-negative, so a
+    feature whose allele coding runs opposite to its physically-linked block-mates (an
+    ordinary GWAS QC artifact) needs recoding (x -> n_trials - x) before the SAR/Newton
+    machinery ever sees it. Confirms detection is correct and localized to the actually-
+    flipped feature, and that apply_sign_flips is its own exact inverse (recoding twice
+    returns the original data)."""
+    X, y, positions, block_id, causal_block, signal = _make_multimember_causal_block_dataset()
+    idx0 = np.where(block_id == causal_block)[0]
+    flip_target = idx0[0]
+    n_trials = 2
+    X_corrupted = X.copy()
+    X_corrupted[:, flip_target] = n_trials - X_corrupted[:, flip_target]
+
+    flip_mask = compute_sign_flips(X_corrupted, block_id, n_trials)
+    assert flip_mask[flip_target]
+    assert not flip_mask[idx0[idx0 != flip_target]].any()  # rest of the causal block untouched
+
+    X_recovered = apply_sign_flips(X_corrupted, flip_mask, n_trials)
+    assert np.array_equal(X_recovered[:, flip_target], X[:, flip_target])
+
+
+def test_estimator_classifier_sar_decorrelate_handles_a_sign_flipped_member():
+    """The actual production fix, end to end: a raw feature within the causal block
+    whose allele coding has been flipped relative to its physically-linked neighbors
+    should no longer meaningfully degrade the fit, now that HierBoostClassifier applies
+    compute_sign_flips/apply_sign_flips automatically before fit_latent_block_model
+    ever runs. Diagnosed, not just asserted: also checks the UNCORRECTED path (calling
+    fit_latent_block_model directly on the corrupted data, the way the estimator used
+    to before this fix existed) actually IS worse, so the comparison demonstrates a
+    real effect rather than the corrupted data being harmless anyway."""
+    X, y, positions, block_id, causal_block, signal = _make_multimember_causal_block_dataset()
+    idx0 = np.where(block_id == causal_block)[0]
+    n_trials = 2
+    X_corrupted = X.copy()
+    X_corrupted[:, idx0[0]] = n_trials - X_corrupted[:, idx0[0]]
+
+    K = len(np.unique(block_id))
+    wr = np.zeros(K)
+    result_uncorrected = fit_latent_block_model(
+        X_corrupted, y, positions, block_id, wr, xi0=-1.0, xi1=0.0, kappa=100.0, nu=1.0, lam=1.0,
+        n_outer=8, n_inner_newton=6, hyper_n_steps=150, seed=0)
+    causal_k_uncorrected = result_uncorrected["block_ids"].index(causal_block)
+    corr_uncorrected = abs(np.corrcoef(result_uncorrected["Z"][:, causal_k_uncorrected], signal)[0, 1])
+
+    clf = HierBoostClassifier(decorrelate="sar", xi0=-1.0, xi1=0.0, kappa=100.0)
+    clf.fit(X_corrupted, y, coords=positions, block_id=block_id, n_trials=n_trials)
+    assert clf.binomial_flip_mask_[idx0[0]]
+    causal_k = clf.block_ids_.index(causal_block)
+    # not an exact tie-for-max check: this toy dataset's null blocks separate cleanly
+    # enough that several routinely tie at theta_hat==1.0 too (a saturated-small-sample
+    # artifact unrelated to the sign-flip fix being tested) -- "clearly high confidence"
+    # is the actual, robust claim here.
+    assert clf.theta_hat_[causal_k] > 0.9
+
+    corr_fixed = abs(np.corrcoef(clf.X_design_[:, 1 + causal_k], signal)[0, 1])
+    assert corr_fixed > corr_uncorrected
 
 
 def test_estimator_classifier_ar1_decorrelate_predicts_held_out():

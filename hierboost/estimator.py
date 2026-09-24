@@ -263,6 +263,7 @@ class _HierBoostBase:
         self.coords_ = None if coords is None else np.asarray(coords, dtype=float)
         self.decorrelate_ = self.decorrelate
         self.marginal_ = self.marginal
+        self.binomial_flip_mask_ = None
         if self.marginal_ == "copula" and self._response == "binomial":
             raise NotImplementedError(
                 "marginal='copula' is only implemented for the continuous factor.py/"
@@ -323,12 +324,24 @@ class _HierBoostBase:
                                   "(fit_method='joint', hierboost.joint) internally; fit_method "
                                   "must be one of those two in this configuration")
             try:
-                from .latent import fit_latent_block_model, fit_block_latent_fits
+                from .latent import (fit_latent_block_model, fit_block_latent_fits,
+                                      compute_sign_flips, apply_sign_flips)
             except ImportError as e:
                 raise ImportError(
                     "decorrelate with a binomial response needs JAX (hierboost.latent) -- "
                     "install it in a separate environment, see README ('pip install jax jaxlib') "
                     "and run from there") from e
+
+            # Sign-align raw features before anything else touches them (see project
+            # memory "spatial-ppca-sign-flip" and compute_sign_flips's docstring): the
+            # SAR/AR1 mechanism's per-feature coefficient on the shared latent is
+            # structurally non-negative, so a feature anti-correlated with its block
+            # (e.g. an arbitrarily-coded reference allele) is otherwise unrepresentable
+            # regardless of how well phi is fit. Computed once on training X; the same
+            # mask must be reapplied to new data at predict time (_transform_new_blocks
+            # does this), never recomputed on it.
+            self.binomial_flip_mask_ = compute_sign_flips(X, self.block_id_, n_trials)
+            X = apply_sign_flips(X, self.binomial_flip_mask_, n_trials)
 
             if self.fit_method == "joint":
                 glm_result, X_design = self._fit_joint(X, y, wr_block, n_trials, verbose)
@@ -668,6 +681,12 @@ class _HierBoostBase:
     def _transform_new_blocks(self, X_new):
         blocks = block_membership_lists(self.block_id_)
         Z_new = np.zeros((X_new.shape[0], len(self.block_ids_)))
+        if self.binomial_flip_mask_ is not None:
+            # Reapply the SAME sign-alignment mask .fit() computed on training data --
+            # never recompute it here, or a new individual's own data could pick a
+            # different (equally arbitrary) sign convention than training used.
+            from .latent import apply_sign_flips
+            X_new = apply_sign_flips(X_new, self.binomial_flip_mask_, self.n_trials_)
         if self.decorrelate_ == "star":
             # Joint across all multi-member blocks at once, mirroring .fit()'s joint
             # treatment -- can't be done block-by-block since Phi couples them.
