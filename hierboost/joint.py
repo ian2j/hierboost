@@ -37,6 +37,12 @@ the original code never actually implemented -- bounds how large an included
 block's effective local scale can grow, the other half of Piironen & Vehtari's
 construction (without it, this was a plain, unregularized horseshoe).
 
+Each block's shared-latent loading is a free `w` with a shrinkage prior toward the
+SAR mechanism's own ell(phi) (see joint_block_model's `tau_w_scale` docstring), rather
+than ell(phi) itself -- ell(phi) is entrywise non-negative in the SAR fit's stable
+regime, so it can't represent a raw feature anti-correlated with its block (e.g. an
+arbitrarily-coded reference allele); the free `w` can.
+
 Per-block latent-prior hyperparameters (mu, phi -> Sigma_v) are taken as given
 (fit once via hierboost.latent.fit_block_hyperparameters, same as the plug-in
 path) rather than treated as top-level unknowns -- an intentional simplification,
@@ -55,23 +61,36 @@ from numpyro.infer import MCMC, NUTS
 
 
 def joint_block_model(X_blocks, y, CT_matrices, mu_v_list, Sigma_v_list, n_trials=2,
-                       tau0=1.0, slab_scale=2.0):
+                       tau0=1.0, slab_scale=2.0, tau_w_scale=0.3):
+    """`tau_w_scale` controls each feature's coefficient on its block's shared latent:
+    instead of the SAR mechanism's fixed ell_j = CT[:, 0] (entrywise non-negative, so
+    it can't represent a feature anti-correlated with its block, e.g. an arbitrarily-
+    coded reference allele), the coefficient is a free w_j ~ Normal(mu0*ell_j, tau_w),
+    with mu0/tau_w given their own priors and inferred jointly by NUTS. tau_w's
+    HalfCauchy prior shrinks w toward the SAR shape by default but lets the posterior
+    widen when the data disagrees."""
     n = y.shape[0]
     K = len(X_blocks)
     Z_cols = []
     for b in range(K):
         m = X_blocks[b].shape[1]
         mu_v, Sigma_v = mu_v_list[b], Sigma_v_list[b]
+        ell_b = CT_matrices[b][:, 0]
+
+        mu0_w = numpyro.sample(f"mu0_w_{b}", dist.Normal(1.0, 1.0))
+        tau_w = numpyro.sample(f"tau_w_{b}", dist.HalfCauchy(tau_w_scale))
+        w_raw = numpyro.sample(f"w_raw_{b}", dist.Normal(0.0, 1.0).expand([m]).to_event(1))
+        w_b = numpyro.deterministic(f"w_{b}", mu0_w * ell_b + tau_w * w_raw)
 
         zt = numpyro.sample(f"Zt_{b}", dist.Normal(mu_v[0], jnp.sqrt(Sigma_v[0, 0])).expand([n]).to_event(1))
         if m > 1:
             delta = numpyro.sample(f"delta_{b}",
                                     dist.MultivariateNormal(mu_v[1:], Sigma_v[1:, 1:] + 1e-6 * jnp.eye(m - 1)))
-            v = jnp.concatenate([zt[:, None], jnp.broadcast_to(delta, (n, m - 1))], axis=1)
+            delta_contrib = CT_matrices[b][:, 1:] @ delta
         else:
-            v = zt[:, None]
+            delta_contrib = jnp.zeros(m)
 
-        U = v @ CT_matrices[b].T
+        U = zt[:, None] * w_b[None, :] + delta_contrib[None, :]
         numpyro.sample(f"X_{b}", dist.Binomial(total_count=n_trials, logits=U).to_event(1), obs=X_blocks[b])
         Z_cols.append(zt)
 
@@ -107,7 +126,7 @@ def joint_block_model(X_blocks, y, CT_matrices, mu_v_list, Sigma_v_list, n_trial
 
 
 def run_joint_inference(X, y, block_id, block_fits, n_trials=2, p0=None, slab_scale=2.0,
-                         num_warmup=500, num_samples=1000, seed=0, progress_bar=True):
+                         tau_w_scale=0.3, num_warmup=500, num_samples=1000, seed=0, progress_bar=True):
     """block_fits: dict block_id -> hierboost.latent.BlockLatentFit (already fit via
     fit_block_hyperparameters), as produced inside fit_latent_block_model. Returns the
     MCMC object plus a posterior summary of block "association strength" comparable to
@@ -152,7 +171,7 @@ def run_joint_inference(X, y, block_id, block_fits, n_trials=2, p0=None, slab_sc
     kernel = NUTS(joint_block_model)
     mcmc = MCMC(kernel, num_warmup=num_warmup, num_samples=num_samples, progress_bar=progress_bar)
     mcmc.run(jax.random.PRNGKey(seed), X_blocks, y_j, CT_matrices, mu_v_list, Sigma_v_list, n_trials,
-              tau0, slab_scale)
+              tau0, slab_scale, tau_w_scale)
     return mcmc, block_ids
 
 

@@ -13,16 +13,15 @@ Composes, in order:
      through one structured, SAR-weighted transition matrix instead of independent
      AR(1)s) -- hierboost.factor/state_space/spacetime for continuous outcomes,
      hierboost.latent for discrete/binomial ones (sar/ar1 only; "star"/"sar_shrink" have
-     no discrete/JAX counterpart yet). "sar_shrink" (continuous only) is "sar"'s
-     structure-USING counterpart: plain "sar" (hierboost.factor.gaussian_block_factor)
-     fits a purely empirical PPCA loading and ignores `coords` entirely once block
-     membership is decided, while "sar_shrink" (hierboost.factor.
-     sar_shrinkage_block_factor) softly shrinks the loading toward the SAR mechanism's
-     distance-based shape -- see that function's docstring for the sign-flip limitation
-     this was built to fix and its validation. Blocks either supplied (`block_id`) or
-     determined data-driven (hierboost.structure.determine_blocks). Optional `marginal="copula"` (continuous
-     branch only): each block's raw features are passed through their own fitted
-     empirical marginal CDF onto a shared Gaussian scale first (hierboost.copula) --
+     no discrete/JAX counterpart yet). "sar" fits a purely empirical PPCA loading per
+     block (hierboost.factor.gaussian_block_factor), ignoring `coords` once block
+     membership is decided; "sar_shrink" (continuous only, hierboost.factor.
+     sar_shrinkage_block_factor) instead softly shrinks the loading toward the SAR
+     mechanism's own distance-based shape. Blocks either supplied (`block_id`) or
+     determined data-driven (hierboost.structure.determine_blocks). Optional
+     `marginal="copula"` (continuous branch only): each block's raw features are
+     passed through their own fitted empirical marginal CDF onto a shared Gaussian
+     scale first (hierboost.copula) --
      the Gaussian-copula/nonparanormal generalization for blocks whose members have
      genuinely different marginal shapes (skewed, heavy-tailed, count-like) but should
      still share one latent under a common correlation structure. factor.py/
@@ -264,6 +263,7 @@ class _HierBoostBase:
         self.decorrelate_ = self.decorrelate
         self.marginal_ = self.marginal
         self.binomial_flip_mask_ = None
+        self.latent_w_ = None
         if self.marginal_ == "copula" and self._response == "binomial":
             raise NotImplementedError(
                 "marginal='copula' is only implemented for the continuous factor.py/"
@@ -332,14 +332,10 @@ class _HierBoostBase:
                     "install it in a separate environment, see README ('pip install jax jaxlib') "
                     "and run from there") from e
 
-            # Sign-align raw features before anything else touches them (see project
-            # memory "spatial-ppca-sign-flip" and compute_sign_flips's docstring): the
-            # SAR/AR1 mechanism's per-feature coefficient on the shared latent is
-            # structurally non-negative, so a feature anti-correlated with its block
-            # (e.g. an arbitrarily-coded reference allele) is otherwise unrepresentable
-            # regardless of how well phi is fit. Computed once on training X; the same
-            # mask must be reapplied to new data at predict time (_transform_new_blocks
-            # does this), never recomputed on it.
+            # Sign-align raw features before anything else touches them (see
+            # compute_sign_flips's docstring for why). Computed once on training X;
+            # the same mask is reapplied to new data at predict time
+            # (_transform_new_blocks), never recomputed.
             self.binomial_flip_mask_ = compute_sign_flips(X, self.block_id_, n_trials)
             X = apply_sign_flips(X, self.binomial_flip_mask_, n_trials)
 
@@ -555,6 +551,14 @@ class _HierBoostBase:
                 else jnp.zeros(0))
             for k, b in enumerate(self.block_ids_)
         }
+        # Posterior mean of each block's free per-feature loading (see hierboost.joint.
+        # joint_block_model's tau_w_scale docstring) -- needed at predict time so new
+        # data is scored with the SAME loading the model was actually fit with, not the
+        # rigid ell(phi) BlockLatentFit otherwise defaults to.
+        self.latent_w_ = {
+            b: jnp.asarray(np.array(samples[f"w_{k}"]).mean(axis=0))
+            for k, b in enumerate(self.block_ids_)
+        }
         X_design = np.column_stack([np.ones(n), Z_mean])
         beta_mean = beta_samples.mean(axis=0)
         mu_train = expit(X_design @ beta_mean)
@@ -736,7 +740,11 @@ class _HierBoostBase:
                 fit = self.latent_fits_[b]
                 delta_b = self.latent_deltas_[b]
                 zt_init = jnp.zeros(Xb_new.shape[0])
-                zt = fit.infer_ztilde_from_data(jnp.asarray(Xb_new, dtype=jnp.float32), delta_b, zt_init)
+                Xb_new_j = jnp.asarray(Xb_new, dtype=jnp.float32)
+                if self.latent_w_ is not None:
+                    zt = fit.infer_ztilde_from_data_shrunk(Xb_new_j, delta_b, self.latent_w_[b], zt_init)
+                else:
+                    zt = fit.infer_ztilde_from_data(Xb_new_j, delta_b, zt_init)
                 Z_new[:, k] = np.array(zt)
         return Z_new
 

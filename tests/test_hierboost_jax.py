@@ -212,14 +212,9 @@ def _make_multimember_causal_block_dataset(seed=1, n=150, m_causal=6, m_null=12)
 
 
 def test_compute_sign_flips_detects_and_reverses_a_flipped_feature():
-    """The Binomial counterpart of the continuous branch's sign-flip fix (see project
-    memory "spatial-ppca-sign-flip"): hierboost.latent's SAR mechanism gives every raw
-    feature a coefficient on the shared latent that is structurally non-negative, so a
-    feature whose allele coding runs opposite to its physically-linked block-mates (an
-    ordinary GWAS QC artifact) needs recoding (x -> n_trials - x) before the SAR/Newton
-    machinery ever sees it. Confirms detection is correct and localized to the actually-
-    flipped feature, and that apply_sign_flips is its own exact inverse (recoding twice
-    returns the original data)."""
+    """A feature whose allele coding runs opposite to its block-mates should be
+    detected and localized correctly, and apply_sign_flips should be its own exact
+    inverse (recoding twice returns the original data)."""
     X, y, positions, block_id, causal_block, signal = _make_multimember_causal_block_dataset()
     idx0 = np.where(block_id == causal_block)[0]
     flip_target = idx0[0]
@@ -236,14 +231,11 @@ def test_compute_sign_flips_detects_and_reverses_a_flipped_feature():
 
 
 def test_estimator_classifier_sar_decorrelate_handles_a_sign_flipped_member():
-    """The actual production fix, end to end: a raw feature within the causal block
-    whose allele coding has been flipped relative to its physically-linked neighbors
-    should no longer meaningfully degrade the fit, now that HierBoostClassifier applies
-    compute_sign_flips/apply_sign_flips automatically before fit_latent_block_model
-    ever runs. Diagnosed, not just asserted: also checks the UNCORRECTED path (calling
-    fit_latent_block_model directly on the corrupted data, the way the estimator used
-    to before this fix existed) actually IS worse, so the comparison demonstrates a
-    real effect rather than the corrupted data being harmless anyway."""
+    """HierBoostClassifier applies sign-alignment automatically before fitting, so a
+    flipped feature within the causal block should no longer meaningfully degrade the
+    fit. Compares against calling fit_latent_block_model directly on the uncorrected
+    data, confirming the correction has a real effect rather than the corruption being
+    harmless anyway."""
     X, y, positions, block_id, causal_block, signal = _make_multimember_causal_block_dataset()
     idx0 = np.where(block_id == causal_block)[0]
     n_trials = 2
@@ -270,6 +262,51 @@ def test_estimator_classifier_sar_decorrelate_handles_a_sign_flipped_member():
 
     corr_fixed = abs(np.corrcoef(clf.X_design_[:, 1 + causal_k], signal)[0, 1])
     assert corr_fixed > corr_uncorrected
+
+
+def test_joint_inference_recovers_signal_with_a_sign_flipped_feature():
+    """joint_block_model's free per-feature loading (see its tau_w_scale docstring)
+    should recover the true signal even with a flipped feature in the causal block.
+    Tested on raw corrupted data, bypassing HierBoostClassifier's own sign-alignment
+    preprocessing, to isolate this mechanism's own contribution."""
+    X, y, positions, block_id, causal_block, signal = _make_multimember_causal_block_dataset(seed=0, n=150)
+    idx0 = np.where(block_id == causal_block)[0]
+    n_trials = 2
+    X_corrupted = X.copy()
+    X_corrupted[:, idx0[0]] = n_trials - X_corrupted[:, idx0[0]]
+
+    from hierboost.latent import fit_block_latent_fits
+    fits = fit_block_latent_fits(X_corrupted, positions, block_id, n_trials=n_trials, hyper_n_steps=150, seed=0)
+    mcmc, block_ids = run_joint_inference(X_corrupted, y, block_id, fits, n_trials=n_trials,
+                                           num_warmup=400, num_samples=600, seed=0, progress_bar=False)
+    causal_k = block_ids.index(causal_block)
+    zt_mean = np.array(mcmc.get_samples()[f"Zt_{causal_k}"]).mean(axis=0)
+    assert abs(np.corrcoef(zt_mean, signal)[0, 1]) > 0.9
+
+    summary = posterior_association_summary(mcmc, block_ids, practical_threshold=0.1)
+    assert summary["prob_association"][causal_k] > 0.95
+
+
+def test_estimator_classifier_joint_decorrelate_predicts_held_out():
+    """End-to-end fit_method='joint' smoke test through HierBoostClassifier (not
+    previously covered): fit, then predict on fresh held-out data generated from the
+    same block structure."""
+    X, y, positions, block_id, causal_block, signal = _make_multimember_causal_block_dataset(seed=0, n=150)
+    clf = HierBoostClassifier(decorrelate="sar", fit_method="joint", xi0=-1.0, xi1=0.0,
+                               burn_in=300, n_samples=400)
+    clf.fit(X, y, coords=positions, block_id=block_id, n_trials=2, verbose=False)
+    assert clf.latent_w_ is not None
+
+    idx0 = np.where(block_id == causal_block)[0]
+    rng = np.random.default_rng(99)
+    maf = rng.uniform(0.15, 0.4, len(positions))
+    X_new = _simulate_genotypes(n=80, positions=positions, maf=maf, ld_length=600, rng=rng)
+    signal_new = X_new[:, idx0].mean(axis=1)
+    signal_new = (signal_new - signal_new.mean()) / signal_new.std()
+
+    pred = clf.predict_proba(X_new, return_std=True)
+    assert pred.mean.shape == (80,)
+    assert abs(np.corrcoef(pred.mean, signal_new)[0, 1]) > 0.5
 
 
 def test_estimator_classifier_ar1_decorrelate_predicts_held_out():

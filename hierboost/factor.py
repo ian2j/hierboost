@@ -128,47 +128,22 @@ def apply_supervised_block_factor(X_new_block, w):
 
 
 # ---------------------------------------------------------------------------
-# sar_shrinkage_block_factor: a SAR-STRUCTURED counterpart of gaussian_block_factor,
-# for when physical coordinates are available for a block's raw members and you want
-# the block-latent's loading direction to actually USE that structure (unlike
-# gaussian_block_factor itself, which is purely empirical and ignores coords even when
-# they're supplied -- coords only ever decide block MEMBERSHIP upstream in blocks.py/
-# structure.py, never the within-block loading shape).
+# sar_shrinkage_block_factor: a SAR-structured counterpart of gaussian_block_factor,
+# for when physical coordinates are available and the block-latent's loading should
+# actually use that structure (gaussian_block_factor ignores coords entirely; they
+# only ever decide block membership upstream in blocks.py/structure.py).
 #
-# Motivation and validation are recorded in project memory ("spatial-ppca-sign-flip"):
-# a first attempt (a HARD constraint pinning the loading to ell(phi) = (I -
-# B(phi))^-1 @ 1, dissertation Ch4's own SAR mixing mechanism applied to a continuous/
-# Gaussian observation instead of Ch4's discrete/Binomial one) won cleanly on one real
-# 1000-Genomes LD block (LCT) but lost badly on three others (DARC/ACKR1, SLC24A5,
-# EDAR) -- diagnosed to a real, previously-undocumented structural gap: whenever the
-# SAR fit is in its stable/convergent regime (spectral radius of B below 1 -- true for
-# any phi a reasonable moment-match or profile-likelihood fit would pick, since B's
-# probit-kernel entries are in [0,1] and (I-B)^-1 = I + B + B^2 + ... converges there),
-# ell(phi) is entrywise NON-NEGATIVE, so it cannot represent a feature that's
-# anti-correlated with its block's shared factor -- an ordinary artifact of arbitrary
-# reference-allele coding in genomics, and plausibly common in
-# other domains too (sensor polarity, short-vs-long instruments, ...). This also
-# affects hierboost.latent's actual discrete Ch4 model, which uses the identical
-# (I-B)^-1 @ 1 quantity as the coefficient multiplying its own per-individual latent.
-#
-# The fix implemented here: replace the hard constraint with a soft, empirical-Bayes
-# shrinkage prior, w_j ~ N(mu0 * ell_j(phi), tau_c2), pulling the loading toward the
-# SAR shape rather than pinning it there. tau_c2 -> 0 recovers the hard-constrained
-# model; tau_c2 -> infinity recovers gaussian_block_factor's own free-loading PPCA
-# exactly (every M-step below reduces to the ordinary FA/PPCA update in that limit,
-# see _em_shrunk_direction's docstring). mu0 and tau_c2 are both estimated from the
-# data by their own closed-form M-steps (empirical Bayes), not hand-picked -- a
-# feature (or a whole block) that genuinely disagrees with the SAR shape automatically
-# loosens the prior instead of needing a manual override.
-#
-# Validated (see project memory for the full numbers): ties or beats plain
-# gaussian_block_factor on every real block tried so far (4 independent 1000-Genomes
-# LD blocks plus one real UK-weather station cluster), including improving on the one
-# case where the hard-constrained model had already won outright. Synthetic tests
-# confirm the mechanism directly: matches the hard-constrained model when the SAR
-# shape is exactly correct, and degrades gracefully toward plain PPCA (rather than
-# collapsing, as the hard-constrained model does) when 2 of 10 features are
-# deliberately sign-flipped relative to the true shape.
+# A hard version of this (pinning the loading to ell(phi) = (I - B(phi))^-1 @ 1, the
+# SAR mixing mechanism hierboost.latent's discrete model also uses) is entrywise
+# non-negative whenever the SAR fit is in its stable/convergent regime, so it can't
+# represent a feature anti-correlated with its block's shared factor -- an ordinary
+# artifact of arbitrary reference-allele coding in genomics. This replaces the hard
+# constraint with a soft empirical-Bayes prior, w_j ~ N(mu0 * ell_j(phi), tau_c2),
+# pulling the loading toward the SAR shape instead of pinning it: tau_c2 -> 0 recovers
+# the hard-constrained model, tau_c2 -> infinity recovers gaussian_block_factor's own
+# free-loading PPCA exactly. mu0 and tau_c2 are fit from the data (empirical Bayes),
+# so a feature that genuinely disagrees with the SAR shape automatically loosens the
+# prior rather than needing a manual override.
 # ---------------------------------------------------------------------------
 
 @dataclass
@@ -188,15 +163,10 @@ class ShrinkageFactorResult:
 
 def sar_loading_direction(coords, phi):
     """ell(phi) = (I - B(phi))^-1 @ 1, normalized to a unit vector -- the SAR-implied
-    "effective loading" of a shared per-individual scalar factor onto each block
-    member (dissertation Ch4's own mixing matrix, hierboost.kernels.sar_weight_matrix,
-    applied to a vector of ones instead of a discrete/Binomial observation model).
-    Entrywise non-negative whenever the SAR fit is in its stable/convergent regime
-    (spectral radius of B below 1 -- true for any phi a reasonable fit would pick
-    relative to the block's physical span; an implausibly large phi can push B's
-    spectral radius above 1 and break this, but that phi would also be a degenerate
-    fit for other reasons) -- see this module's SAR-shrinkage section docstring for
-    why the non-negativity matters."""
+    "effective loading" of a shared per-individual factor onto each block member
+    (hierboost.kernels.sar_weight_matrix's mixing matrix applied to a vector of ones).
+    Entrywise non-negative whenever B's spectral radius is below 1, true for any phi a
+    reasonable fit would pick relative to the block's physical span."""
     coords = np.asarray(coords, dtype=float)
     B = sar_weight_matrix(coords, phi)
     m = B.shape[0]
@@ -234,14 +204,11 @@ def _em_shrunk_direction(Xc, ell, n_em=100, tol=1e-8, min_var_frac=0.02):
                hard-constrained model); tau_c2 -> infinity drops the 1/tau_c2 terms,
                recovering ordinary PPCA/factor-analysis's own (sigma2-independent)
                free M-step exactly: w_j -> sum_i(x_ij*E[z_i]) / sum_i(E[z_i^2]).
-      sigma2 = standard per-feature residual-variance M-step (unchanged in form from
-               gaussian_block_factor's implicit one), floored at a small fraction of
-               the feature's own raw variance -- guards a real Heywood-case failure
-               mode confirmed on 1000-Genomes data (with the loading direction
-               partially fixed by the prior, the sigma2 M-step can still drive one
-               feature's residual variance toward 0 if `ell` happens to align
-               unusually well with it), the same role hierboost.spike_slab's
-               Inv-Gamma prior on sigma2 plays elsewhere in this codebase.
+      sigma2 = standard per-feature residual-variance M-step, floored at a small
+               fraction of the feature's own raw variance -- guards against a Heywood
+               case (the sigma2 M-step can drive one feature's residual variance
+               toward 0 if `ell` happens to align unusually well with it), the same
+               role hierboost.spike_slab's Inv-Gamma prior on sigma2 plays elsewhere.
       mu0    = dot(ell, w) -- least-squares fit of w against the unit vector ell.
       tau_c2 = mean((w - mu0*ell)^2) -- how much the data-fitted w actually deviates
                from the SAR shape, re-estimated every iteration so a genuinely
@@ -300,8 +267,7 @@ def sar_shrinkage_block_factor(X_block, coords, phi=None, n_em=100, min_var_frac
     per block, with the loading direction softly shrunk toward the SAR mechanism's
     ell(phi) instead of estimated purely empirically. Requires physical (or temporal/
     any metric-space) coordinates for the block's raw members, unlike
-    gaussian_block_factor. See this module's SAR-shrinkage section docstring above for
-    the mechanism, motivation, and validation.
+    gaussian_block_factor.
 
     `phi=None` (default): fit via profile likelihood (fit_phi_shrinkage). Pass a fixed
     value to skip that search (e.g. reusing a value already fit on a training fold).

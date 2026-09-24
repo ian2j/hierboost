@@ -351,11 +351,9 @@ def test_apply_supervised_block_factor_matches_fit_on_same_data():
 
 
 def test_sar_shrinkage_block_factor_beats_plain_ppca_when_truly_sar_shaped_at_small_n():
-    """The motivating case (see project memory 'spatial-ppca-sign-flip'): when a
-    block's true loading really does follow the SAR mechanism's distance-decay shape,
-    shrinking toward it should recover the shared factor better than gaussian_block_
-    factor's purely empirical eigenvector, especially at small n where the empirical
-    estimate is noisiest."""
+    """When a block's true loading really does follow the SAR mechanism's distance-
+    decay shape, shrinking toward it should recover the shared factor better than
+    gaussian_block_factor's purely empirical eigenvector, especially at small n."""
     m = 10
     coords = np.linspace(0, 9, m)
     # phi=0.8 keeps B's spectral radius well below 1 (the SAR fit's stable/convergent
@@ -380,15 +378,10 @@ def test_sar_shrinkage_block_factor_beats_plain_ppca_when_truly_sar_shaped_at_sm
 
 
 def test_sar_shrinkage_block_factor_handles_a_sign_flipped_feature():
-    """The actual bug this was built to fix: within its stable/convergent regime,
-    hierboost's SAR mechanism ell(phi) = (I-B(phi))^-1 @ 1 is entrywise non-negative,
-    so a HARD SAR-constrained loading cannot represent a feature anti-correlated with
-    the block's shared factor (an ordinary ref/alt allele-coding artifact in
-    genomics). Confirms the free-loading fix here recovers a loading of OPPOSITE sign
-    for that feature relative to the rest of the block -- the identifiable claim (a
-    factor model's overall sign is only determined up to a global flip, so checking an
-    absolute sign on one feature alone isn't meaningful; checking it disagrees with
-    the block's own majority sign is)."""
+    """A feature genuinely anti-correlated with its block's shared factor (e.g. an
+    allele-coding artifact) should get a loading of OPPOSITE sign from the rest of the
+    block. Checked relative to the block's own majority sign, not an absolute sign --
+    a factor model's overall sign is only identified up to a global flip."""
     m = 8
     coords = np.linspace(0, 7, m)
     ell_true = sar_loading_direction(coords, phi=0.8).copy()  # stable regime -- see test above
